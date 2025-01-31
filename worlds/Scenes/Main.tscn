@@ -32,6 +32,8 @@ func SpawnBiome(gPos:Vector2i, type:Biome.Type) -> void:
 	
 	Record_DiscoveredBiomes({gPos:Biome.Type.Earth});
 	
+	InGameDebugger.Say(str(gPos, \" : \", discoveredBiomes[gPos]), true);
+	
 func Instantiate_BiomeNode(type:Biome.Type) -> Node2D:
 	match type:
 		Biome.Type.Earth:
