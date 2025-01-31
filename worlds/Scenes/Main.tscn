@@ -17,7 +17,7 @@ func _ready() -> void:
 
 func Spawn_InitialBiomes() -> void:
 	SpawnBiome(Vector2i.ZERO, Biome.Type.Earth);
-	SpawnBiomes_3x3(Vector2i.ZERO);
+	SpawnRandomBiomes_3x3(Vector2i.ZERO);
 
 # Single Biome
 
@@ -45,7 +45,7 @@ func Record_DiscoveredBiomes(biomes:Dictionary) -> void:
 	
 # Multiple Biomes
 	
-func SpawnBiomes_3x3(gPos:Vector2i) -> void:
+func SpawnRandomBiomes_3x3(gPos:Vector2i) -> void:
 	
 	var surrounding = Get_GridPosArray3x3(gPos);
 	surrounding = Remove_Occupied(surrounding);
