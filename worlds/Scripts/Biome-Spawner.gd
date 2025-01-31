@@ -16,7 +16,7 @@ func SpawnBiome(gPos:Vector2i, type:Biome.Type) -> void:
 	biomeHolder.add_child(newBiome);
 	newBiome.position = gPos * World.cellSize;
 	
-	Record_DiscoveredBiomes({gPos:type});
+	Record_DiscoveredBiomes({gPos:newBiome});
 	
 	InGameDebugger.Say(str(gPos, " : ", discoveredBiomes[gPos]), true);
 	
