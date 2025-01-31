@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://cthwn85ucmned"]
+
+[ext_resource type="Texture2D" uid="uid://dk06eplgkeoi2" path="res://Sprites/Clack_Map_SpriteSheet_2048.png" id="1_jh4oi"]
+
+[node name="Grass-Biome" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_jh4oi")
+region_enabled = true
+region_rect = Rect2(768, 0, 256, 256)

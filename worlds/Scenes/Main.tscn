@@ -11,36 +11,30 @@ script/source = "extends Node;
 
 @export var biomeHolder:Node;
 
-@onready var earthBiome:PackedScene = preload(\"res://Prefabs/Earth-Biome.tscn\");
-
 var discoveredBiomes = {};
 
 func _ready() -> void:
 	Spawn_InitialBiomes();
 
 func Spawn_InitialBiomes() -> void:
-	SpawnBiome(Vector2i.ZERO, Biome.Type.Earth);
+	SpawnBiome(Vector2i.ZERO, Biome.Type.Grass);
 	SpawnRandomBiomes_3x3(Vector2i.ZERO);
 
 # Single Biome
 
 func SpawnBiome(gPos:Vector2i, type:Biome.Type) -> void:
 	
-	var newBiome = Instantiate_BiomeNode(type);		
+	var newBiome = Instantiate_BiomeNode(type);
+	
 	biomeHolder.add_child(newBiome);
 	newBiome.position = gPos * World.cellSize;
 	
-	Record_DiscoveredBiomes({gPos:Biome.Type.Earth});
+	Record_DiscoveredBiomes({gPos:type});
 	
 	InGameDebugger.Say(str(gPos, \" : \", discoveredBiomes[gPos]), true);
 	
 func Instantiate_BiomeNode(type:Biome.Type) -> Node2D:
-	match type:
-		Biome.Type.Earth:
-			return earthBiome.instantiate();
-			
-	InGameDebugger.Warn(\"Failed to Instantiate Biome.\");
-	return null;
+	return Biome.Get_BiomePrefab(type).instantiate();
 	
 func Record_DiscoveredBiomes(biomes:Dictionary) -> void:
 	for key in biomes.keys():
