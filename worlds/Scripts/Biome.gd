@@ -1,6 +1,6 @@
 extends Node;
 
-enum Type {Earth, Grass};
+enum Type {NULL, Earth, Grass};
 
 @onready var earthBiome:PackedScene = preload("res://Prefabs/Earth-Biome.tscn");
 @onready var grassBiome:PackedScene = preload("res://Prefabs/Grass-Biome.tscn");

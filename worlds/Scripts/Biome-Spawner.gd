@@ -2,8 +2,6 @@ extends Node;
 
 @export var biomeHolder:Node;
 
-var discoveredBiomes = {};
-
 func _ready() -> void:
 	get_parent().SpawnAround.connect(SpawnRandomBiomes_3x3);
 
@@ -16,16 +14,12 @@ func SpawnBiome(gPos:Vector2i, type:Biome.Type) -> void:
 	biomeHolder.add_child(newBiome);
 	newBiome.position = gPos * World.cellSize;
 	
-	Record_DiscoveredBiomes({gPos:newBiome});
+	World.Record_Biomes({gPos:newBiome});
 	
-	InGameDebugger.Say(str(gPos, " : ", discoveredBiomes[gPos]), true);
+	InGameDebugger.Say(str(gPos, " : ", World.Get_BiomeType(gPos)), true);
 	
 func Instantiate_BiomeNode(type:Biome.Type) -> Node2D:
 	return Biome.Get_BiomePrefab(type).instantiate();
-	
-func Record_DiscoveredBiomes(biomes:Dictionary) -> void:
-	for key in biomes.keys():
-		discoveredBiomes[key] = biomes.get(key);
 
 # Multiple Biomes
 	
@@ -47,6 +41,6 @@ func Get_GridPosArray3x3(gPos:Vector2i) -> Array:
 func Remove_Occupied(gPosArray:Array) -> Array:
 	var empties = [];
 	for gPos in gPosArray:
-		if !discoveredBiomes.has(gPos):
+		if !World.Is_Occupied(gPos):
 			empties.append(gPos);
 	return empties;
