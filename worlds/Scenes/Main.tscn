@@ -1,6 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://dpw5ih7gg3btv"]
+[gd_scene load_steps=6 format=3 uid="uid://dpw5ih7gg3btv"]
 
 [ext_resource type="Texture2D" uid="uid://dk06eplgkeoi2" path="res://Sprites/Clack_Map_SpriteSheet_2048.png" id="1_ntyhy"]
+[ext_resource type="Script" path="res://Scripts/Mover.gd" id="1_vinv6"]
+[ext_resource type="Script" path="res://Scripts/Player.gd" id="2_54uhw"]
+[ext_resource type="Script" path="res://Scripts/Button-Movement.gd" id="2_chx15"]
 
 [sub_resource type="GDScript" id="GDScript_1augw"]
 resource_name = "Biome-Spawner"
@@ -29,20 +32,18 @@ func SpawnBiome(gPos:Vector2i, type:Biome.Type) -> void:
 	
 	Record_DiscoveredBiomes({gPos:Biome.Type.Earth});
 	
-	InGameDebugger.Say(discoveredBiomes[gPos]);
-	
 func Instantiate_BiomeNode(type:Biome.Type) -> Node2D:
 	match type:
 		Biome.Type.Earth:
 			return earthBiome.instantiate();
 			
-	print(\"Failed to Instantiate Biome.\");
+	InGameDebugger.Warn(\"Failed to Instantiate Biome.\");
 	return null;
 	
 func Record_DiscoveredBiomes(biomes:Dictionary) -> void:
 	for key in biomes.keys():
 		discoveredBiomes[key] = biomes.get(key);
-	
+
 # Multiple Biomes
 	
 func SpawnRandomBiomes_3x3(gPos:Vector2i) -> void:
@@ -68,18 +69,27 @@ func Remove_Occupied(gPosArray:Array) -> Array:
 	return empties;
 "
 
-[node name="Node2D" type="Node2D"]
+[node name="World" type="Node2D"]
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(0.125, 0.125)
 
-[node name="Player" type="Node2D" parent="."]
+[node name="Mover" type="Node" parent="Camera2D" node_paths=PackedStringArray("master")]
+script = ExtResource("1_vinv6")
+master = NodePath("..")
+
+[node name="Player" type="Node2D" parent="." node_paths=PackedStringArray("camMover")]
 z_index = 1
+script = ExtResource("2_54uhw")
+camMover = NodePath("../Camera2D/Mover")
 
 [node name="Sprite2D" type="Sprite2D" parent="Player"]
 texture = ExtResource("1_ntyhy")
 region_enabled = true
 region_rect = Rect2(0, 1536, 256, 256)
+
+[node name="Button-Movement" type="Node" parent="Player"]
+script = ExtResource("2_chx15")
 
 [node name="Biome-Holder" type="Node" parent="." node_paths=PackedStringArray("biomeHolder")]
 script = SubResource("GDScript_1augw")
