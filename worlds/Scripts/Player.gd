@@ -5,17 +5,18 @@ extends Node2D;
 
 @export var camMover:Node;
 
-var currGridPos := Vector2i(0,0);
+var initGridPos := Vector2i(0,0);
+var currGridPos:Vector2i;
 
 signal SpawnAround(pos);
 
 func _ready() -> void:
+	currGridPos = initGridPos;
 	Spawn_InitialBiomes();
 
 func _process(_delta: float) -> void:
 	
 	# Check Directional Input
-	
 	var inputDir:Vector2i = buttonMovement.Get_InputDirection();
 	
 	if inputDir == Vector2i(0,0):
@@ -24,6 +25,7 @@ func _process(_delta: float) -> void:
 	# Update Current Grid Position
 	currGridPos += inputDir;
 	
+	# Spawn Biomes around new position
 	SpawnAround.emit(currGridPos);
 	
 	var targPos = position + Vector2(inputDir) * World.cellSize;
@@ -35,5 +37,5 @@ func _process(_delta: float) -> void:
 	camMover.StartMove(targPos);
 
 func Spawn_InitialBiomes() -> void:
-	biomeSpawner.SpawnBiome(Vector2i(0,0), Biome.Type.Grass);
+	biomeSpawner.SpawnBiome(currGridPos, Biome.Type.Grass);
 	biomeSpawner.SpawnRandomBiomes_3x3(Vector2i(0,0));

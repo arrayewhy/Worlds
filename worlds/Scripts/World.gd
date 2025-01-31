@@ -17,7 +17,6 @@ func Get_BiomeNode(gPos:Vector2i) -> Node:
 		return discoveredBiomes[gPos];
 	
 	InGameDebugger.Warn(str("Biome NOT found: ", gPos));
-	
 	return null;
 
 func Get_BiomeType(gPos:Vector2i) -> Biome.Type:
@@ -26,5 +25,4 @@ func Get_BiomeType(gPos:Vector2i) -> Biome.Type:
 		return discoveredBiomes[gPos].type;
 	
 	InGameDebugger.Warn(str("Biome NOT found: ", gPos));
-	
 	return Biome.Type.NULL;
