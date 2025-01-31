@@ -1,0 +1,86 @@
+[gd_scene load_steps=3 format=3 uid="uid://dpw5ih7gg3btv"]
+
+[ext_resource type="Texture2D" uid="uid://dk06eplgkeoi2" path="res://Sprites/Clack_Map_SpriteSheet_2048.png" id="1_ntyhy"]
+
+[sub_resource type="GDScript" id="GDScript_1augw"]
+resource_name = "Biome-Spawner"
+script/source = "extends Node;
+
+@export var biomeHolder:Node;
+
+@onready var earthBiome:PackedScene = preload(\"res://Prefabs/Earth-Biome.tscn\");
+
+var discoveredBiomes = {};
+
+func _ready() -> void:
+	Spawn_InitialBiomes();
+
+func Spawn_InitialBiomes() -> void:
+	SpawnBiome(Vector2i.ZERO, Biome.Type.Earth);
+	SpawnBiomes_3x3(Vector2i.ZERO);
+
+# Single Biome
+
+func SpawnBiome(gPos:Vector2i, type:Biome.Type) -> void:
+	
+	var newBiome = Instantiate_BiomeNode(type);		
+	biomeHolder.add_child(newBiome);
+	newBiome.position = gPos * World.cellSize;
+	
+	Record_DiscoveredBiomes({gPos:Biome.Type.Earth});
+	
+	InGameDebugger.Say(discoveredBiomes[gPos]);
+	
+func Instantiate_BiomeNode(type:Biome.Type) -> Node2D:
+	match type:
+		Biome.Type.Earth:
+			return earthBiome.instantiate();
+			
+	print(\"Failed to Instantiate Biome.\");
+	return null;
+	
+func Record_DiscoveredBiomes(biomes:Dictionary) -> void:
+	for key in biomes.keys():
+		discoveredBiomes[key] = biomes.get(key);
+	
+# Multiple Biomes
+	
+func SpawnBiomes_3x3(gPos:Vector2i) -> void:
+	
+	var surrounding = Get_GridPosArray3x3(gPos);
+	surrounding = Remove_Occupied(surrounding);
+	
+	for e in surrounding:
+		SpawnBiome(e, Biome.Type.Earth);
+	
+func Get_GridPosArray3x3(gPos:Vector2i) -> Array:
+	return [
+		gPos + Vector2i(-1,-1), gPos + Vector2i.UP, gPos + Vector2i(1,-1),
+		gPos + Vector2i.LEFT, gPos + Vector2i.RIGHT,
+		gPos + Vector2i(-1,1), gPos + Vector2i.DOWN, gPos + Vector2i(1,1),
+		];
+
+func Remove_Occupied(gPosArray:Array) -> Array:
+	var empties = [];
+	for gPos in gPosArray:
+		if !discoveredBiomes.has(gPos):
+			empties.append(gPos);
+	return empties;
+"
+
+[node name="Node2D" type="Node2D"]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(0.125, 0.125)
+
+[node name="Player" type="Node2D" parent="."]
+z_index = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="Player"]
+texture = ExtResource("1_ntyhy")
+region_enabled = true
+region_rect = Rect2(0, 1536, 256, 256)
+
+[node name="Biome-Holder" type="Node" parent="." node_paths=PackedStringArray("biomeHolder")]
+script = SubResource("GDScript_1augw")
+biomeHolder = NodePath(".")
