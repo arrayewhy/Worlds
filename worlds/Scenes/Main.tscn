@@ -4,66 +4,7 @@
 [ext_resource type="Script" path="res://Scripts/Mover.gd" id="1_vinv6"]
 [ext_resource type="Script" path="res://Scripts/Player.gd" id="2_54uhw"]
 [ext_resource type="Script" path="res://Scripts/Button-Movement.gd" id="2_chx15"]
-
-[sub_resource type="GDScript" id="GDScript_1augw"]
-resource_name = "Biome-Spawner"
-script/source = "extends Node;
-
-@export var biomeHolder:Node;
-
-var discoveredBiomes = {};
-
-func _ready() -> void:
-	Spawn_InitialBiomes();
-
-func Spawn_InitialBiomes() -> void:
-	SpawnBiome(Vector2i.ZERO, Biome.Type.Grass);
-	SpawnRandomBiomes_3x3(Vector2i.ZERO);
-
-# Single Biome
-
-func SpawnBiome(gPos:Vector2i, type:Biome.Type) -> void:
-	
-	var newBiome = Instantiate_BiomeNode(type);
-	
-	biomeHolder.add_child(newBiome);
-	newBiome.position = gPos * World.cellSize;
-	
-	Record_DiscoveredBiomes({gPos:type});
-	
-	InGameDebugger.Say(str(gPos, \" : \", discoveredBiomes[gPos]), true);
-	
-func Instantiate_BiomeNode(type:Biome.Type) -> Node2D:
-	return Biome.Get_BiomePrefab(type).instantiate();
-	
-func Record_DiscoveredBiomes(biomes:Dictionary) -> void:
-	for key in biomes.keys():
-		discoveredBiomes[key] = biomes.get(key);
-
-# Multiple Biomes
-	
-func SpawnRandomBiomes_3x3(gPos:Vector2i) -> void:
-	
-	var surrounding = Get_GridPosArray3x3(gPos);
-	surrounding = Remove_Occupied(surrounding);
-	
-	for e in surrounding:
-		SpawnBiome(e, Biome.Type.Earth);
-	
-func Get_GridPosArray3x3(gPos:Vector2i) -> Array:
-	return [
-		gPos + Vector2i(-1,-1), gPos + Vector2i.UP, gPos + Vector2i(1,-1),
-		gPos + Vector2i.LEFT, gPos + Vector2i.RIGHT,
-		gPos + Vector2i(-1,1), gPos + Vector2i.DOWN, gPos + Vector2i(1,1),
-		];
-
-func Remove_Occupied(gPosArray:Array) -> Array:
-	var empties = [];
-	for gPos in gPosArray:
-		if !discoveredBiomes.has(gPos):
-			empties.append(gPos);
-	return empties;
-"
+[ext_resource type="Script" path="res://Scripts/Biome-Spawner.gd" id="5_nwltf"]
 
 [node name="World" type="Node2D"]
 
@@ -87,6 +28,8 @@ region_rect = Rect2(0, 1536, 256, 256)
 [node name="Button-Movement" type="Node" parent="Player"]
 script = ExtResource("2_chx15")
 
-[node name="Biome-Holder" type="Node" parent="." node_paths=PackedStringArray("biomeHolder")]
-script = SubResource("GDScript_1augw")
-biomeHolder = NodePath(".")
+[node name="Biome-Spawner" type="Node" parent="Player" node_paths=PackedStringArray("biomeHolder")]
+script = ExtResource("5_nwltf")
+biomeHolder = NodePath("../../Biome-Holder")
+
+[node name="Biome-Holder" type="Node" parent="."]
