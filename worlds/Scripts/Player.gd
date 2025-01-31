@@ -13,12 +13,10 @@ func _process(_delta: float) -> void:
 	if inputDir == Vector2(0,0):
 		return;
 	
-	# Move Player
-	
 	var targPos = position + inputDir * World.cellSize;
 	
+	# Move Player
 	position = targPos;
 	
 	# Move Camera
-	
 	camMover.StartMove(targPos);
