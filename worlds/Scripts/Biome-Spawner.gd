@@ -12,7 +12,11 @@ func SpawnBiome(gPos:Vector2i, type:Biome.Type) -> void:
 	var newBiome = Instantiate_BiomeNode(type);
 	
 	biomeHolder.add_child(newBiome);
-	newBiome.position = gPos * World.cellSize;
+	# Position New Biome in World Space
+	var newPos:Vector2 = Vector2(gPos) * World.cellSize;
+	# Randomise position slightly
+	newPos += Vector2(randf_range(-8, 8), randf_range(-8, 8));
+	newBiome.position = newPos;
 	
 	World.Record_Biomes({gPos:newBiome});
 	
