@@ -15,6 +15,8 @@ const speed:float = 100;
 
 var showing:bool;
 
+signal HideDone;
+
 func _ready() -> void:
 	
 	initTopPos = topBar.position;
@@ -41,6 +43,7 @@ func _process(delta: float) -> void:
 		Hide_Bars(speed * delta);
 		if All_Hidden():
 			InGameDebugger.Say("Black-Bars: Hidden");
+			HideDone.emit();
 			set_process(false);
 
 func Show() -> void:
