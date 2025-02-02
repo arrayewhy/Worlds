@@ -6,9 +6,9 @@ extends CanvasLayer;
 var showing:bool;
 
 func _ready() -> void:
-	Hide_CanvLayer();
+	self.hide();
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("Enter"):
 		if !showing:
 			showing = true;
@@ -23,7 +23,8 @@ func Show_Illums() -> void:
 		show();
 	illumFader.FadeToOpaque(.5);
 	blackBars.Show();
-	blackBars.HideDone.connect(Hide_CanvLayer);
+	if !blackBars.HideDone.is_connected(Hide_CanvLayer):
+		blackBars.HideDone.connect(Hide_CanvLayer);
 	
 func Hide_Illums() -> void:
 	illumFader.FadeToTrans(8);
@@ -31,3 +32,4 @@ func Hide_Illums() -> void:
 
 func Hide_CanvLayer() -> void:
 	self.hide();
+	blackBars.HideDone.disconnect(Hide_CanvLayer);
