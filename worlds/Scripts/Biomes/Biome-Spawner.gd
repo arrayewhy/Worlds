@@ -33,22 +33,53 @@ func Instantiate_BiomeNode(type:BiomeMaster.Type) -> Node2D:
 # Multiple Biomes
 	
 func SpawnRandomBiomes_3x3(gPos:Vector2i) -> void:
-	var surroundingPos = Get_GridPosArray3x3(gPos);
-	surroundingPos = Remove_Occupied(surroundingPos);
-	for e in surroundingPos:
+	var surrounding_GPos = Get_GridPosArray3x3(gPos);
+	# Remove Empty Positions in case we are at the World Edge
+	surrounding_GPos = Get_EmptyGridPositions(surrounding_GPos);
+	for e in surrounding_GPos:
 		SpawnRandomBiome(e);
 		#SpawnBiome(e, BiomeMaster.Type.Earth);
 	
-func Get_GridPosArray3x3(gPos:Vector2i) -> Array:
-	return [
-		gPos + Vector2i(-1,-1), gPos + Vector2i.UP, gPos + Vector2i(1,-1),
-		gPos + Vector2i.LEFT, gPos + Vector2i.RIGHT,
-		gPos + Vector2i(-1,1), gPos + Vector2i.DOWN, gPos + Vector2i(1,1),
-		];
+func Get_GridPosArray3x3(gPos:Vector2i, includeCenter:bool = false) -> Array[Vector2i]:
+	var array:Array[Vector2i];
+	if includeCenter:
+		array.push_back(gPos);
+	array.append_array(
+		[gPos + Vector2i(-1,-1), # Top Left
+		gPos + Vector2i.UP, 
+		gPos + Vector2i(1,-1), # Top Right
+		gPos + Vector2i.LEFT, 
+		gPos + Vector2i.RIGHT,
+		gPos + Vector2i(-1,1), # Bottom Left
+		gPos + Vector2i.DOWN, 
+		gPos + Vector2i(1,1)] # Bottom Right
+		);
+	return array;
 
-func Remove_Occupied(gPosArray:Array) -> Array:
-	var empties = [];
+func Get_EmptyGridPositions(gPosArray:Array[Vector2i]) -> Array[Vector2i]:
+	var empties:Array[Vector2i] = [];
 	for gPos in gPosArray:
 		if !World.Is_Occupied(gPos):
 			empties.append(gPos);
 	return empties;
+	
+func Get_OccupiedGridPositions(gPosArray:Array[Vector2i]) -> Array[Vector2i]:
+	var occupied:Array[Vector2i] = [];
+	for gPos in gPosArray:
+		if World.Is_Occupied(gPos):
+			occupied.append(gPos);
+	return occupied;
+
+func Get_BiomeTypesAround(gPos:Vector2i) -> Array[Dictionary]:
+	var surrounding_GPos:Array[Vector2i] = Get_GridPosArray3x3(gPos, true);
+	# Remove Empty Positions in case we are at the World Edge
+	surrounding_GPos = Get_OccupiedGridPositions(surrounding_GPos);
+	
+	var influences:Array[Dictionary];
+	
+	for p in surrounding_GPos:
+		influences.append({ p : World.Get_BiomeType(p) });
+		
+	#InGameDebugger.Say(influences);
+	
+	return influences;
