@@ -46,6 +46,7 @@ biomeHolder = NodePath("../../Biome-Holder")
 [node name="Biome-Holder" type="Node" parent="."]
 
 [node name="Illuminations-Layer" type="CanvasLayer" parent="."]
+visible = false
 script = ExtResource("6_ljcja")
 
 [node name="Illumination-Spawner" type="Node2D" parent="Illuminations-Layer"]

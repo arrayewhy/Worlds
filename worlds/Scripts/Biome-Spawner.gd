@@ -18,7 +18,7 @@ func SpawnBiome(gPos:Vector2i, type:Biome.Type) -> void:
 	newPos += Vector2(randf_range(-8, 8), randf_range(-8, 8));
 	newBiome.position = newPos;
 	
-	World.Record_Biomes({gPos:newBiome});
+	World.Record_Biome(gPos, newBiome, type);
 	
 	InGameDebugger.Say(str(gPos, " : ", World.Get_BiomeType(gPos)), true);
 	
