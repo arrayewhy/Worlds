@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://dau0b5fcbsdk8"]
 
 [ext_resource type="Texture2D" uid="uid://dk06eplgkeoi2" path="res://Sprites/Clack_Map_SpriteSheet_2048.png" id="1_xo1b3"]
-[ext_resource type="Script" path="res://Scripts/Illumination.gd" id="2_qfwv1"]
+[ext_resource type="Script" path="res://Scripts/UI/Illumination.gd" id="2_qfwv1"]
 
 [node name="Illumination" type="Sprite2D"]
 position = Vector2(24, 24)

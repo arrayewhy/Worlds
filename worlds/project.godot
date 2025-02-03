@@ -16,9 +16,9 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-Biome="*res://Scripts/Biome.gd"
-World="*res://Scripts/World.gd"
-InGameDebugger="*res://Scripts/InGameDebugger.gd"
+Biome="*res://Scripts/Autoloads/Biome.gd"
+World="*res://Scripts/Autoloads/World.gd"
+InGameDebugger="*res://Scripts/Debug/InGameDebugger.gd"
 
 [display]
 

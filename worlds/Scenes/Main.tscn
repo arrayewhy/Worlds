@@ -4,12 +4,12 @@
 [ext_resource type="Script" path="res://Scripts/Mover.gd" id="1_vinv6"]
 [ext_resource type="Script" path="res://Scripts/Player.gd" id="2_54uhw"]
 [ext_resource type="Script" path="res://Scripts/Button-Movement.gd" id="2_chx15"]
-[ext_resource type="Script" path="res://Scripts/Biome-Spawner.gd" id="5_nwltf"]
+[ext_resource type="Script" path="res://Scripts/Biomes/Biome-Spawner.gd" id="5_nwltf"]
 [ext_resource type="PackedScene" uid="uid://dau0b5fcbsdk8" path="res://Prefabs/Illumination.tscn" id="6_2cew8"]
-[ext_resource type="Script" path="res://Scripts/Illuminations-Handler.gd" id="6_ljcja"]
-[ext_resource type="Script" path="res://Scripts/Illumination-Spawner.gd" id="7_rmeg4"]
+[ext_resource type="Script" path="res://Scripts/UI/Illuminations-Handler.gd" id="6_ljcja"]
+[ext_resource type="Script" path="res://Scripts/UI/Illumination-Spawner.gd" id="7_rmeg4"]
 [ext_resource type="Script" path="res://Scripts/Fader.gd" id="8_u5mxs"]
-[ext_resource type="Script" path="res://Scripts/Black-Bars.gd" id="8_umww4"]
+[ext_resource type="Script" path="res://Scripts/UI/Black-Bars.gd" id="8_umww4"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_bu5ns"]
 size = Vector2(1920, 48)
