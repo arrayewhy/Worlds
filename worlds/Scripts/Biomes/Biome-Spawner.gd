@@ -23,7 +23,7 @@ func SpawnBiome(gPos:Vector2i, type:BiomeMaster.Type, interType:InteractionMaste
 	InGameDebugger.Say(str(gPos, " : ", World.Get_BiomeType(gPos), ", ", World.Get_InteractionType(gPos)), true);
 	
 func SpawnRandomBiome(gPos:Vector2i, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
-	SpawnBiome(gPos, 3, interType);
+	SpawnBiome(gPos, BiomeMaster.RandomBiomeType(), interType);
 	
 func Instantiate_BiomeNode(type:BiomeMaster.Type) -> Node2D:
 	var newBiome:Object = biomePrefab.instantiate();
