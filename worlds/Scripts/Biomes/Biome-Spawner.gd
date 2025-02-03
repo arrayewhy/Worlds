@@ -10,23 +10,20 @@ func _ready() -> void:
 # Single Biome
 
 func SpawnBiome(gPos:Vector2i, type:BiomeMaster.Type, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
-	
 	var newBiome = Instantiate_BiomeNode(type);
-	
 	biomeHolder.add_child(newBiome);
 	# Position New Biome in World Space
 	var newPos:Vector2 = Vector2(gPos) * World.cellSize;
 	# Randomise position slightly
-	newPos += Vector2(randf_range(-8, 8), randf_range(-8, 8));
+	newPos += Vector2(randf_range(-6, 6), randf_range(-6, 6));
 	newBiome.position = newPos;
-	
 	newBiome.Set_Interaction(interType);
-	
 	World.Record_Biome(gPos, newBiome, type, interType);
-	
 	# Debug Message
-	
 	InGameDebugger.Say(str(gPos, " : ", World.Get_BiomeType(gPos), ", ", World.Get_InteractionType(gPos)), true);
+	
+func SpawnRandomBiome(gPos:Vector2i, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
+	SpawnBiome(gPos, 3, interType);
 	
 func Instantiate_BiomeNode(type:BiomeMaster.Type) -> Node2D:
 	var newBiome:Object = biomePrefab.instantiate();
@@ -36,12 +33,11 @@ func Instantiate_BiomeNode(type:BiomeMaster.Type) -> Node2D:
 # Multiple Biomes
 	
 func SpawnRandomBiomes_3x3(gPos:Vector2i) -> void:
-	
-	var surrounding = Get_GridPosArray3x3(gPos);
-	surrounding = Remove_Occupied(surrounding);
-	
-	for e in surrounding:
-		SpawnBiome(e, BiomeMaster.Type.Earth);
+	var surroundingPos = Get_GridPosArray3x3(gPos);
+	surroundingPos = Remove_Occupied(surroundingPos);
+	for e in surroundingPos:
+		SpawnRandomBiome(e);
+		#SpawnBiome(e, BiomeMaster.Type.Earth);
 	
 func Get_GridPosArray3x3(gPos:Vector2i) -> Array:
 	return [
