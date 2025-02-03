@@ -4,9 +4,6 @@ var biomeSprite:Sprite2D;
 
 @export var type:BiomeMaster.Type;
 
-func _ready() -> void:
-	print("ready");
-
 func Initialise(biomeType:BiomeMaster.Type) -> void:
 	
 	biomeSprite = $Sprite2D;

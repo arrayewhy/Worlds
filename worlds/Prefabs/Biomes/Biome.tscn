@@ -9,4 +9,4 @@ script = ExtResource("1_hkqds")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_xqfes")
 region_enabled = true
-region_rect = Rect2(512, 0, 256, 256)
+region_rect = Rect2(2048, 0, 256, 256)
