@@ -12,8 +12,16 @@ var sprite:Sprite2D;
 var currInteraction:InteractionMaster.Type;
 
 func Set_Interaction(interType:InteractionMaster.Type) -> void:
+	
 	currInteraction = interType;
-	sprite = $\"Interaction-Sprite\";
+	
+	if !sprite:
+		sprite = $\"Interaction-Sprite\";
+		
+	if interType == InteractionMaster.Type.NULL:
+		sprite.hide();
+		return;
+		
 	sprite.show();
 "
 
@@ -29,7 +37,6 @@ region_rect = Rect2(2048, 0, 256, 256)
 script = SubResource("GDScript_03sd1")
 
 [node name="Interaction-Sprite" type="Sprite2D" parent="Interaction-Spawner"]
-visible = false
 z_index = 1
 texture = ExtResource("2_xqfes")
 region_enabled = true
