@@ -1,4 +1,4 @@
-extends Node;
+extends Node2D;
 
 var biomeSprite:Sprite2D;
 var interactionSpawner:Node;
@@ -9,6 +9,10 @@ func Initialise(biomeType:BiomeMaster.Type) -> void:
 	
 	if !biomeSprite:
 		biomeSprite = $"Biome-Sprite";
+	
+	# A bit of Visual Styling
+	self.rotate(randf_range(-.05, .05));
+	biomeSprite.modulate.v = randf_range(.9, 1);
 	
 	match biomeType:
 		BiomeMaster.Type.Earth:
