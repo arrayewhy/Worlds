@@ -1,12 +1,14 @@
 extends Node;
 
 var biomeSprite:Sprite2D;
+var interactionSpawner:Node;
 
-@export var type:BiomeMaster.Type;
+var type:BiomeMaster.Type;
 
 func Initialise(biomeType:BiomeMaster.Type) -> void:
 	
-	biomeSprite = $Sprite2D;
+	if !biomeSprite:
+		biomeSprite = $"Biome-Sprite";
 	
 	match biomeType:
 		BiomeMaster.Type.Earth:
@@ -29,3 +31,8 @@ func Prep_Grass() -> void:
 func Prep_Water() -> void:
 	type = BiomeMaster.Type.Water;
 	biomeSprite.region_rect.position = Vector2i(0, 0);
+
+func Set_Interaction(interType:InteractionMaster.Type) -> void:
+	if !interactionSpawner:
+		interactionSpawner = $"Interaction-Spawner";
+	interactionSpawner.Set_Interaction(interType);

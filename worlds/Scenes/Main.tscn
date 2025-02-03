@@ -27,7 +27,7 @@ script = ExtResource("1_vinv6")
 master = NodePath("..")
 
 [node name="Player" type="Node2D" parent="." node_paths=PackedStringArray("camMover")]
-z_index = 1
+z_index = 100
 script = ExtResource("2_54uhw")
 camMover = NodePath("../Camera2D/Mover")
 

@@ -9,7 +9,7 @@ func _ready() -> void:
 
 # Single Biome
 
-func SpawnBiome(gPos:Vector2i, type:BiomeMaster.Type) -> void:
+func SpawnBiome(gPos:Vector2i, type:BiomeMaster.Type, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
 	
 	var newBiome = Instantiate_BiomeNode(type);
 	
@@ -20,9 +20,17 @@ func SpawnBiome(gPos:Vector2i, type:BiomeMaster.Type) -> void:
 	newPos += Vector2(randf_range(-8, 8), randf_range(-8, 8));
 	newBiome.position = newPos;
 	
-	World.Record_Biome(gPos, newBiome, type);
+	if interType != InteractionMaster.Type.NULL:
+		newBiome.Set_Interaction(interType);
 	
-	InGameDebugger.Say(str(gPos, " : ", World.Get_BiomeType(gPos)), true);
+	World.Record_Biome(gPos, newBiome, type, interType);
+	
+	# Debug Message
+	
+	if interType == InteractionMaster.Type.NULL:
+		InGameDebugger.Say(str(gPos, " : ", World.Get_BiomeType(gPos)), true);
+	else:
+		InGameDebugger.Say(str(gPos, " : ", World.Get_BiomeType(gPos), ", ", World.Get_InteractionType(gPos)), true);
 	
 func Instantiate_BiomeNode(type:BiomeMaster.Type) -> Node2D:
 	var newBiome:Object = biomePrefab.instantiate();
