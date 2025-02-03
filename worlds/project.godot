@@ -11,12 +11,13 @@ config_version=5
 [application]
 
 config/name="Worlds"
+run/main_scene="res://Scenes/Main.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
 
-Biome="*res://Scripts/Autoloads/Biome.gd"
+BiomeMaster="*res://Scripts/Autoloads/Biome-Master.gd"
 World="*res://Scripts/Autoloads/World.gd"
 InGameDebugger="*res://Scripts/Debug/InGameDebugger.gd"
 

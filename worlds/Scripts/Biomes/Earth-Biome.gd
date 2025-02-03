@@ -1,3 +1,3 @@
 extends Node2D;
 
-const type := Biome.Type.Earth;
+const type := BiomeMaster.Type.Earth;

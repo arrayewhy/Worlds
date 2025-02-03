@@ -2,8 +2,8 @@ extends Node;
 
 enum Type {NULL, Earth, Grass};
 
-@onready var earthBiome:PackedScene = preload("res://Prefabs/Earth-Biome.tscn");
-@onready var grassBiome:PackedScene = preload("res://Prefabs/Grass-Biome.tscn");
+@onready var earthBiome:PackedScene = preload("res://Prefabs/Biomes/Earth-Biome.tscn");
+@onready var grassBiome:PackedScene = preload("res://Prefabs/Biomes/Grass-Biome.tscn");
 
 func Get_BiomePrefab(type:Type) -> PackedScene:
 	

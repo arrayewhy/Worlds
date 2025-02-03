@@ -7,7 +7,7 @@ func _ready() -> void:
 
 # Single Biome
 
-func SpawnBiome(gPos:Vector2i, type:Biome.Type) -> void:
+func SpawnBiome(gPos:Vector2i, type:BiomeMaster.Type) -> void:
 	
 	var newBiome = Instantiate_BiomeNode(type);
 	
@@ -22,8 +22,8 @@ func SpawnBiome(gPos:Vector2i, type:Biome.Type) -> void:
 	
 	InGameDebugger.Say(str(gPos, " : ", World.Get_BiomeType(gPos)), true);
 	
-func Instantiate_BiomeNode(type:Biome.Type) -> Node2D:
-	return Biome.Get_BiomePrefab(type).instantiate();
+func Instantiate_BiomeNode(type:BiomeMaster.Type) -> Node2D:
+	return BiomeMaster.Get_BiomePrefab(type).instantiate();
 
 # Multiple Biomes
 	
@@ -33,7 +33,7 @@ func SpawnRandomBiomes_3x3(gPos:Vector2i) -> void:
 	surrounding = Remove_Occupied(surrounding);
 	
 	for e in surrounding:
-		SpawnBiome(e, Biome.Type.Earth);
+		SpawnBiome(e, BiomeMaster.Type.Earth);
 	
 func Get_GridPosArray3x3(gPos:Vector2i) -> Array:
 	return [

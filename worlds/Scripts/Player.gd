@@ -37,5 +37,5 @@ func _process(_delta: float) -> void:
 	camMover.StartMove(targPos);
 
 func Spawn_InitialBiomes() -> void:
-	biomeSpawner.SpawnBiome(currGridPos, Biome.Type.Grass);
+	biomeSpawner.SpawnBiome(currGridPos, BiomeMaster.Type.Grass);
 	biomeSpawner.SpawnRandomBiomes_3x3(Vector2i(0,0));
