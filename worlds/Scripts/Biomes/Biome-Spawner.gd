@@ -1,5 +1,7 @@
 extends Node;
 
+@onready var biomePrefab:PackedScene = preload("res://Prefabs/Biomes/Biome.tscn");
+
 @export var biomeHolder:Node;
 
 func _ready() -> void:
@@ -23,7 +25,9 @@ func SpawnBiome(gPos:Vector2i, type:BiomeMaster.Type) -> void:
 	InGameDebugger.Say(str(gPos, " : ", World.Get_BiomeType(gPos)), true);
 	
 func Instantiate_BiomeNode(type:BiomeMaster.Type) -> Node2D:
-	return BiomeMaster.Get_BiomePrefab(type).instantiate();
+	var newBiome:Object = biomePrefab.instantiate();
+	newBiome.Initialise(type);
+	return newBiome;
 
 # Multiple Biomes
 	
