@@ -4,6 +4,8 @@ var debugCanvLay:CanvasLayer;
 var overlays:Array;
 var textSize:int = 20;
 
+var active:bool = false;
+
 func _ready() -> void:
 	
 	# Init Canvas Layer
@@ -18,9 +20,13 @@ func _ready() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("Tilde"):
+		active = !active;
 		debugCanvLay.set_visible(!debugCanvLay.is_visible());
 
 func Add_Text(overlayIndex:int, val:String, withTime:bool = false) -> void:
+	
+	if !active:
+		return;
 	
 	var currOverlay = GetOverlay(overlayIndex);
 	
