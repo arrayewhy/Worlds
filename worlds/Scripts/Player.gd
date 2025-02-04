@@ -8,7 +8,7 @@ extends Node2D;
 var initGridPos := Vector2i(0,0);
 var currGridPos:Vector2i;
 
-signal SpawnAround(pos);
+signal SpawnAround(currGPos, prevGPos);
 
 func _ready() -> void:
 	currGridPos = initGridPos;
@@ -25,11 +25,13 @@ func _process(_delta: float) -> void:
 	if inputDir == Vector2i(0,0):
 		return;
 	
+	var prevGridPos = currGridPos;
+	
 	# Update Current Grid Position
 	currGridPos += inputDir;
 	
 	# Spawn Biomes around new position
-	SpawnAround.emit(currGridPos);
+	SpawnAround.emit(currGridPos, prevGridPos);
 	
 	var targPos = position + Vector2(inputDir) * World.cellSize;
 	

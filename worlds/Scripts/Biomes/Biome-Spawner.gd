@@ -5,7 +5,7 @@ extends Node;
 @export var biomeHolder:Node;
 
 func _ready() -> void:
-	get_parent().SpawnAround.connect(SpawnRandomBiomes_3x3);
+	get_parent().SpawnAround.connect(SpawnRandomBiomes_3x3_Influenced);
 
 # Single Biome
 
@@ -33,12 +33,36 @@ func Instantiate_BiomeNode(type:BiomeMaster.Type) -> Node2D:
 # Multiple Biomes
 	
 func SpawnRandomBiomes_3x3(gPos:Vector2i) -> void:
-	var surrounding_GPos = Get_GridPosArray3x3(gPos);
-	# Remove Empty Positions in case we are at the World Edge
-	surrounding_GPos = Get_EmptyGridPositions(surrounding_GPos);
-	for e in surrounding_GPos:
+	var empties:Array[Vector2i] = Get_SurroundingEmpties(gPos);
+	
+	if empties.size() == 0:
+		return;
+	
+	for e in empties:
 		SpawnRandomBiome(e);
-		#SpawnBiome(e, BiomeMaster.Type.Earth);
+		
+	#InGameDebugger.Say(""); # Add space between the last debug message and the next one.
+		
+func SpawnRandomBiomes_3x3_Influenced(currGPos:Vector2i, prevGPos:Vector2i) -> void:
+	
+	var empties:Array[Vector2i] = Get_SurroundingEmpties(currGPos);
+	
+	if empties.size() == 0:
+		return;
+	
+	var influences:Array[Array] = Get_BiomeTypesAround(prevGPos);
+	
+	for e in empties:
+		for i in influences:
+			if Are_GridPosNeighbours(e, i[0]):
+				SpawnBiome(e, i[1]);
+	
+	InGameDebugger.Say(""); # Add space between the last debug message and the next one.
+	
+func Get_SurroundingEmpties(gPos:Vector2i) -> Array[Vector2i]:
+	var surrounding_GPos:Array[Vector2i] = Get_GridPosArray3x3(gPos);
+	# Remove Empty Positions in case we are at the World Edge
+	return Get_EmptyGridPositions(surrounding_GPos);
 	
 func Get_GridPosArray3x3(gPos:Vector2i, includeCenter:bool = false) -> Array[Vector2i]:
 	var array:Array[Vector2i];
@@ -78,22 +102,21 @@ func Get_BiomeTypesAround(gPos:Vector2i) -> Array[Array]:
 	# Remove Empty Positions in case we are at the World Edge
 	surrounding_GPos = Get_OccupiedGridPositions(surrounding_GPos);
 	
-	# An Array where each element contains a Grid Pos and Biome Type
-	var influences:Array[Array];
+	var influences:Array[Array]; # Array[Grid Pos, Biome Type]
 	
 	for p in surrounding_GPos:
 		influences.append([p, World.Get_BiomeType(p)]);
 		
 	# Debug Message
 		
-	var message:String;
-		
-	for i in influences.size():
-		if i == 4:
-			message += "PLAYER";
-		message += str("GridPos: ", influences[i][0], ", Biome: ", influences[i][1], " | ");
-		
-	InGameDebugger.Say(message);
+	#var message:String;
+		#
+	#for i in influences.size():
+		#if i == 4:
+			#message += "PLAYER";
+		#message += str("GridPos: ", influences[i][0], ", Biome: ", influences[i][1], " | ");
+		#
+	#InGameDebugger.Say(message);
 	
 	return influences;
 	
