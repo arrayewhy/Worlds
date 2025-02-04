@@ -42,13 +42,16 @@ func SpawnRandomBiomes_3x3(gPos:Vector2i) -> void:
 	
 func Get_GridPosArray3x3(gPos:Vector2i, includeCenter:bool = false) -> Array[Vector2i]:
 	var array:Array[Vector2i];
-	if includeCenter:
-		array.push_back(gPos);
 	array.append_array(
 		[gPos + Vector2i(-1,-1), # Top Left
 		gPos + Vector2i.UP, 
 		gPos + Vector2i(1,-1), # Top Right
-		gPos + Vector2i.LEFT, 
+		gPos + Vector2i.LEFT]
+		);
+	if includeCenter:
+		array.push_back(gPos);
+	array.append_array(
+		[
 		gPos + Vector2i.RIGHT,
 		gPos + Vector2i(-1,1), # Bottom Left
 		gPos + Vector2i.DOWN, 
@@ -70,16 +73,37 @@ func Get_OccupiedGridPositions(gPosArray:Array[Vector2i]) -> Array[Vector2i]:
 			occupied.append(gPos);
 	return occupied;
 
-func Get_BiomeTypesAround(gPos:Vector2i) -> Array[Dictionary]:
+func Get_BiomeTypesAround(gPos:Vector2i) -> Array[Array]:
 	var surrounding_GPos:Array[Vector2i] = Get_GridPosArray3x3(gPos, true);
 	# Remove Empty Positions in case we are at the World Edge
 	surrounding_GPos = Get_OccupiedGridPositions(surrounding_GPos);
 	
-	var influences:Array[Dictionary];
+	# An Array where each element contains a Grid Pos and Biome Type
+	var influences:Array[Array];
 	
 	for p in surrounding_GPos:
-		influences.append({ p : World.Get_BiomeType(p) });
+		influences.append([p, World.Get_BiomeType(p)]);
 		
-	#InGameDebugger.Say(influences);
+	# Debug Message
+		
+	var message:String;
+		
+	for i in influences.size():
+		if i == 4:
+			message += "PLAYER";
+		message += str("GridPos: ", influences[i][0], ", Biome: ", influences[i][1], " | ");
+		
+	InGameDebugger.Say(message);
 	
 	return influences;
+	
+func Are_GridPosNeighbours(gPos:Vector2i, neighbourGPos:Vector2i) -> bool:
+	if gPos + Vector2i.UP == neighbourGPos:
+		return true;
+	if gPos + Vector2i.DOWN == neighbourGPos:
+		return true;
+	if gPos + Vector2i.LEFT == neighbourGPos:
+		return true;
+	if gPos + Vector2i.RIGHT == neighbourGPos:
+		return true;
+	return false;
