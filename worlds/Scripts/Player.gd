@@ -16,6 +16,9 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	
+	# This is for Debugging
+	#if Input.is_action_just_pressed("Enter"):
+		
 	# Check Directional Input
 	var inputDir:Vector2i = buttonMovement.Get_InputDirection();
 	
