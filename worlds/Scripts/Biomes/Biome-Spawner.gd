@@ -20,7 +20,7 @@ func SpawnBiome(gPos:Vector2i, type:BiomeMaster.Type, interType:InteractionMaste
 	newBiome.Set_Interaction(interType);
 	World.Record_Biome(gPos, newBiome, type, interType);
 	# Debug Message
-	InGameDebugger.Say(str(gPos, " : ", World.Get_BiomeType(gPos), ", ", World.Get_InteractionType(gPos)), true);
+	#InGameDebugger.Say(str(gPos, " : ", World.Get_BiomeType(gPos), ", ", World.Get_InteractionType(gPos)), true);
 	
 func SpawnRandomBiome(gPos:Vector2i, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
 	SpawnBiome(gPos, BiomeMaster.RandomBiomeType(), interType);
@@ -75,7 +75,7 @@ func SpawnRandomBiomes_3x3_Influenced(currGPos:Vector2i, prevGPos:Vector2i) -> v
 				
 				SpawnBiome(e, influences.pick_random());
 	
-	InGameDebugger.Say(""); # Add space between the last debug message and the next one.
+	#InGameDebugger.Say(""); # Add space between the last debug message and the next one.
 	
 func Get_SurroundingEmpties(gPos:Vector2i) -> Array[Vector2i]:
 	var surrounding_GPos:Array[Vector2i] = Get_GridPosArray3x3(gPos);

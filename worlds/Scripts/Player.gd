@@ -19,25 +19,10 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	var inputDir:Vector2i = Vector2i.ZERO;
 	
 	if event.is_action_pressed("One"):
-		
-		for i in 100:
-		
-			match randi_range(0, 3):
-				0:
-					inputDir = Vector2i.UP;
-				1:
-					inputDir = Vector2i.DOWN;
-				2:
-					inputDir = Vector2i.LEFT;
-				3:
-					inputDir = Vector2i.RIGHT;
-			
-			MovePlayer_And_SpawnBiomes(inputDir);
-			
+		MovePlayer_And_SpawnBiomes_Repeated(inputDir, 10000);
 		return;
 	
-	if Is_DirectionInput(event):
-		
+	if Is_DirectionInput(event):	
 		# Check Directional Input
 		inputDir = buttonMovement.Get_InputDirection();
 		
@@ -54,6 +39,10 @@ func Is_DirectionInput(event:InputEvent) -> bool:
 		return true;
 	return false;
 		
+func Spawn_InitialBiomes() -> void:
+	biomeSpawner.SpawnRandomBiome(currGridPos);
+	biomeSpawner.SpawnRandomBiomes_3x3(Vector2i(0,0));
+
 func MovePlayer_And_SpawnBiomes(inputDir:Vector2i) -> void:
 	var prevGridPos = currGridPos;
 	# Update Current Grid Position
@@ -65,7 +54,20 @@ func MovePlayer_And_SpawnBiomes(inputDir:Vector2i) -> void:
 	position = targPos;
 	# Move Camera
 	camMover.StartMove(targPos);
+
+func MovePlayer_And_SpawnBiomes_Repeated(inputDir:Vector2i, repetitions:int = 1000) -> void:
+	for i in repetitions:
 		
-func Spawn_InitialBiomes() -> void:
-	biomeSpawner.SpawnRandomBiome(currGridPos);
-	biomeSpawner.SpawnRandomBiomes_3x3(Vector2i(0,0));
+		match randi_range(0, 3):
+			0:
+				inputDir = Vector2i.UP;
+			1:
+				inputDir = Vector2i.DOWN;
+			2:
+				inputDir = Vector2i.LEFT;
+			3:
+				inputDir = Vector2i.RIGHT;
+		
+		MovePlayer_And_SpawnBiomes(inputDir);
+		
+	InGameDebugger.Say(World.discoveredBiomes.size());
