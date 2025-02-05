@@ -19,7 +19,7 @@ func _ready() -> void:
 	debugCanvLay.hide();
 
 func _unhandled_input(event: InputEvent) -> void:
-	if Input.is_action_just_pressed("Tilde"):
+	if event.is_action_pressed("Tilde"):
 		active = !active;
 		debugCanvLay.set_visible(!debugCanvLay.is_visible());
 

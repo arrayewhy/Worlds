@@ -36,7 +36,7 @@ func Prep_Water() -> void:
 	type = BiomeMaster.Type.Water;
 	biomeSprite.region_rect.position = Vector2i(0, 0);
 
-func Set_Interaction(interType:InteractionMaster.Type) -> void:
+func Initialise_Interaction(biomeType:BiomeMaster.Type) -> void:
 	if !interactionSpawner:
 		interactionSpawner = $"Interaction-Spawner";
-	interactionSpawner.Set_Interaction(interType);
+	interactionSpawner.Initialise(biomeType);

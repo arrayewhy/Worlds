@@ -6,6 +6,9 @@ var discoveredBiomes = {}; # Grid Position : [Biome Object, Biome Type, Interact
 
 var worldSize:int = 1;
 
+const maxChance:int = 999;
+var chance_dog:int = 0;
+
 func Increase_WorldSize() -> void:
 	worldSize += 1;
 	
@@ -13,9 +16,6 @@ func Get_WorldSize() -> int:
 	return worldSize;
 
 func Check_IncreaseWorldSize() -> void:
-	#InGameDebugger.Say(discoveredBiomes.size() % 1000);
-	#InGameDebugger.Say(worldSize);
-	#InGameDebugger.Say("");
 	if discoveredBiomes.size() % 1000 == 0:
 		Increase_WorldSize();
 
@@ -47,10 +47,26 @@ func Get_BiomeType(gPos:Vector2i) -> BiomeMaster.Type:
 
 func Get_InteractionType(gPos:Vector2i) -> InteractionMaster.Type:
 	if !discoveredBiomes.has(gPos):
-		InGameDebugger.Warn(str("No Biome or Interaction: ", gPos));
+		InGameDebugger.Warn(str("No Biome, so no Interaction: ", gPos));
 		return InteractionMaster.Type.NULL;
 	else:
 		return discoveredBiomes[gPos][2];
+
+# Interactions
+
+func Get_MaxChance() -> int:
+	return maxChance;
+
+func GetChance_Dog() -> int:
+	# We pick from a random range [0, chance], so if the chance starts at ZERO, 
+	# and we pick from [0, 0], it is a 100% instead of what we intend which is 0% Chance.
+	# So to make it work as intended, we minus the Chance from 999, and return that.
+	# This way, we are picking 1 from [0, 999] at a very low Chance.
+	return maxChance - chance_dog;
 	
-	InGameDebugger.Warn(str("Biome exists, but Interaction NOT found: ", gPos));
-	return InteractionMaster.Type.NULL;
+func IncreaseChance_Dog() -> void:
+	if chance_dog < maxChance:
+		chance_dog += 1;
+
+func ResetChance_Dog() -> void:
+	chance_dog = 0;

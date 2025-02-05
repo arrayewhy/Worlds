@@ -17,7 +17,7 @@ func SpawnBiome(gPos:Vector2i, type:BiomeMaster.Type, interType:InteractionMaste
 	# Randomise position slightly
 	newPos += Vector2(randf_range(-6, 6), randf_range(-6, 6));
 	newBiome.position = newPos;
-	newBiome.Set_Interaction(interType);
+	newBiome.Initialise_Interaction(type);
 	World.Record_Biome(gPos, newBiome, type, interType);
 	World.Check_IncreaseWorldSize();
 	# Debug Message
