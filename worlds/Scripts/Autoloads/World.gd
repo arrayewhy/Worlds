@@ -52,8 +52,6 @@ func Get_InteractionType(gPos:Vector2i) -> InteractionMaster.Type:
 	else:
 		return discoveredBiomes[gPos][2];
 
-# Interactions
-
 func Get_MaxChance() -> int:
 	return maxChance;
 

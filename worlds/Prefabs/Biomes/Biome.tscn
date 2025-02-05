@@ -2,58 +2,7 @@
 
 [ext_resource type="Script" path="res://Scripts/Biomes/Biome.gd" id="1_hkqds"]
 [ext_resource type="Texture2D" uid="uid://dk06eplgkeoi2" path="res://Sprites/Clack_Map_SpriteSheet_2048.png" id="2_xqfes"]
-
-[sub_resource type="GDScript" id="GDScript_03sd1"]
-resource_name = "Interaction-Spawner"
-script/source = "extends Node;
-
-var sprite:Sprite2D;
-
-var currInteraction:InteractionMaster.Type;
-
-func Initialise(biomeType:BiomeMaster.Type) -> void:
-	
-	if !sprite:
-		sprite = $\"Interaction-Sprite\";
-		
-	match randi_range(0, InteractionMaster.Type.size()):
-		0:
-			currInteraction = InteractionMaster.Type.NULL;
-		1:
-			TrySpawn_Dog(biomeType);
-		
-	if currInteraction == InteractionMaster.Type.NULL:
-		sprite.hide();
-		return;
-		
-	sprite.show();
-
-func Get_Interaction() -> InteractionMaster.Type:
-	return currInteraction;
-
-func TrySpawn_Dog(biomeType:BiomeMaster.Type) -> void:
-	
-	if randi_range(0, World.GetChance_Dog()) != 0:
-		World.IncreaseChance_Dog();
-		InGameDebugger.Say(World.chance_dog);
-		currInteraction = InteractionMaster.Type.NULL;
-		return;
-	
-	if biomeType == BiomeMaster.Type.Water and randi_range(0, World.Get_MaxChance()) != 0:
-		return;
-
-	Spawn_Dog();
-
-func Spawn_Dog() -> void:
-	currInteraction = InteractionMaster.Type.Dog;
-	World.ResetChance_Dog();
-	InGameDebugger.Say(\"Doggo sighted!\");
-
-func Spawn_WaterDog() -> void:
-	currInteraction = InteractionMaster.Type.Dog;
-	World.ResetChance_Dog();
-	InGameDebugger.Say(\"Doggo overboard!\");
-"
+[ext_resource type="Script" path="res://Scripts/Interactions/Interaction-Spawner.gd" id="3_hof4e"]
 
 [node name="Biome" type="Node2D"]
 script = ExtResource("1_hkqds")
@@ -64,7 +13,7 @@ region_enabled = true
 region_rect = Rect2(2048, 0, 256, 256)
 
 [node name="Interaction-Spawner" type="Node2D" parent="."]
-script = SubResource("GDScript_03sd1")
+script = ExtResource("3_hof4e")
 
 [node name="Interaction-Sprite" type="Sprite2D" parent="Interaction-Spawner"]
 z_index = 1
