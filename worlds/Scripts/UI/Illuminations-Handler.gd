@@ -27,7 +27,8 @@ func Show_Illums() -> void:
 		blackBars.HideDone.connect(Hide_CanvLayer);
 	
 func Hide_Illums() -> void:
-	illumFader.FadeToTrans(8);
+	illumFader.FadeToTrans(2);
+	await get_tree().create_timer(.5).timeout;
 	blackBars.Hide();
 
 func Hide_CanvLayer() -> void:
