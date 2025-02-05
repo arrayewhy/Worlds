@@ -4,6 +4,23 @@ const cellSize:int = 256;
 
 var discoveredBiomes = {}; # Grid Position : [Biome Object, Biome Type, Interaction]
 
+var worldSize:int = 1;
+
+func Increase_WorldSize() -> void:
+	worldSize += 1;
+	
+func Get_WorldSize() -> int:
+	return worldSize;
+
+func Check_IncreaseWorldSize() -> void:
+	#InGameDebugger.Say(discoveredBiomes.size() % 1000);
+	#InGameDebugger.Say(worldSize);
+	#InGameDebugger.Say("");
+	if discoveredBiomes.size() % 1000 == 0:
+		Increase_WorldSize();
+
+# Functions: Biomes
+
 func Record_Biome(gPos:Vector2i, biome:Object, type:BiomeMaster.Type, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
 	discoveredBiomes[gPos] = [biome, type, interType];
 
@@ -26,7 +43,7 @@ func Get_BiomeType(gPos:Vector2i) -> BiomeMaster.Type:
 	InGameDebugger.Warn(str("Biome NOT found: ", gPos));
 	return BiomeMaster.Type.NULL;
 
-# Interactions
+# Functions: Interactions
 
 func Get_InteractionType(gPos:Vector2i) -> InteractionMaster.Type:
 	if !discoveredBiomes.has(gPos):

@@ -17,6 +17,7 @@ script/source = "extends Node;
 var cam:Camera2D;
 var initZoom:Vector2;
 var currZoomLvl:int = 0;
+const zoomLimit:int = 2;
 
 func _ready() -> void:
 	cam = get_parent();
@@ -25,15 +26,23 @@ func _ready() -> void:
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event.is_action_pressed(\"Two\"):
 		
+		var worldSize:int = World.Get_WorldSize();
+		
 		match currZoomLvl:
-			3:
-				cam.zoom = initZoom;
-				currZoomLvl = 0;
+			worldSize:
+				ResetZoom();
 				return;
 			_:
+				if currZoomLvl > zoomLimit:
+					ResetZoom();
+					return;
 				cam.zoom = cam.zoom / 2;
 		
 		currZoomLvl += 1;
+
+func ResetZoom() -> void:
+	cam.zoom = initZoom;
+	currZoomLvl = 0;
 "
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_bu5ns"]

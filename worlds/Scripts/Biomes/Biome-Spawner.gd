@@ -19,6 +19,7 @@ func SpawnBiome(gPos:Vector2i, type:BiomeMaster.Type, interType:InteractionMaste
 	newBiome.position = newPos;
 	newBiome.Set_Interaction(interType);
 	World.Record_Biome(gPos, newBiome, type, interType);
+	World.Check_IncreaseWorldSize();
 	# Debug Message
 	#InGameDebugger.Say(str(gPos, " : ", World.Get_BiomeType(gPos), ", ", World.Get_InteractionType(gPos)), true);
 	
