@@ -69,14 +69,15 @@ func SpawnRandomBiomes_3x3_Influenced(currGPos:Vector2i, prevGPos:Vector2i) -> v
 			if Are_GridPosNeighbours(e, i[0]):
 				
 				# Add bias for Neighbouring Biome
-				if i[1] == BiomeMaster.Type.Water:
-					for c in 8:
-						influences.append(i[1]);
-				else:
-					for c in 2:
-						influences.append(i[1]);
+				match i[1]:
+					BiomeMaster.Type.Water:
+						for c in 8:
+							influences.append(i[1]);
+					_:
+						for c in 2:
+							influences.append(i[1]);
 				
-				InGameDebugger.Say(influences);
+				#InGameDebugger.Say(influences);
 				
 				SpawnBiome(e, influences.pick_random());
 	
