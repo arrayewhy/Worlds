@@ -1,7 +1,6 @@
 extends Node2D;
 
 @onready var biomeSpawner = $"Biome-Spawner";
-@onready var buttonMovement = $"Button-Movement";
 
 @export var camMover:Node;
 
@@ -18,26 +17,29 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	
 	var inputDir:Vector2i = Vector2i.ZERO;
 	
+	# Move and Spawn Repeater
+	
 	if event.is_action_pressed("One"):
 		MovePlayer_And_SpawnBiomes_Repeated(inputDir, 10000);
 		return;
 	
-	if Is_DirectionInput(event):	
-		# Check Directional Input
-		inputDir = buttonMovement.Get_InputDirection();
-		
-	if inputDir == Vector2i(0,0):
+	# Normal Player Move and Biome Spawn
+	
+	inputDir = Get_DirectionInput(event);
+	if inputDir != Vector2i(0,0):
+		MovePlayer_And_SpawnBiomes(inputDir);
 		return;
 	
-	MovePlayer_And_SpawnBiomes(inputDir);
-
-func Is_DirectionInput(event:InputEvent) -> bool:
-	if event.is_action_pressed("Up") or \
-	event.is_action_pressed("Down") or \
-	event.is_action_pressed("Left") or \
-	event.is_action_pressed("Right"):
-		return true;
-	return false;
+func Get_DirectionInput(event:InputEvent) -> Vector2i:
+	if event.is_action_pressed("Up"):
+		return Vector2i.UP;
+	if event.is_action_pressed("Down"):
+		return Vector2i.DOWN;
+	if event.is_action_pressed("Left"):
+		return Vector2i.LEFT;
+	if event.is_action_pressed("Right"):
+		return Vector2i.RIGHT;
+	return Vector2i.ZERO;
 		
 func Spawn_InitialBiomes() -> void:
 	biomeSpawner.SpawnRandomBiome(currGridPos);
