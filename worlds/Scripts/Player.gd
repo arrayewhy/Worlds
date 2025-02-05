@@ -58,18 +58,24 @@ func MovePlayer_And_SpawnBiomes(inputDir:Vector2i) -> void:
 	camMover.StartMove(targPos);
 
 func MovePlayer_And_SpawnBiomes_Repeated(inputDir:Vector2i, repetitions:int = 1000) -> void:
+	
 	for i in repetitions:
 		
-		match randi_range(0, 3):
-			0:
-				inputDir = Vector2i.UP;
-			1:
-				inputDir = Vector2i.DOWN;
-			2:
-				inputDir = Vector2i.LEFT;
-			3:
-				inputDir = Vector2i.RIGHT;
+		inputDir = Get_RandDirection();
 		
 		MovePlayer_And_SpawnBiomes(inputDir);
 		
 	InGameDebugger.Say(World.discoveredBiomes.size());
+
+func Get_RandDirection() -> Vector2i:
+	match randi_range(0, 3):
+			0:
+				return Vector2i.UP;
+			1:
+				return Vector2i.DOWN;
+			2:
+				return Vector2i.LEFT;
+			3:
+				return Vector2i.RIGHT;
+			_:
+				return Vector2i.ZERO;
