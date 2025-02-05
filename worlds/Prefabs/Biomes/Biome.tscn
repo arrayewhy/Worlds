@@ -23,6 +23,9 @@ func Set_Interaction(interType:InteractionMaster.Type) -> void:
 		return;
 		
 	sprite.show();
+
+func Get_Interaction() -> InteractionMaster.Type:
+	return currInteraction;
 "
 
 [node name="Biome" type="Node2D"]

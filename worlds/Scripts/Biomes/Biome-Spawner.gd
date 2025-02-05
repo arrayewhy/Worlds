@@ -64,11 +64,20 @@ func SpawnRandomBiomes_3x3_Influenced(currGPos:Vector2i, prevGPos:Vector2i) -> v
 	for point in spawnPoints:
 		for i in biomes_WithGPos:
 			if Are_GridPosNeighbours(point, i[0]):
-				#var neighbourBias:Array[BiomeMaster.Type] = generalInfluences;
 				var neighbourBias:Array[BiomeMaster.Type] = influences;
 				# Add One-Off bias for Neighbouring Biome
 				neighbourBias.append_array(Get_NeighbourBias(i[1]));
-				SpawnBiome(point, neighbourBias.pick_random());
+				var newBiomeType:BiomeMaster.Type = neighbourBias.pick_random();
+				
+				var interaction:InteractionMaster.Type = InteractionMaster.Type.NULL;
+				match randi_range(0, 1):
+					0:
+						pass;
+					1:
+						if randi_range(0, 99) == 1 and newBiomeType != BiomeMaster.Type.Water:
+							interaction = InteractionMaster.Type.Dog;
+				
+				SpawnBiome(point, newBiomeType, interaction);
 	
 func Get_NeighbourBias(neighbourBiome:BiomeMaster.Type) -> Array[BiomeMaster.Type]:
 	
