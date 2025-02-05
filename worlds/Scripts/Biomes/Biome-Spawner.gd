@@ -71,7 +71,7 @@ func SpawnRandomBiomes_3x3_Influenced(currGPos:Vector2i, prevGPos:Vector2i) -> v
 				for c in 2:
 					influences.append(i[1]);
 				
-				InGameDebugger.Say(influences);
+				#InGameDebugger.Say(influences);
 				
 				SpawnBiome(e, influences.pick_random());
 	
