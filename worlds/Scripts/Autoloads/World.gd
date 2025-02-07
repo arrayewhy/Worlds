@@ -7,12 +7,10 @@ var discoveredBiomes = {}; # Grid Position : [Biome Object, Biome Type, Interact
 var worldSize:int = 1;
 
 const maxChance:int = 999;
-var chance_dog:int = 0;
 var chances:Dictionary; # BiomeMaster.Type : int
 
 func _ready() -> void:
-	for i in InteractionMaster.Type.size():
-		chances[i] = 0;
+	Initialise_Chances();
 
 func Increase_WorldSize() -> void:
 	worldSize += 1;
@@ -80,4 +78,16 @@ func Increase_Chance(type:InteractionMaster.Type) -> void:
 		chances[type] += 1;
 
 func Reset_Chance(type:InteractionMaster.Type) -> void:
-	chances[type] = 0;
+	match type:
+		InteractionMaster.Type.Dog:
+			chances[type] = 0;
+		InteractionMaster.Type.Fish:
+			chances[type] = 997;
+
+func Initialise_Chances() -> void:
+	
+	for i in InteractionMaster.Type.size():
+		chances[i] = 0;
+
+	for c in chances.keys():
+		Reset_Chance(c);

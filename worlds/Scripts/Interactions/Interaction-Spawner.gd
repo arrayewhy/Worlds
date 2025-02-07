@@ -23,30 +23,48 @@ func Get_Interaction() -> InteractionMaster.Type:
 	return currInteraction;
 
 func Spawn_RandomInteraction(gPos:Vector2i, biomeType:BiomeMaster.Type) -> void:
+	
+	if biomeType == BiomeMaster.Type.Water:
+		Try_Spawn(gPos, biomeType, InteractionMaster.Type.Fish);
+		return;
+	
 	Try_Spawn(gPos, biomeType, randi_range(1, InteractionMaster.Type.size() - 1));
 
 func Try_Spawn(gPos:Vector2i, biomeType:BiomeMaster.Type, interType:InteractionMaster.Type) -> void:
 	
+	if !Should_Spawn(interType):
+		
+		if interType != InteractionMaster.Type.Fish:
+			World.Increase_Chance(interType);
+		Set_None();
+		return;
+	
 	match interType:
 		
 		InteractionMaster.Type.Dog:
-			
-			if !Should_Spawn(InteractionMaster.Type.Dog):
-				World.Increase_Chance(InteractionMaster.Type.Dog);
-				Set_None();
-				return;
 		
 			if biomeType == BiomeMaster.Type.Water:
-				if Win_ImprobableRoll():
-					Spawn_Interaction(gPos, InteractionMaster.Type.Dog);
-					return;
-				else:
-					World.Increase_Chance(InteractionMaster.Type.Dog);
+				if !Win_ImprobableRoll():
+					World.Increase_Chance(interType);
 					Set_None();
 					return;
-					
-			Spawn_Interaction(gPos, InteractionMaster.Type.Dog);
+				
+			Spawn_Interaction(gPos, interType);
+			World.Reset_Chance(interType);
+			InGameDebugger.Say("Spawn: Dog");
 			return;
+			
+		InteractionMaster.Type.Fish:
+			
+			if biomeType == BiomeMaster.Type.Water:
+				Spawn_Interaction(gPos, interType);
+				InGameDebugger.Say("Spawn: Fish");
+				return;
+			
+			# Land Fish
+			if !Win_ImprobableRoll():
+				Set_None();
+				return;
 
 func Win_ImprobableRoll() -> bool:
 	return randi_range(0, World.Get_MaxChance()) == 0;
@@ -57,13 +75,14 @@ func Should_Spawn(interType:InteractionMaster.Type) -> bool:
 func Spawn_Interaction(gPos:Vector2i, interType:InteractionMaster.Type) -> void:
 	currInteraction = interType;
 	Update_Sprite(interType);
-	World.Reset_Chance(interType);
 	World.Record_Interaction(gPos, interType);
 
 func Update_Sprite(interType:InteractionMaster.Type) -> void:
 	match interType:
 		InteractionMaster.Type.Dog:
 			sprite.region_rect.position = Vector2i(0, 2048);
+		InteractionMaster.Type.Fish:
+			sprite.region_rect.position = Vector2i(0, 1792);
 		_:
 			InGameDebugger.Warn(str("Failed to update sprite, Interaction: "), interType);
 
