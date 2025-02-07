@@ -4,45 +4,69 @@ var sprite:Sprite2D;
 
 var currInteraction:InteractionMaster.Type;
 
-func Initialise(biomeType:BiomeMaster.Type) -> void:
+func Initialise(gPos:Vector2i, biomeType:BiomeMaster.Type, interType:InteractionMaster.Type) -> void:
 	
 	if !sprite:
 		sprite = $"Interaction-Sprite";
+	
+	if interType == InteractionMaster.Type.NULL:
 		
-	match randi_range(0, InteractionMaster.Type.size()):
-		0:
-			currInteraction = InteractionMaster.Type.NULL;
-		1:
-			TrySpawn_Dog(biomeType);
-		
-	if currInteraction == InteractionMaster.Type.NULL:
-		sprite.hide();
-		return;
-		
-	sprite.show();
+		match randi_range(0, 1):
+			0:
+				currInteraction = InteractionMaster.Type.NULL;
+				sprite.hide();
+				return;
+			1:
+				Spawn_RandomInteraction(gPos, biomeType);
 
 func Get_Interaction() -> InteractionMaster.Type:
 	return currInteraction;
 
-func TrySpawn_Dog(biomeType:BiomeMaster.Type) -> void:
+func Spawn_RandomInteraction(gPos:Vector2i, biomeType:BiomeMaster.Type) -> void:
+	Try_Spawn(gPos, biomeType, randi_range(1, InteractionMaster.Type.size() - 1));
+
+func Try_Spawn(gPos:Vector2i, biomeType:BiomeMaster.Type, interType:InteractionMaster.Type) -> void:
 	
-	if randi_range(0, World.GetChance_Dog()) != 0:
-		World.IncreaseChance_Dog();
-		InGameDebugger.Say(World.chance_dog);
-		currInteraction = InteractionMaster.Type.NULL;
-		return;
-	
-	if biomeType == BiomeMaster.Type.Water and randi_range(0, World.Get_MaxChance()) != 0:
-		return;
+	match interType:
+		
+		InteractionMaster.Type.Dog:
+			
+			if !Should_Spawn(InteractionMaster.Type.Dog):
+				World.Increase_Chance(InteractionMaster.Type.Dog);
+				Set_None();
+				return;
+		
+			if biomeType == BiomeMaster.Type.Water:
+				if Win_ImprobableRoll():
+					Spawn_Interaction(gPos, InteractionMaster.Type.Dog);
+					return;
+				else:
+					World.Increase_Chance(InteractionMaster.Type.Dog);
+					Set_None();
+					return;
+					
+			Spawn_Interaction(gPos, InteractionMaster.Type.Dog);
+			return;
 
-	Spawn_Dog();
+func Win_ImprobableRoll() -> bool:
+	return randi_range(0, World.Get_MaxChance()) == 0;
 
-func Spawn_Dog() -> void:
-	currInteraction = InteractionMaster.Type.Dog;
-	World.ResetChance_Dog();
-	InGameDebugger.Say("Doggo sighted!");
+func Should_Spawn(interType:InteractionMaster.Type) -> bool:
+	return randi_range(0, World.Get_Chance(interType)) == 0;
 
-func Spawn_WaterDog() -> void:
-	currInteraction = InteractionMaster.Type.Dog;
-	World.ResetChance_Dog();
-	InGameDebugger.Say("Doggo overboard!");
+func Spawn_Interaction(gPos:Vector2i, interType:InteractionMaster.Type) -> void:
+	currInteraction = interType;
+	Update_Sprite(interType);
+	World.Reset_Chance(interType);
+	World.Record_Interaction(gPos, interType);
+
+func Update_Sprite(interType:InteractionMaster.Type) -> void:
+	match interType:
+		InteractionMaster.Type.Dog:
+			sprite.region_rect.position = Vector2i(0, 2048);
+		_:
+			InGameDebugger.Warn(str("Failed to update sprite, Interaction: "), interType);
+
+func Set_None() -> void:
+	currInteraction = InteractionMaster.Type.NULL;
+	sprite.hide();

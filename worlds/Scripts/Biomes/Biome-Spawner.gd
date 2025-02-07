@@ -17,8 +17,8 @@ func SpawnBiome(gPos:Vector2i, type:BiomeMaster.Type, interType:InteractionMaste
 	# Randomise position slightly
 	newPos += Vector2(randf_range(-6, 6), randf_range(-6, 6));
 	newBiome.position = newPos;
-	newBiome.Initialise_Interaction(type);
-	World.Record_Biome(gPos, newBiome, type, interType);
+	World.Record_Biome(gPos, newBiome, type);
+	newBiome.Initialise_Interaction(gPos, type, interType);
 	World.Check_IncreaseWorldSize();
 	# Debug Message
 	#InGameDebugger.Say(str(gPos, " : ", World.Get_BiomeType(gPos), ", ", World.Get_InteractionType(gPos)), true);
@@ -69,15 +69,7 @@ func SpawnRandomBiomes_3x3_Influenced(currGPos:Vector2i, prevGPos:Vector2i) -> v
 				neighbourBias.append_array(Get_NeighbourBias(i[1]));
 				var newBiomeType:BiomeMaster.Type = neighbourBias.pick_random();
 				
-				var interaction:InteractionMaster.Type = InteractionMaster.Type.NULL;
-				match randi_range(0, 1):
-					0:
-						pass;
-					1:
-						if randi_range(0, 99) == 1 and newBiomeType != BiomeMaster.Type.Water:
-							interaction = InteractionMaster.Type.Dog;
-				
-				SpawnBiome(point, newBiomeType, interaction);
+				SpawnBiome(point, newBiomeType);
 	
 func Get_NeighbourBias(neighbourBiome:BiomeMaster.Type) -> Array[BiomeMaster.Type]:
 	

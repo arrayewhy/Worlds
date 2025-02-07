@@ -8,6 +8,11 @@ var worldSize:int = 1;
 
 const maxChance:int = 999;
 var chance_dog:int = 0;
+var chances:Dictionary; # BiomeMaster.Type : int
+
+func _ready() -> void:
+	for i in InteractionMaster.Type.size():
+		chances[i] = 0;
 
 func Increase_WorldSize() -> void:
 	worldSize += 1;
@@ -21,8 +26,8 @@ func Check_IncreaseWorldSize() -> void:
 
 # Functions: Biomes
 
-func Record_Biome(gPos:Vector2i, biome:Object, type:BiomeMaster.Type, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
-	discoveredBiomes[gPos] = [biome, type, interType];
+func Record_Biome(gPos:Vector2i, biome:Object, type:BiomeMaster.Type) -> void:
+	discoveredBiomes[gPos] = [biome, type];
 
 func Is_Occupied(gPos:Vector2i) -> bool:
 	return discoveredBiomes.has(gPos);
@@ -45,6 +50,14 @@ func Get_BiomeType(gPos:Vector2i) -> BiomeMaster.Type:
 
 # Functions: Interactions
 
+func Record_Interaction(gPos:Vector2i, interType:InteractionMaster.Type) -> void:
+	# We record a biome's Interaction in the 3rd element of its array so it contains:
+	# [Biome Object, Biome Type, Interaction]
+	if discoveredBiomes[gPos].size() > 2:
+		discoveredBiomes[gPos][2] = interType;
+		return;
+	discoveredBiomes[gPos].push_back(interType);
+
 func Get_InteractionType(gPos:Vector2i) -> InteractionMaster.Type:
 	if !discoveredBiomes.has(gPos):
 		InGameDebugger.Warn(str("No Biome, so no Interaction: ", gPos));
@@ -55,16 +68,16 @@ func Get_InteractionType(gPos:Vector2i) -> InteractionMaster.Type:
 func Get_MaxChance() -> int:
 	return maxChance;
 
-func GetChance_Dog() -> int:
+func Get_Chance(type:InteractionMaster.Type) -> int:
 	# We pick from a random range [0, chance], so if the chance starts at ZERO, 
 	# and we pick from [0, 0], it is a 100% instead of what we intend which is 0% Chance.
 	# So to make it work as intended, we minus the Chance from 999, and return that.
 	# This way, we are picking 1 from [0, 999] at a very low Chance.
-	return maxChance - chance_dog;
+	return maxChance - chances[type];
 	
-func IncreaseChance_Dog() -> void:
-	if chance_dog < maxChance:
-		chance_dog += 1;
+func Increase_Chance(type:InteractionMaster.Type) -> void:
+	if chances[type] < maxChance:
+		chances[type] += 1;
 
-func ResetChance_Dog() -> void:
-	chance_dog = 0;
+func Reset_Chance(type:InteractionMaster.Type) -> void:
+	chances[type] = 0;
