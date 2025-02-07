@@ -82,7 +82,7 @@ func Reset_Chance(type:InteractionMaster.Type) -> void:
 		InteractionMaster.Type.Dog:
 			chances[type] = 0;
 		InteractionMaster.Type.Fish:
-			chances[type] = 997;
+			chances[type] = 990;
 
 func Initialise_Chances() -> void:
 	
