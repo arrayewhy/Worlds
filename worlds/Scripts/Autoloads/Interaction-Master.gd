@@ -7,3 +7,6 @@ func LandInteractions() -> Array[Type]:
 
 func WaterInteractions() -> Array[Type]:
 	return [Type.Fish, Type.Boat];
+
+func InteractionsWith_IncreasingChance() -> Array[Type]:
+	return [Type.Dog, Type.Boat];
