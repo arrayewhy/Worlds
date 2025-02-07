@@ -8,9 +8,13 @@ var worldSize:int = 1;
 
 const maxChance:int = 999;
 var chances:Dictionary; # BiomeMaster.Type : int
+const initChance_Dog:int = 0;
+const initChance_Fish:int = 990;
 
 func _ready() -> void:
 	Initialise_Chances();
+
+# Functions: World Size
 
 func Increase_WorldSize() -> void:
 	worldSize += 1;
@@ -63,26 +67,23 @@ func Get_InteractionType(gPos:Vector2i) -> InteractionMaster.Type:
 	else:
 		return discoveredBiomes[gPos][2];
 
-func Get_MaxChance() -> int:
-	return maxChance;
-
 func Get_Chance(type:InteractionMaster.Type) -> int:
 	# We pick from a random range [0, chance], so if the chance starts at ZERO, 
 	# and we pick from [0, 0], it is a 100% instead of what we intend which is 0% Chance.
 	# So to make it work as intended, we minus the Chance from 999, and return that.
 	# This way, we are picking 1 from [0, 999] at a very low Chance.
-	return maxChance - chances[type];
+	return Get_MaxChance() - chances[type];
 	
 func Increase_Chance(type:InteractionMaster.Type) -> void:
-	if chances[type] < maxChance:
+	if chances[type] < Get_MaxChance():
 		chances[type] += 1;
 
 func Reset_Chance(type:InteractionMaster.Type) -> void:
 	match type:
 		InteractionMaster.Type.Dog:
-			chances[type] = 0;
+			chances[type] = initChance_Dog;
 		InteractionMaster.Type.Fish:
-			chances[type] = 990;
+			chances[type] = initChance_Fish;
 
 func Initialise_Chances() -> void:
 	
@@ -91,3 +92,9 @@ func Initialise_Chances() -> void:
 
 	for c in chances.keys():
 		Reset_Chance(c);
+
+func Get_MaxChance() -> int:
+	return maxChance;
+
+func Win_ImprobableRoll() -> bool:
+	return randi_range(0, Get_MaxChance()) == 0;

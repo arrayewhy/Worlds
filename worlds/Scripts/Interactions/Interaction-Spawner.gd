@@ -44,7 +44,7 @@ func Try_Spawn(gPos:Vector2i, biomeType:BiomeMaster.Type, interType:InteractionM
 		InteractionMaster.Type.Dog:
 		
 			if biomeType == BiomeMaster.Type.Water:
-				if !Win_ImprobableRoll():
+				if !World.Win_ImprobableRoll():
 					World.Increase_Chance(interType);
 					Set_None();
 					return;
@@ -62,12 +62,9 @@ func Try_Spawn(gPos:Vector2i, biomeType:BiomeMaster.Type, interType:InteractionM
 				return;
 			
 			# Land Fish
-			if !Win_ImprobableRoll():
+			if !World.Win_ImprobableRoll():
 				Set_None();
 				return;
-
-func Win_ImprobableRoll() -> bool:
-	return randi_range(0, World.Get_MaxChance()) == 0;
 
 func Should_Spawn(interType:InteractionMaster.Type) -> bool:
 	return randi_range(0, World.Get_Chance(interType)) == 0;
