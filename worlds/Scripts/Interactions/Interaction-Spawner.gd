@@ -48,13 +48,10 @@ func Try_Spawn(gPos:Vector2i, biomeType:BiomeMaster.Type, interType:InteractionM
 		
 		InteractionMaster.Type.Dog:
 		
-			if biomeType == BiomeMaster.Type.Water and !World.Win_ImprobableRoll():
-					Set_None();
-					return;
-				
-			Spawn_Interaction(gPos, interType, true);
-			InGameDebugger.Say("Spawn: Dog");
-			return;
+			if biomeType != BiomeMaster.Type.Water or World.Win_ImprobableRoll():
+				Spawn_Interaction(gPos, interType, true);
+				InGameDebugger.Say("Spawn: Dog");
+				return;
 			
 		InteractionMaster.Type.Fish:
 			
@@ -62,9 +59,6 @@ func Try_Spawn(gPos:Vector2i, biomeType:BiomeMaster.Type, interType:InteractionM
 				Spawn_Interaction(gPos, interType);
 				InGameDebugger.Say("Spawn: Fish");
 				return;
-			
-			Set_None();
-			return;
 				
 		InteractionMaster.Type.Boat:
 			
@@ -73,8 +67,8 @@ func Try_Spawn(gPos:Vector2i, biomeType:BiomeMaster.Type, interType:InteractionM
 				InGameDebugger.Say("Spawn: Boat");
 				return;
 			
-			Set_None();
-			return;
+	Set_None();
+	return;
 
 func Should_Spawn(interType:InteractionMaster.Type) -> bool:
 	return randi_range(0, World.Get_Chance(interType)) == 0;
