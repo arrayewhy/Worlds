@@ -43,6 +43,9 @@ func Try_Spawn(gPos:Vector2i, biomeType:BiomeMaster.Type, interType:InteractionM
 		Set_None();
 		return;
 	
+	# We still check for Water Biomes here because random combinations 
+	# like Water Biome + Dog can still occur.
+	
 	match interType:
 		
 		InteractionMaster.Type.Dog:
