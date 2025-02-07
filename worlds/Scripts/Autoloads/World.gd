@@ -75,9 +75,9 @@ func Get_Chance(type:InteractionMaster.Type) -> int:
 	# This way, we are picking 1 from [0, 999] at a very low Chance.
 	return Get_MaxChance() - chances[type];
 	
-func Increase_Chance(type:InteractionMaster.Type) -> void:
+func Increase_Chance(type:InteractionMaster.Type, rate:int = 1) -> void:
 	if chances[type] < Get_MaxChance():
-		chances[type] += 1;
+		chances[type] += rate;
 
 func Reset_Chance(type:InteractionMaster.Type) -> void:
 	match type:

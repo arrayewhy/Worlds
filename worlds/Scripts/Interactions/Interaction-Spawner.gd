@@ -82,7 +82,7 @@ func Spawn_Interaction(gPos:Vector2i, interType:InteractionMaster.Type, resetCha
 func Update_Sprite(interType:InteractionMaster.Type) -> void:
 	match interType:
 		InteractionMaster.Type.Dog:
-			sprite.region_rect.position = Vector2i(0, 2048);
+			sprite.region_rect.position = Vector2i(0, 1024);
 		InteractionMaster.Type.Fish:
 			sprite.region_rect.position = Vector2i(0, 1792);
 		InteractionMaster.Type.Boat:
