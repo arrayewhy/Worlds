@@ -25,11 +25,8 @@ func Get_Interaction() -> InteractionMaster.Type:
 func Spawn_RandomInteraction(gPos:Vector2i, biomeType:BiomeMaster.Type) -> void:
 	
 	if biomeType == BiomeMaster.Type.Water:
-		
 		var waterInteractions:Array[InteractionMaster.Type] = [InteractionMaster.Type. Fish, InteractionMaster.Type.Boat];
-		
 		Try_Spawn(gPos, biomeType, waterInteractions.pick_random());
-		
 		return;
 	
 	Try_Spawn(gPos, biomeType, randi_range(1, InteractionMaster.Type.size() - 1));
