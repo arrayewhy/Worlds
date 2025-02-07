@@ -1,3 +1,3 @@
 extends Node;
 
-enum Type {NULL, Dog, Fish};
+enum Type {NULL, Dog, Fish, Boat};

@@ -10,6 +10,7 @@ const maxChance:int = 999;
 var chances:Dictionary; # BiomeMaster.Type : int
 const initChance_Dog:int = 0;
 const initChance_Fish:int = 990;
+const initChance_Boat:int = 0;
 
 func _ready() -> void:
 	Initialise_Chances();
@@ -84,6 +85,8 @@ func Reset_Chance(type:InteractionMaster.Type) -> void:
 			chances[type] = initChance_Dog;
 		InteractionMaster.Type.Fish:
 			chances[type] = initChance_Fish;
+		InteractionMaster.Type.Boat:
+			chances[type] = initChance_Boat;
 
 func Initialise_Chances() -> void:
 	
