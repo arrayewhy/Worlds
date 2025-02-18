@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://dpw5ih7gg3btv"]
+[gd_scene load_steps=16 format=3 uid="uid://dpw5ih7gg3btv"]
 
 [ext_resource type="Script" path="res://Scripts/Main-Camera.gd" id="1_e4dtk"]
 [ext_resource type="Texture2D" uid="uid://dk06eplgkeoi2" path="res://Sprites/Clack_Map_SpriteSheet_2048.png" id="1_ntyhy"]
@@ -11,6 +11,8 @@
 [ext_resource type="Script" path="res://Scripts/UI/Illumination-Spawner.gd" id="7_rmeg4"]
 [ext_resource type="Script" path="res://Scripts/Fader.gd" id="8_u5mxs"]
 [ext_resource type="Script" path="res://Scripts/UI/Black-Bars.gd" id="8_umww4"]
+[ext_resource type="AudioStream" uid="uid://sos25qvtf0mq" path="res://Audio/SFX/Desert-Wind_611257__newlocknew__windsynth-3winter3osc.wav" id="12_py2jo"]
+[ext_resource type="AudioStream" uid="uid://cgv7itiiugmiq" path="res://Audio/SFX/Forest_634315__klankbeeld__border-forestfarmfield-727am-nl-eu-220515_0345.wav" id="13_wbwr2"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_bu5ns"]
 size = Vector2(1920, 48)
@@ -91,3 +93,13 @@ metadata/_edit_lock_ = true
 script = ExtResource("8_u5mxs")
 target = NodePath("../Illumination-Spawner")
 startVisible = false
+
+[node name="Audio" type="Node" parent="."]
+
+[node name="Desert-Wind" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("12_py2jo")
+autoplay = true
+
+[node name="Forest" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("13_wbwr2")
+autoplay = true
