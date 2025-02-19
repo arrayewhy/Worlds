@@ -42,15 +42,15 @@ func Get_DirectionInput(event:InputEvent) -> Vector2i:
 	return Vector2i.ZERO;
 		
 func Spawn_InitialBiomes() -> void:
-	biomeSpawner.SpawnRandomBiome(currGridPos);
-	biomeSpawner.SpawnRandomBiomes_3x3(Vector2i(0,0));
+	#biomeSpawner.SpawnRandomBiome(currGridPos);
+	biomeSpawner.SpawnRandomBiomes(Vector2i(0,0), 2);
 
 func MovePlayer_And_SpawnBiomes(inputDir:Vector2i) -> void:
 	var prevGridPos = currGridPos;
 	# Update Current Grid Position
 	currGridPos += inputDir;
 	# Spawn Biomes around new position
-	SpawnAround.emit(currGridPos, prevGridPos);
+	SpawnAround.emit(currGridPos, prevGridPos, 2);
 	var targPos = position + Vector2(inputDir) * World.cellSize;
 	# Move Player
 	position = targPos;

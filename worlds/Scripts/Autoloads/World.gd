@@ -23,7 +23,7 @@ func Increase_WorldSize() -> void:
 func Get_WorldSize() -> int:
 	return worldSize;
 
-func Check_IncreaseWorldSize() -> void:
+func IncreaseWorldSize() -> void:
 	if discoveredBiomes.size() % 1000 == 0:
 		Increase_WorldSize();
 
