@@ -36,13 +36,13 @@ func _process(delta: float) -> void:
 	if showing:
 		Show_Bars(speed * delta);
 		if All_Shown():
-			InGameDebugger.Say("Black-Bars: Shown");
+			#InGameDebugger.Say("Black-Bars: Shown");
 			set_process(false);
 		return;
 	else:
 		Hide_Bars(speed * delta);
 		if All_Hidden():
-			InGameDebugger.Say("Black-Bars: Hidden");
+			#InGameDebugger.Say("Black-Bars: Hidden");
 			HideDone.emit();
 			set_process(false);
 

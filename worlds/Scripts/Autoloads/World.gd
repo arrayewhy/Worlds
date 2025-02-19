@@ -7,7 +7,7 @@ var discoveredBiomes = {}; # Grid Position : [Biome Object, Biome Type, Interact
 var worldSize:int = 1;
 
 const maxChance:int = 999;
-var chances:Dictionary; # BiomeMaster.Type : int
+var chances:Dictionary; # Biome_Master.Type : int
 const initChance_Dog:int = 0;
 const initChance_Fish:int = 990;
 const initChance_Boat:int = 0;
@@ -29,7 +29,7 @@ func Check_IncreaseWorldSize() -> void:
 
 # Functions: Biomes
 
-func Record_Biome(gPos:Vector2i, biome:Object, type:BiomeMaster.Type) -> void:
+func Record_Biome(gPos:Vector2i, biome:Object, type:Biome_Master.Type) -> void:
 	discoveredBiomes[gPos] = [biome, type];
 
 func Is_Occupied(gPos:Vector2i) -> bool:
@@ -43,13 +43,13 @@ func Get_BiomeNode(gPos:Vector2i) -> Object:
 	InGameDebugger.Warn(str("Biome NOT found: ", gPos));
 	return null;
 
-func Get_BiomeType(gPos:Vector2i) -> BiomeMaster.Type:
+func Get_BiomeType(gPos:Vector2i) -> Biome_Master.Type:
 	
 	if discoveredBiomes.has(gPos):
 		return discoveredBiomes[gPos][1];
 	
 	InGameDebugger.Warn(str("Biome NOT found: ", gPos));
-	return BiomeMaster.Type.NULL;
+	return Biome_Master.Type.NULL;
 
 # Functions: Interactions
 

@@ -9,7 +9,7 @@ func _ready() -> void:
 
 # Single Biome
 
-func SpawnBiome(gPos:Vector2i, type:BiomeMaster.Type, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
+func SpawnBiome(gPos:Vector2i, type:Biome_Master.Type, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
 	var newBiome = Instantiate_BiomeNode(type);
 	biomeHolder.add_child(newBiome);
 	# Position New Biome in World Space
@@ -24,9 +24,9 @@ func SpawnBiome(gPos:Vector2i, type:BiomeMaster.Type, interType:InteractionMaste
 	#InGameDebugger.Say(str(gPos, " : ", World.Get_BiomeType(gPos), ", ", World.Get_InteractionType(gPos)), true);
 	
 func SpawnRandomBiome(gPos:Vector2i, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
-	SpawnBiome(gPos, BiomeMaster.RandomBiomeType(), interType);
+	SpawnBiome(gPos, Biome_Master.RandomBiomeType(), interType);
 	
-func Instantiate_BiomeNode(type:BiomeMaster.Type) -> Node2D:
+func Instantiate_BiomeNode(type:Biome_Master.Type) -> Node2D:
 	var newBiome:Object = biomePrefab.instantiate();
 	newBiome.Initialise(type);
 	return newBiome;
@@ -54,31 +54,31 @@ func SpawnRandomBiomes_3x3_Influenced(currGPos:Vector2i, prevGPos:Vector2i) -> v
 	# Type of the newly Spawned Biome.
 	var biomes_WithGPos:Array[Array] = Get_SurroundingBiomeTypes_WithGPos(prevGPos);
 	
-	var influences:Array[BiomeMaster.Type] = [];
+	var influences:Array[Biome_Master.Type] = [];
 	for b in biomes_WithGPos:
 		influences.append(b[1]);
 	
 	# Add random biome ensure there is always a chance to spawn a different biome region.
-	influences.append(BiomeMaster.RandomBiomeType());
+	influences.append(Biome_Master.RandomBiomeType());
 	
 	for point in spawnPoints:
 		for i in biomes_WithGPos:
 			if Are_GridPosNeighbours(point, i[0]):
-				var neighbourBias:Array[BiomeMaster.Type] = influences;
+				var neighbourBias:Array[Biome_Master.Type] = influences;
 				# Add One-Off bias for Neighbouring Biome
 				neighbourBias.append_array(Get_NeighbourBias(i[1]));
-				var newBiomeType:BiomeMaster.Type = neighbourBias.pick_random();
+				var newBiomeType:Biome_Master.Type = neighbourBias.pick_random();
 				
 				SpawnBiome(point, newBiomeType);
 	
-func Get_NeighbourBias(neighbourBiome:BiomeMaster.Type) -> Array[BiomeMaster.Type]:
+func Get_NeighbourBias(neighbourBiome:Biome_Master.Type) -> Array[Biome_Master.Type]:
 	
-	var bias:Array[BiomeMaster.Type] = [];
+	var bias:Array[Biome_Master.Type] = [];
 	
 	match neighbourBiome:
-		BiomeMaster.Type.Water:
+		Biome_Master.Type.Water:
 			for c in 4: # We favour Water!
-				bias.append(BiomeMaster.Type.Water);
+				bias.append(Biome_Master.Type.Water);
 		_:
 			for c in 2:
 				bias.append(neighbourBiome);
@@ -127,12 +127,12 @@ func Get_OccupiedGridPositions(gPosArray:Array[Vector2i]) -> Array[Vector2i]:
 			occupied.append(gPos);
 	return occupied;
 
-func Get_SurroundingBiomeTypes(gPos:Vector2i) -> Array[BiomeMaster.Type]:
+func Get_SurroundingBiomeTypes(gPos:Vector2i) -> Array[Biome_Master.Type]:
 	var surrounding_GPos:Array[Vector2i] = Get_GridPosArray3x3(gPos, true);
 	# Remove Empty Positions in case we are at the World Edge
 	surrounding_GPos = Get_OccupiedGridPositions(surrounding_GPos);
 	
-	var biomesAround:Array[BiomeMaster.Type]; # Array[Grid Pos, Biome Type]
+	var biomesAround:Array[Biome_Master.Type]; # Array[Grid Pos, Biome Type]
 	
 	for p in surrounding_GPos:
 		biomesAround.append(World.Get_BiomeType(p));
