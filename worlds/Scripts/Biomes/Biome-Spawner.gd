@@ -5,7 +5,7 @@ extends Node;
 @export var biomeHolder:Node;
 
 func _ready() -> void:
-	get_parent().SpawnAround.connect(SpawnRandomBiomes_Influenced);
+	get_parent().SpawnAround.connect(On_SpawnAround);
 
 # [ 1 / 4 ] Functions: Biome Spawning ----------------------------------------------------------------------------------------------------
 
@@ -32,10 +32,10 @@ func SpawnRandomBiomes(gPos:Vector2i, reach:int) -> void:
 	if empties.size() > 0:
 		for e in empties:
 			SpawnRandomBiome(e);
-		
-func SpawnRandomBiomes_Influenced(currGPos:Vector2i, prevGPos:Vector2i, reach:int) -> void:
+
+func SpawnRandomBiomes_Influenced(currGPos:Vector2i, prevGPos:Vector2i, spawnRange:int, influenceRange:int) -> void:
 	
-	var spawnPoints:Array[Vector2i] = Get_Surrounding_Empties(currGPos, reach);
+	var spawnPoints:Array[Vector2i] = Get_Surrounding_Empties(currGPos, spawnRange);
 	
 	if spawnPoints.size() == 0:
 		return;
@@ -43,7 +43,7 @@ func SpawnRandomBiomes_Influenced(currGPos:Vector2i, prevGPos:Vector2i, reach:in
 	# Get Surrounding Biomes with Grid Positions used to compare with each Spawn Point and get
 	# its Adjacent Biome Type, which will determine the Influences used in selecting the
 	# Type of the newly Spawned Biome.
-	var biomes_WithGPos:Array[Array] = Get_Surrounding_BiomeTypes_WithGPos(prevGPos, reach);
+	var biomes_WithGPos:Array[Array] = Get_Surrounding_BiomeTypes_WithGPos(prevGPos, influenceRange);
 	
 	var influences:Array[Biome_Master.Type] = [];
 	for b in biomes_WithGPos:
@@ -61,6 +61,9 @@ func SpawnRandomBiomes_Influenced(currGPos:Vector2i, prevGPos:Vector2i, reach:in
 				var newBiomeType:Biome_Master.Type = neighbourBias.pick_random();
 				
 				SpawnBiome(point, newBiomeType);
+
+func On_SpawnAround(currGPos:Vector2i, prevGPos:Vector2i) -> void:
+	SpawnRandomBiomes_Influenced(currGPos, prevGPos, 2, 1);
 
 # [ 2 / 4 ] Functions: Bias ----------------------------------------------------------------------------------------------------
 

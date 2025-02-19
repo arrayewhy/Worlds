@@ -50,7 +50,7 @@ func MovePlayer_And_SpawnBiomes(inputDir:Vector2i) -> void:
 	# Update Current Grid Position
 	currGridPos += inputDir;
 	# Spawn Biomes around new position
-	SpawnAround.emit(currGridPos, prevGridPos, 2);
+	SpawnAround.emit(currGridPos, prevGridPos);
 	var targPos = position + Vector2(inputDir) * World.cellSize;
 	# Move Player
 	position = targPos;
