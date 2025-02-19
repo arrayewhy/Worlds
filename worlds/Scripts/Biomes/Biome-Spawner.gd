@@ -40,10 +40,14 @@ func SpawnRandomBiomes_Influenced(currGPos:Vector2i, prevGPos:Vector2i, spawnRan
 	if spawnPoints.size() == 0:
 		return;
 	
+	# Remove a random spawn point just for fun!
+	if spawnPoints.size() > 1:
+		spawnPoints.remove_at(randi_range(0, spawnPoints.size()));
+	
 	# Get Surrounding Biomes with Grid Positions used to compare with each Spawn Point and get
 	# its Adjacent Biome Type, which will determine the Influences used in selecting the
 	# Type of the newly Spawned Biome.
-	var biomes_WithGPos:Array[Array] = Get_Surrounding_BiomeTypes_WithGPos(prevGPos, influenceRange);
+	var biomes_WithGPos:Array[Array] = Get_Surrounding_BiomeTypes_WithGPos(currGPos, influenceRange);
 	
 	var influences:Array[Biome_Master.Type] = [];
 	for b in biomes_WithGPos:
@@ -53,14 +57,16 @@ func SpawnRandomBiomes_Influenced(currGPos:Vector2i, prevGPos:Vector2i, spawnRan
 	influences.append(Biome_Master.RandomBiomeType());
 	
 	for point in spawnPoints:
+		var count:int = 0;
 		for i in biomes_WithGPos:
 			if Are_GridPosNeighbours(point, i[0]):
 				var neighbourBias:Array[Biome_Master.Type] = influences;
 				# Add One-Off bias for Neighbouring Biome
 				neighbourBias.append_array(Get_NeighbourBias(i[1]));
-				var newBiomeType:Biome_Master.Type = neighbourBias.pick_random();
-				
-				SpawnBiome(point, newBiomeType);
+				SpawnBiome(point, neighbourBias.pick_random());
+				#InGameDebugger.Say("Spawn!")
+				break;
+	#InGameDebugger.Say("\n");
 
 func On_SpawnAround(currGPos:Vector2i, prevGPos:Vector2i) -> void:
 	SpawnRandomBiomes_Influenced(currGPos, prevGPos, 2, 1);
