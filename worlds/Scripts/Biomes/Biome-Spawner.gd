@@ -34,7 +34,7 @@ func SpawnRandomBiomes(gPos:Vector2i, reach:int) -> void:
 		for e in empties:
 			SpawnRandomBiome(e);
 
-func SpawnRandomBiomes_Influenced(currGPos:Vector2i, prevGPos:Vector2i, spawnRange:int, influenceRange:int) -> void:
+func SpawnRandomBiomes_Influenced(currGPos:Vector2i, _prevGPos:Vector2i, spawnRange:int, influenceRange:int) -> void:
 	
 	var spawnPoints:Array[Vector2i] = Get_Surrounding_Empties(currGPos, spawnRange);
 	
@@ -58,7 +58,6 @@ func SpawnRandomBiomes_Influenced(currGPos:Vector2i, prevGPos:Vector2i, spawnRan
 	influences.append(Biome_Master.RandomBiomeType());
 	
 	for point in spawnPoints:
-		var count:int = 0;
 		for i in biomes_WithGPos:
 			if Are_GridPosNeighbours(point, i[0]):
 				var neighbourBias:Array[Biome_Master.Type] = influences;
