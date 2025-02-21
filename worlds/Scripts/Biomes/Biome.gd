@@ -1,11 +1,15 @@
 extends Node2D;
 
+# Components
 var biomeSprite:Sprite2D;
 var interactionSpawner:Node;
-
+# Variables
 var type:Biome_Master.Type;
+var gridPos:Vector2i;
 
-func Initialise(biomeType:Biome_Master.Type) -> void:
+func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type) -> void:
+	
+	gridPos = gPos;
 	
 	if !biomeSprite:
 		biomeSprite = $"Biome-Sprite";
@@ -50,3 +54,8 @@ func Initialise_Interaction(gPos:Vector2i, biomeType:Biome_Master.Type, interTyp
 
 func Get_Interaction() -> InteractionMaster.Type:
 	return interactionSpawner.Get_Interaction();
+
+# Functions: Grid Position ----------------------------------------------------------------------------------------------------
+
+func Get_GridPosition() -> Vector2i:
+	return gridPos;

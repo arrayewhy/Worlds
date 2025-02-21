@@ -12,7 +12,7 @@ func _ready() -> void:
 
 func SpawnBiome(gPos:Vector2i, type:Biome_Master.Type, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
 	var newBiome:Object = biomePrefab.instantiate();
-	newBiome.Initialise(type);
+	newBiome.Initialise(gPos, type);
 	biomeHolder.add_child(newBiome);
 	# Position New Biome in World Space with slight randomisation
 	var newPos:Vector2 = Vector2(gPos) * World.cellSize;

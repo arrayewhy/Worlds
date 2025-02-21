@@ -3,13 +3,11 @@ extends Node;
 # Components
 var fader:Node;
 var sprite:Sprite2D;
-
 # Variables
-var gPos:Vector2i;
 var currInteraction:InteractionMaster.Type;
 
 func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type, interType:InteractionMaster.Type) -> void:
-	
+	set_process(false)
 	# Initialise Compenents
 	fader = $Fader;
 	sprite = $"Interaction-Sprite";
@@ -24,7 +22,7 @@ func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type, interType:Interactio
 			1:
 				Spawn_RandomInteraction(gPos, biomeType);
 
-# [ 1 / 3 ] Functions: Spawning ----------------------------------------------------------------------------------------------------
+# [ 1 / 4 ] Functions: Spawning ----------------------------------------------------------------------------------------------------
 
 func Spawn_Interaction(gPos:Vector2i, interType:InteractionMaster.Type, resetChance:bool = false) -> void:
 	Set_Interaction(interType);
@@ -88,7 +86,7 @@ func Try_Spawn(gPos:Vector2i, biomeType:Biome_Master.Type, interType:Interaction
 func Should_Spawn(interType:InteractionMaster.Type) -> bool:
 	return randi_range(0, World.Get_Chance(interType)) == 0;
 
-# [ 2 / 3 ] Functions: Get Set Interaction ----------------------------------------------------------------------------------------------------
+# [ 2 / 4 ] Functions: Get Set Interaction ----------------------------------------------------------------------------------------------------
 
 func Set_Interaction(type:InteractionMaster.Type) -> void:
 	currInteraction = type;
@@ -96,7 +94,7 @@ func Set_Interaction(type:InteractionMaster.Type) -> void:
 func Get_Interaction() -> InteractionMaster.Type:
 	return currInteraction;
 
-# [ 3 / 3 ] Functions: Sprite ----------------------------------------------------------------------------------------------------
+# [ 3 / 4 ] Functions: Sprite ----------------------------------------------------------------------------------------------------
 
 func Vanish() -> void:
 	fader.FadeToTrans();
@@ -114,3 +112,8 @@ func Update_Sprite(interType:InteractionMaster.Type) -> void:
 			sprite.region_rect.position = Vector2i(256, 1536);
 		_:
 			InGameDebugger.Warn(str("Failed to update sprite, Interaction: "), interType);
+
+# [ 4 / 4 ] Functions: Grid Position ----------------------------------------------------------------------------------------------------
+
+func Get_GridPosition() -> Vector2i:
+	return get_parent().Get_GridPosition();

@@ -8,6 +8,11 @@
 [sub_resource type="GDScript" id="GDScript_g5468"]
 resource_name = "Interaction-Mover"
 script/source = "extends Node;
+
+# Functions: Grid Position ----------------------------------------------------------------------------------------------------
+
+func Get_GridPosition() -> Vector2i:
+	return get_parent().Get_GridPosition();
 "
 
 [node name="Biome" type="Node2D"]
