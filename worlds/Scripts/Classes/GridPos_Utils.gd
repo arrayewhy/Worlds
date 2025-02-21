@@ -12,11 +12,14 @@ static func GridPositions_Around(gPos:Vector2i, reach:int, removeCenter:bool = f
 	
 	for row in size:
 		for col in size:
+			
 			var targ:Vector2i = topLeft + offset;
+			
 			if removeCenter and targ == gPos:
 				pass;
 			else:
 				array.append(targ);
+				
 			offset.x += 1;
 		offset.x = 0;
 		offset.y += 1;

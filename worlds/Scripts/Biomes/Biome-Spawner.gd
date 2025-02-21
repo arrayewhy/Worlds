@@ -4,35 +4,39 @@ extends Node;
 
 @export var biomeHolder:Node;
 
+
 func _ready() -> void:
 	get_parent().SpawnInit.connect(SpawnInitBiomes);
 	get_parent().SpawnAround.connect(On_SpawnAround);
 
+
 # [ 1 / 3 ] Functions: Biome Spawning ----------------------------------------------------------------------------------------------------
+
 
 func SpawnBiome(gPos:Vector2i, type:Biome_Master.Type, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
 	var newBiome:Object = biomePrefab.instantiate();
 	newBiome.Initialise(gPos, type);
 	biomeHolder.add_child(newBiome);
-	# Position New Biome in World Space with slight randomisation
-	var newPos:Vector2 = Vector2(gPos) * World.cellSize;
-	newPos += Vector2(randf_range(-6, 6), randf_range(-6, 6));
-	newBiome.position = newPos;
+	# Position New Biome in World Space
+	newBiome.position = Vector2(gPos) * World.cellSize;
 	# Record the biome
 	World.Record_Biome(gPos, newBiome, type);
 	newBiome.Initialise_Interaction(gPos, type, interType);
 	World.IncreaseWorldSize();
 	# Debug Message
 	#InGameDebugger.Say(str(gPos, " : ", World.Get_BiomeType(gPos), ", ", World.Get_InteractionType(gPos)), true);
-	
+
+
 func SpawnRandomBiome(gPos:Vector2i, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
 	SpawnBiome(gPos, Biome_Master.RandomBiomeType(), interType);
-		
+
+
 func SpawnRandomBiomes(gPos:Vector2i, reach:int) -> void:
 	var empties:Array[Vector2i] = GridPos_Utils.Empties_Around(gPos, reach);
 	if empties.size() > 0:
 		for e in empties:
 			SpawnRandomBiome(e);
+
 
 func SpawnRandomBiomes_Influenced(currGPos:Vector2i, _prevGPos:Vector2i, spawnRange:int, influenceRange:int) -> void:
 	
@@ -40,10 +44,6 @@ func SpawnRandomBiomes_Influenced(currGPos:Vector2i, _prevGPos:Vector2i, spawnRa
 	
 	if spawnPoints.size() == 0:
 		return;
-	
-	# Remove a random spawn point just for fun!
-	if spawnPoints.size() > 1:
-		spawnPoints.remove_at(randi_range(0, spawnPoints.size() - 1));
 	
 	# Get Surrounding Biomes with Grid Positions used to compare with each Spawn Point and get
 	# its Adjacent Biome Type, which will determine the Influences used in selecting the
@@ -68,8 +68,10 @@ func SpawnRandomBiomes_Influenced(currGPos:Vector2i, _prevGPos:Vector2i, spawnRa
 				break;
 	#InGameDebugger.Say("\n");
 
+
 func On_SpawnAround(currGPos:Vector2i, prevGPos:Vector2i) -> void:
 	SpawnRandomBiomes_Influenced(currGPos, prevGPos, 2, 1);
+
 
 func SpawnInitBiomes(gPos:Vector2i) -> void:
 	var surroundingEmpties = GridPos_Utils.GridPositions_Around(gPos, 1);
@@ -77,7 +79,9 @@ func SpawnInitBiomes(gPos:Vector2i) -> void:
 		SpawnRandomBiome(e);
 	get_parent().SpawnInit.disconnect(SpawnInitBiomes);
 
+
 # [ 2 / 3 ] Functions: Bias ----------------------------------------------------------------------------------------------------
+
 
 func Get_NeighbourBias(neighbourBiome:Biome_Master.Type) -> Array[Biome_Master.Type]:
 	

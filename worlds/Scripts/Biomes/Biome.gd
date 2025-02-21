@@ -6,6 +6,8 @@ var interactionSpawner:Node;
 # Variables
 var type:Biome_Master.Type;
 var gridPos:Vector2i;
+const rotRandLimit:float = .05;
+const posRandLimit:float = 8;
 
 func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type) -> void:
 	
@@ -15,7 +17,10 @@ func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type) -> void:
 		biomeSprite = $"Biome-Sprite";
 	
 	# A bit of Visual Styling
-	self.rotate(randf_range(-.05, .05));
+	biomeSprite.rotate(randf_range(-rotRandLimit, rotRandLimit));
+	biomeSprite.position += Vector2(randf_range(-posRandLimit, posRandLimit), randf_range(-posRandLimit, posRandLimit));
+	#InGameDebugger.Say(position)
+	#position += rand;
 	biomeSprite.modulate.v = randf_range(.9, 1);
 	
 	match biomeType:
