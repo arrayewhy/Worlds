@@ -14,6 +14,10 @@ func _ready() -> void:
 	currGridPos = initGridPos;
 	Spawn_InitialBiomes();
 
+func _process(delta: float) -> void:
+	if Input.is_action_just_pressed("Enter"):
+		InGameDebugger.Say(World.Get_InteractionType(currGridPos));
+
 func _unhandled_key_input(event: InputEvent) -> void:
 	
 	var inputDir:Vector2i = Vector2i.ZERO;

@@ -7,7 +7,7 @@ var discoveredBiomes = {}; # Grid Position : [Biome Object, Biome Type, Interact
 var worldSize:int = 1;
 
 const maxChance:int = 999;
-var chances:Dictionary; # Biome_Master.Type : int
+var chances:Dictionary; # InteractionMaster.Type : int
 const initChance_Dog:int = 0;
 const initChance_Fish:int = 990;
 const initChance_Boat:int = 0;
@@ -15,7 +15,7 @@ const initChance_Boat:int = 0;
 func _ready() -> void:
 	Initialise_Chances();
 
-# Functions: World Size
+# Functions: World Size ----------------------------------------------------------------------------------------------------
 
 func Increase_WorldSize() -> void:
 	worldSize += 1;
@@ -27,7 +27,7 @@ func IncreaseWorldSize() -> void:
 	if discoveredBiomes.size() % 1000 == 0:
 		Increase_WorldSize();
 
-# Functions: Biomes
+# Functions: Biomes ----------------------------------------------------------------------------------------------------
 
 func Record_Biome(gPos:Vector2i, biome:Object, type:Biome_Master.Type) -> void:
 	discoveredBiomes[gPos] = [biome, type];
@@ -51,22 +51,14 @@ func Get_BiomeType(gPos:Vector2i) -> Biome_Master.Type:
 	InGameDebugger.Warn(str("Biome NOT found: ", gPos));
 	return Biome_Master.Type.NULL;
 
-# Functions: Interactions
-
-func Record_Interaction(gPos:Vector2i, interType:InteractionMaster.Type) -> void:
-	# We record a biome's Interaction in the 3rd element of its array so it contains:
-	# [Biome Object, Biome Type, Interaction]
-	if discoveredBiomes[gPos].size() > 2:
-		discoveredBiomes[gPos][2] = interType;
-		return;
-	discoveredBiomes[gPos].push_back(interType);
+# Functions: Interactions ----------------------------------------------------------------------------------------------------
 
 func Get_InteractionType(gPos:Vector2i) -> InteractionMaster.Type:
 	if !discoveredBiomes.has(gPos):
 		InGameDebugger.Warn(str("No Biome, so no Interaction: ", gPos));
 		return InteractionMaster.Type.NULL;
 	else:
-		return discoveredBiomes[gPos][2];
+		return discoveredBiomes[gPos][0].Get_Interaction();
 
 func Get_Chance(type:InteractionMaster.Type) -> int:
 	# We pick from a random range [0, chance], so if the chance starts at ZERO, 

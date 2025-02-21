@@ -40,3 +40,6 @@ func Initialise_Interaction(gPos:Vector2i, biomeType:Biome_Master.Type, interTyp
 	if !interactionSpawner:
 		interactionSpawner = $"Interaction-Spawner";
 	interactionSpawner.Initialise(gPos, biomeType, interType);
+
+func Get_Interaction() -> InteractionMaster.Type:
+	return interactionSpawner.Get_Interaction();

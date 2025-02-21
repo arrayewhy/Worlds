@@ -78,7 +78,6 @@ func Should_Spawn(interType:InteractionMaster.Type) -> bool:
 func Spawn_Interaction(gPos:Vector2i, interType:InteractionMaster.Type, resetChance:bool = false) -> void:
 	currInteraction = interType;
 	Update_Sprite(interType);
-	World.Record_Interaction(gPos, interType);
 	if resetChance:
 		World.Reset_Chance(interType);
 
