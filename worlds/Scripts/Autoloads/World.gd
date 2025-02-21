@@ -12,8 +12,19 @@ const initChance_Dog:int = 0;
 const initChance_Fish:int = 990;
 const initChance_Boat:int = 0;
 
+signal SpawnBiomesAroundPlayer(currGPos, prevGPos);
+signal SpawnBiomes(gPos);
+
 func _ready() -> void:
 	Initialise_Chances();
+
+# Functions: Signals ----------------------------------------------------------------------------------------------------
+
+func SpawnBiomes_AroundPlayer(currGPos:Vector2i, prevGPos:Vector2i) -> void:
+	SpawnBiomesAroundPlayer.emit(currGPos, prevGPos);
+
+func SpawnBiomes_Around(gPos:Vector2i) -> void:
+	SpawnBiomes.emit(gPos);
 
 # Functions: World Size ----------------------------------------------------------------------------------------------------
 

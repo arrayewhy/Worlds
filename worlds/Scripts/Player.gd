@@ -7,12 +7,10 @@ extends Node2D;
 var initGridPos := Vector2i(0,0);
 var currGridPos:Vector2i;
 
-signal SpawnInit(gPos);
-signal SpawnAround(currGPos, prevGPos);
-
 func _ready() -> void:
 	currGridPos = initGridPos;
-	Spawn_InitialBiomes();
+	World.SpawnBiomes_Around(currGridPos);
+	#Spawn_InitialBiomes();
 
 #func _process(delta: float) -> void:
 	#if Input.is_action_just_pressed("Enter"):
@@ -45,23 +43,20 @@ func Get_DirectionInput(event:InputEvent) -> Vector2i:
 	if event.is_action_pressed("Right"):
 		return Vector2i.RIGHT;
 	return Vector2i.ZERO;
-		
-func Spawn_InitialBiomes() -> void:
-	#biomeSpawner.SpawnRandomBiome(currGridPos);
-	SpawnInit.emit(currGridPos);
-	#biomeSpawner.SpawnRandomBiomes(Vector2i(0,0), 2);
 
 func MovePlayer_And_SpawnBiomes(inputDir:Vector2i) -> void:
 	var prevGridPos = currGridPos;
 	# Update Current Grid Position
 	currGridPos += inputDir;
 	# Spawn Biomes around new position
-	SpawnAround.emit(currGridPos, prevGridPos);
+	World.SpawnBiomes_AroundPlayer(currGridPos, prevGridPos);
 	var targPos = position + Vector2(inputDir) * World.cellSize;
 	# Move Player
 	position = targPos;
 	# Move Camera
 	camMover.StartMove(targPos);
+
+# Functions: Debug ----------------------------------------------------------------------------------------------------
 
 func MovePlayer_And_SpawnBiomes_Repeated(inputDir:Vector2i, repetitions:int = 1000) -> void:
 	

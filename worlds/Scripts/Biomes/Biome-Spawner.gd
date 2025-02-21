@@ -6,8 +6,8 @@ extends Node;
 
 
 func _ready() -> void:
-	get_parent().SpawnInit.connect(SpawnInitBiomes);
-	get_parent().SpawnAround.connect(On_SpawnAround);
+	World.SpawnBiomes.connect(Spawn_Around);
+	World.SpawnBiomesAroundPlayer.connect(On_SpawnAround);
 
 
 # [ 1 / 3 ] Functions: Biome Spawning ----------------------------------------------------------------------------------------------------
@@ -21,7 +21,7 @@ func SpawnBiome(gPos:Vector2i, type:Biome_Master.Type, interType:InteractionMast
 	newBiome.position = Vector2(gPos) * World.cellSize;
 	# Record the biome
 	World.Record_Biome(gPos, newBiome, type);
-	newBiome.Initialise_Interaction(gPos, type, interType);
+	newBiome.Initialise_Interaction(type, interType);
 	World.IncreaseWorldSize();
 	# Debug Message
 	#InGameDebugger.Say(str(gPos, " : ", World.Get_BiomeType(gPos), ", ", World.Get_InteractionType(gPos)), true);
@@ -73,11 +73,10 @@ func On_SpawnAround(currGPos:Vector2i, prevGPos:Vector2i) -> void:
 	SpawnRandomBiomes_Influenced(currGPos, prevGPos, 2, 1);
 
 
-func SpawnInitBiomes(gPos:Vector2i) -> void:
+func Spawn_Around(gPos:Vector2i) -> void:
 	var surroundingEmpties = GridPos_Utils.GridPositions_Around(gPos, 1);
 	for e in surroundingEmpties:
 		SpawnRandomBiome(e);
-	get_parent().SpawnInit.disconnect(SpawnInitBiomes);
 
 
 # [ 2 / 3 ] Functions: Bias ----------------------------------------------------------------------------------------------------

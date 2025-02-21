@@ -52,10 +52,10 @@ func Prep_Water() -> void:
 
 # Functions: Interactions ----------------------------------------------------------------------------------------------------
 
-func Initialise_Interaction(gPos:Vector2i, biomeType:Biome_Master.Type, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
+func Initialise_Interaction(biomeType:Biome_Master.Type, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
 	if !interactionSpawner:
 		interactionSpawner = $"Interaction";
-	interactionSpawner.Initialise(gPos, biomeType, interType);
+	interactionSpawner.Initialise(biomeType, interType);
 
 func Get_Interaction() -> InteractionMaster.Type:
 	return interactionSpawner.Get_Interaction();
