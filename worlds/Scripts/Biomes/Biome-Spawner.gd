@@ -9,7 +9,7 @@ func _ready() -> void:
 	World.SpawnBiomes.connect(Spawn_Around);
 	World.SpawnBiomesAroundPlayer.connect(On_SpawnAround);
 
-# [ 1 / 3 ] Functions: Biome Spawning ----------------------------------------------------------------------------------------------------
+# [ 1 / 2 ] Functions: Biome Spawning ----------------------------------------------------------------------------------------------------
 
 func SpawnBiome(gPos:Vector2i, type:Biome_Master.Type, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
 	var newBiome:Object = biomePrefab.instantiate();
@@ -43,7 +43,7 @@ func SpawnRandomBiomes_Influenced(currGPos:Vector2i, _prevGPos:Vector2i, spawnRa
 	# Get Surrounding Biomes with Grid Positions used to compare with each Spawn Point and get
 	# its Adjacent Biome Type, which will determine the Influences used in selecting the
 	# Type of the newly Spawned Biome.
-	var biomes_WithGPos:Array[Array] = Get_Surrounding_BiomeTypes_WithGPos(currGPos, influenceRange);
+	var biomes_WithGPos:Array[Array] = World.Surrounding_Biomes_WithGPos(currGPos, influenceRange);
 	
 	var influences:Array[Biome_Master.Type] = [];
 	for b in biomes_WithGPos:
@@ -71,7 +71,7 @@ func Spawn_Around(gPos:Vector2i) -> void:
 	for e in surroundingEmpties:
 		SpawnRandomBiome(e);
 
-# [ 2 / 3 ] Functions: Bias ----------------------------------------------------------------------------------------------------
+# [ 2 / 2 ] Functions: Bias ----------------------------------------------------------------------------------------------------
 
 func Get_NeighbourBias(neighbourBiome:Biome_Master.Type) -> Array[Biome_Master.Type]:
 	
@@ -90,51 +90,3 @@ func Get_NeighbourBias(neighbourBiome:Biome_Master.Type) -> Array[Biome_Master.T
 	if bias == []:
 		InGameDebugger.Warn("No neighbour biases found.");
 	return bias;
-
-# [ 3 / 3 ] Functions: Biome Types ----------------------------------------------------------------------------------------------------
-
-func Get_Surrounding_BiomeTypes(gPos:Vector2i, reach:int) -> Array[Biome_Master.Type]:
-	var surrounding_GPos:Array[Vector2i] = GridPos_Utils.GridPositions_Around(gPos, reach);
-	# Remove Empty Positions in case we are at the World Edge
-	surrounding_GPos = GridPos_Utils.Remove_Empty(surrounding_GPos);
-	
-	var biomesAround:Array[Biome_Master.Type]; # Array[Grid Pos, Biome Type]
-	
-	for p in surrounding_GPos:
-		biomesAround.append(World.Get_BiomeType(p));
-		
-	# Debug Message
-		
-	#var message:String;
-		#
-	#for i in biomesAround.size():
-		#if i == 4:
-			#message += "PLAYER";
-		#message += str("Biome: ", biomesAround[i], " | ");
-		#
-	#InGameDebugger.Say(message);
-	
-	return biomesAround;
-
-func Get_Surrounding_BiomeTypes_WithGPos(gPos:Vector2i, reach:int) -> Array[Array]:
-	var surrounding_GPos:Array[Vector2i] = GridPos_Utils.GridPositions_Around(gPos, reach);
-	# Remove Empty Positions in case we are at the World Edge
-	surrounding_GPos = GridPos_Utils.Remove_Empty(surrounding_GPos);
-	
-	var biomesAround:Array[Array]; # Array[Grid Pos, Biome Type]
-	
-	for p in surrounding_GPos:
-		biomesAround.append([p, World.Get_BiomeType(p)]);
-		
-	# Debug Message
-		
-	#var message:String;
-		#
-	#for i in biomesAround.size():
-		#if i == 4:
-			#message += "PLAYER";
-		#message += str("GridPos: ", biomesAround[i][0], ", Biome: ", biomesAround[i][1], " | ");
-		#
-	#InGameDebugger.Say(message);
-	
-	return biomesAround;

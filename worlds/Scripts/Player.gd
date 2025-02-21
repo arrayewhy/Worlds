@@ -22,7 +22,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	# Move and Spawn Repeater
 	
 	if event.is_action_pressed("One"):
-		MovePlayer_And_SpawnBiomes_Repeated(inputDir, 10000);
+		MovePlayer_And_SpawnBiomes_Repeated(inputDir, 5000);
 		return;
 	
 	# Normal Player Move and Biome Spawn

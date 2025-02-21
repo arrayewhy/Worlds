@@ -66,6 +66,30 @@ func Get_BiomeType(gPos:Vector2i) -> Biome_Master.Type:
 	InGameDebugger.Warn(str("Biome NOT found: ", gPos));
 	return Biome_Master.Type.NULL;
 
+func Surrounding_Biomes(gPos:Vector2i, reach:int) -> Array[Biome_Master.Type]:
+	var surrounding_GPos:Array[Vector2i] = GridPos_Utils.GridPositions_Around(gPos, reach);
+	# Remove Empty Positions in case we are at the World Edge
+	surrounding_GPos = GridPos_Utils.Remove_Empty(surrounding_GPos);
+	
+	var biomesAround:Array[Biome_Master.Type]; # Array[Biome Type]
+	
+	for p in surrounding_GPos:
+		biomesAround.append(World.Get_BiomeType(p));
+	
+	return biomesAround;
+
+func Surrounding_Biomes_WithGPos(gPos:Vector2i, reach:int) -> Array[Array]:
+	var surrounding_GPos:Array[Vector2i] = GridPos_Utils.GridPositions_Around(gPos, reach);
+	# Remove Empty Positions in case we are at the World Edge
+	surrounding_GPos = GridPos_Utils.Remove_Empty(surrounding_GPos);
+	
+	var biomesAround:Array[Array]; # Array[Grid Pos, Biome Type]
+	
+	for p in surrounding_GPos:
+		biomesAround.append([p, World.Get_BiomeType(p)]);
+	
+	return biomesAround;
+
 # Functions: Interactions ----------------------------------------------------------------------------------------------------
 
 func Get_InteractionType(gPos:Vector2i) -> InteractionMaster.Type:
