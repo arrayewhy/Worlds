@@ -8,7 +8,7 @@ func _ready() -> void:
 	get_parent().SpawnInit.connect(SpawnInitBiomes);
 	get_parent().SpawnAround.connect(On_SpawnAround);
 
-# [ 1 / 4 ] Functions: Biome Spawning ----------------------------------------------------------------------------------------------------
+# [ 1 / 3 ] Functions: Biome Spawning ----------------------------------------------------------------------------------------------------
 
 func SpawnBiome(gPos:Vector2i, type:Biome_Master.Type, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
 	var newBiome:Object = biomePrefab.instantiate();
@@ -29,14 +29,14 @@ func SpawnRandomBiome(gPos:Vector2i, interType:InteractionMaster.Type = Interact
 	SpawnBiome(gPos, Biome_Master.RandomBiomeType(), interType);
 		
 func SpawnRandomBiomes(gPos:Vector2i, reach:int) -> void:
-	var empties:Array[Vector2i] = Get_Surrounding_Empties(gPos, reach);
+	var empties:Array[Vector2i] = GridPos_Utils.Get_Surrounding_Empties(gPos, reach);
 	if empties.size() > 0:
 		for e in empties:
 			SpawnRandomBiome(e);
 
 func SpawnRandomBiomes_Influenced(currGPos:Vector2i, _prevGPos:Vector2i, spawnRange:int, influenceRange:int) -> void:
 	
-	var spawnPoints:Array[Vector2i] = Get_Surrounding_Empties(currGPos, spawnRange);
+	var spawnPoints:Array[Vector2i] = GridPos_Utils.Get_Surrounding_Empties(currGPos, spawnRange);
 	
 	if spawnPoints.size() == 0:
 		return;
@@ -59,7 +59,7 @@ func SpawnRandomBiomes_Influenced(currGPos:Vector2i, _prevGPos:Vector2i, spawnRa
 	
 	for point in spawnPoints:
 		for i in biomes_WithGPos:
-			if Are_GridPosNeighbours(point, i[0]):
+			if GridPos_Utils.Are_GridPosNeighbours(point, i[0]):
 				var neighbourBias:Array[Biome_Master.Type] = influences;
 				# Add One-Off bias for Neighbouring Biome
 				neighbourBias.append_array(Get_NeighbourBias(i[1]));
@@ -72,12 +72,12 @@ func On_SpawnAround(currGPos:Vector2i, prevGPos:Vector2i) -> void:
 	SpawnRandomBiomes_Influenced(currGPos, prevGPos, 2, 1);
 
 func SpawnInitBiomes(gPos:Vector2i) -> void:
-	var surroundingEmpties = GridPositions_Around(gPos, 1);
+	var surroundingEmpties = GridPos_Utils.GridPositions_Around(gPos, 1);
 	for e in surroundingEmpties:
 		SpawnRandomBiome(e);
 	get_parent().SpawnInit.disconnect(SpawnInitBiomes);
 
-# [ 2 / 4 ] Functions: Bias ----------------------------------------------------------------------------------------------------
+# [ 2 / 3 ] Functions: Bias ----------------------------------------------------------------------------------------------------
 
 func Get_NeighbourBias(neighbourBiome:Biome_Master.Type) -> Array[Biome_Master.Type]:
 	
@@ -97,64 +97,12 @@ func Get_NeighbourBias(neighbourBiome:Biome_Master.Type) -> Array[Biome_Master.T
 		InGameDebugger.Warn("No neighbour biases found.");
 	return bias;
 
-# [ 3 / 4 ] Functions: Grid Positions ----------------------------------------------------------------------------------------------------
-
-func GridPositions_Around(gPos:Vector2i, reach:int) -> Array[Vector2i]:
-	
-	var array:Array[Vector2i] = [];
-	
-	var size:int = reach * 2 + 1;
-	
-	var topLeft:Vector2i = gPos + Vector2i(-1, -1) * reach;
-	
-	var offset:Vector2i = Vector2i(0, 0);
-	
-	for row in size:
-		for col in size:
-			array.append(topLeft + offset);
-			offset.x += 1;
-		offset.x = 0;
-		offset.y += 1;
-	
-	return array;
-
-func Get_Surrounding_Empties(gPos:Vector2i, reach:int) -> Array[Vector2i]:
-	var surrounding_GPos:Array[Vector2i] = GridPositions_Around(gPos, reach);
-	# The comment below seems wrong?
-	# Remove Empty Positions in case we are at the World Edge
-	return Remove_Occupied(surrounding_GPos);
-
-func Remove_Occupied(gPosArray:Array[Vector2i]) -> Array[Vector2i]:
-	var empties:Array[Vector2i] = [];
-	for gPos in gPosArray:
-		if !World.Is_Occupied(gPos):
-			empties.append(gPos);
-	return empties;
-	
-func Get_Occupied(gPosArray:Array[Vector2i]) -> Array[Vector2i]:
-	var occupied:Array[Vector2i] = [];
-	for gPos in gPosArray:
-		if World.Is_Occupied(gPos):
-			occupied.append(gPos);
-	return occupied;
-
-func Are_GridPosNeighbours(gPos:Vector2i, neighbourGPos:Vector2i) -> bool:
-	if gPos + Vector2i.UP == neighbourGPos:
-		return true;
-	if gPos + Vector2i.DOWN == neighbourGPos:
-		return true;
-	if gPos + Vector2i.LEFT == neighbourGPos:
-		return true;
-	if gPos + Vector2i.RIGHT == neighbourGPos:
-		return true;
-	return false;
-
-# [ 4 / 4 ] Functions: Biome Types ----------------------------------------------------------------------------------------------------
+# [ 3 / 3 ] Functions: Biome Types ----------------------------------------------------------------------------------------------------
 
 func Get_Surrounding_BiomeTypes(gPos:Vector2i, reach:int) -> Array[Biome_Master.Type]:
-	var surrounding_GPos:Array[Vector2i] = GridPositions_Around(gPos, reach);
+	var surrounding_GPos:Array[Vector2i] = GridPos_Utils.GridPositions_Around(gPos, reach);
 	# Remove Empty Positions in case we are at the World Edge
-	surrounding_GPos = Get_Occupied(surrounding_GPos);
+	surrounding_GPos = GridPos_Utils.Get_Occupied(surrounding_GPos);
 	
 	var biomesAround:Array[Biome_Master.Type]; # Array[Grid Pos, Biome Type]
 	
@@ -175,9 +123,9 @@ func Get_Surrounding_BiomeTypes(gPos:Vector2i, reach:int) -> Array[Biome_Master.
 	return biomesAround;
 
 func Get_Surrounding_BiomeTypes_WithGPos(gPos:Vector2i, reach:int) -> Array[Array]:
-	var surrounding_GPos:Array[Vector2i] = GridPositions_Around(gPos, reach);
+	var surrounding_GPos:Array[Vector2i] = GridPos_Utils.GridPositions_Around(gPos, reach);
 	# Remove Empty Positions in case we are at the World Edge
-	surrounding_GPos = Get_Occupied(surrounding_GPos);
+	surrounding_GPos = GridPos_Utils.Get_Occupied(surrounding_GPos);
 	
 	var biomesAround:Array[Array]; # Array[Grid Pos, Biome Type]
 	

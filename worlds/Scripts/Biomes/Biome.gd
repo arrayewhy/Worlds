@@ -24,6 +24,11 @@ func Initialise(biomeType:Biome_Master.Type) -> void:
 		_:
 			InGameDebugger.Warn("Failed to Initialise Biome: No type specified.");
 
+# Functions: Biome Type ----------------------------------------------------------------------------------------------------
+
+func Get_BiomeType() -> Biome_Master.Type:
+	return type;
+
 func Prep_Earth() -> void:
 	type = Biome_Master.Type.Earth;
 	biomeSprite.region_rect.position = Vector2i(256, 0);
@@ -35,6 +40,8 @@ func Prep_Grass() -> void:
 func Prep_Water() -> void:
 	type = Biome_Master.Type.Water;
 	biomeSprite.region_rect.position = Vector2i(0, 0);
+
+# Functions: Interactions ----------------------------------------------------------------------------------------------------
 
 func Initialise_Interaction(gPos:Vector2i, biomeType:Biome_Master.Type, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
 	if !interactionSpawner:

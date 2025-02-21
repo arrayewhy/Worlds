@@ -1,9 +1,14 @@
-[gd_scene load_steps=5 format=3 uid="uid://dp8o013p58rw7"]
+[gd_scene load_steps=6 format=3 uid="uid://dp8o013p58rw7"]
 
 [ext_resource type="Script" path="res://Scripts/Biomes/Biome.gd" id="1_hkqds"]
 [ext_resource type="Texture2D" uid="uid://dk06eplgkeoi2" path="res://Sprites/Clack_Map_SpriteSheet_2048.png" id="2_xqfes"]
 [ext_resource type="Script" path="res://Scripts/Interactions/Interaction-Spawner.gd" id="3_hof4e"]
 [ext_resource type="Script" path="res://Scripts/Fader.gd" id="4_tdtd5"]
+
+[sub_resource type="GDScript" id="GDScript_g5468"]
+resource_name = "Interaction-Mover"
+script/source = "extends Node;
+"
 
 [node name="Biome" type="Node2D"]
 script = ExtResource("1_hkqds")
@@ -25,3 +30,6 @@ region_rect = Rect2(0, 1024, 256, 256)
 [node name="Fader" type="Node" parent="Interaction-Spawner" node_paths=PackedStringArray("target")]
 script = ExtResource("4_tdtd5")
 target = NodePath("../Interaction-Sprite")
+
+[node name="Interaction-Mover" type="Node" parent="Interaction-Spawner"]
+script = SubResource("GDScript_g5468")
