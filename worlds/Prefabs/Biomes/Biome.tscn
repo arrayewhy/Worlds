@@ -4,16 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://dk06eplgkeoi2" path="res://Sprites/Clack_Map_SpriteSheet_2048.png" id="2_xqfes"]
 [ext_resource type="Script" path="res://Scripts/Interactions/Interaction.gd" id="3_dd44l"]
 [ext_resource type="Script" path="res://Scripts/Fader.gd" id="4_tdtd5"]
-
-[sub_resource type="GDScript" id="GDScript_g5468"]
-resource_name = "Interaction-Mover"
-script/source = "extends Node;
-
-# Functions: Grid Position ----------------------------------------------------------------------------------------------------
-
-func Get_GridPosition() -> Vector2i:
-	return get_parent().Get_GridPosition();
-"
+[ext_resource type="Script" path="res://Scripts/Interactions/Interaction-Updater.gd" id="5_bdkr0"]
 
 [node name="Biome" type="Node2D"]
 script = ExtResource("1_hkqds")
@@ -37,7 +28,7 @@ script = ExtResource("4_tdtd5")
 target = NodePath("../Interaction-Sprite")
 startVisible = false
 
-[node name="Mover" type="Node" parent="Interaction"]
-script = SubResource("GDScript_g5468")
+[node name="Updater" type="Node" parent="Interaction"]
+script = ExtResource("5_bdkr0")
 
 [node name="Spawner" type="Node" parent="Interaction"]

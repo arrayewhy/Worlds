@@ -80,14 +80,6 @@ func Spawn_Interaction(interType:InteractionMaster.Type, resetChance:bool = fals
 	if resetChance:
 		World.Reset_Chance(interType);
 
-	if World.TimeTick.is_connected(On_WorldTick):
-		return;
-
-	# Start updating on the next frame
-	await get_tree().process_frame;
-
-	World.TimeTick.connect(On_WorldTick);
-
 # [ 2 / 4 ] Functions: Get Set Interaction ----------------------------------------------------------------------------------------------------
 
 func Set_Interaction(type:InteractionMaster.Type) -> void:
@@ -116,46 +108,6 @@ func Update_Sprite(interType:InteractionMaster.Type) -> void:
 			InGameDebugger.Warn(str("Failed to update sprite, Interaction: "), interType);
 
 # [ 4 / 4 ] Functions: Grid Position ----------------------------------------------------------------------------------------------------
-
-func On_WorldTick() -> void:
-	
-	var surroundings:Array[Vector2i] = GridPos_Utils.GridPositions_Around(Get_GridPosition(), 1, true);
-	surroundings = GridPos_Utils.Remove_Empty(surroundings);
-	
-	match(currInteraction):
-		InteractionMaster.Type.Fish:
-			Update_Fish(surroundings);
-		InteractionMaster.Type.NULL:
-			pass;
-
-func Update_Fish(surroundings:Array[Vector2i]) -> void:
-
-	var shouldMove:bool = randi_range(0, 1);
-	
-	if !shouldMove:
-		return;
-
-	var waters:Array[Vector2i] = [];
-	
-	for i in surroundings.size():
-		
-		var biomeObject:Object = World.Get_BiomeObject(surroundings[i]);
-		
-		if biomeObject.Get_BiomeType() != Biome_Master.Type.Water:
-			continue;
-		if biomeObject.Get_Interaction() != InteractionMaster.Type.NULL:
-			continue;
-		
-		waters.append(surroundings[i]);
-	
-	if waters.size() == 0:
-		return;
-	
-	var targPos:Vector2i = waters.pick_random();
-	
-	Set_Interaction(InteractionMaster.Type.NULL);
-	Vanish(4);
-	World.Get_BiomeObject(targPos).Spawn_Interaction(InteractionMaster.Type.Fish);
 
 func Get_GridPosition() -> Vector2i:
 	return get_parent().Get_GridPosition();

@@ -26,9 +26,13 @@ static func GridPositions_Around(gPos:Vector2i, reach:int, removeCenter:bool = f
 	
 	return array;
 
-static func Empties_Around(gPos:Vector2i, reach:int) -> Array[Vector2i]:
-	var surrounding_GPos:Array[Vector2i] = GridPositions_Around(gPos, reach);
+static func Empties_Around(gPos:Vector2i, reach:int, removeCenter:bool) -> Array[Vector2i]:
+	var surrounding_GPos:Array[Vector2i] = GridPositions_Around(gPos, reach, removeCenter);
 	return Remove_Occupied(surrounding_GPos);
+	
+static func Occupieds_Around(gPos:Vector2i, reach:int, removeCenter:bool) -> Array[Vector2i]:
+	var surrounding_GPos:Array[Vector2i] = GridPositions_Around(gPos, reach, removeCenter);
+	return Remove_Empty(surrounding_GPos);
 
 static func Are_GridPosNeighbours(gPos:Vector2i, neighbourGPos:Vector2i, diagonal:bool = false) -> bool:
 	if gPos + Vector2i.UP == neighbourGPos:

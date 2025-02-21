@@ -10,7 +10,6 @@ var currGridPos:Vector2i;
 func _ready() -> void:
 	currGridPos = initGridPos;
 	World.SpawnBiomes_Around(currGridPos);
-	#Spawn_InitialBiomes();
 
 #func _process(delta: float) -> void:
 	#if Input.is_action_just_pressed("Enter"):
