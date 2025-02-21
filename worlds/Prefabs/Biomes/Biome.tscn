@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Scripts/Biomes/Biome.gd" id="1_hkqds"]
 [ext_resource type="Texture2D" uid="uid://dk06eplgkeoi2" path="res://Sprites/Clack_Map_SpriteSheet_2048.png" id="2_xqfes"]
-[ext_resource type="Script" path="res://Scripts/Interactions/Interaction-Spawner.gd" id="3_hof4e"]
+[ext_resource type="Script" path="res://Scripts/Interactions/Interaction.gd" id="3_dd44l"]
 [ext_resource type="Script" path="res://Scripts/Fader.gd" id="4_tdtd5"]
 
 [sub_resource type="GDScript" id="GDScript_g5468"]
@@ -24,7 +24,7 @@ region_enabled = true
 region_rect = Rect2(2048, 0, 256, 256)
 
 [node name="Interaction" type="Node2D" parent="."]
-script = ExtResource("3_hof4e")
+script = ExtResource("3_dd44l")
 
 [node name="Interaction-Sprite" type="Sprite2D" parent="Interaction"]
 z_index = 1

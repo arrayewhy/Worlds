@@ -6,7 +6,7 @@ var sprite:Sprite2D;
 # Variables
 var currInteraction:InteractionMaster.Type;
 
-func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type, interType:InteractionMaster.Type) -> void:
+func Initialise(biomeType:Biome_Master.Type, interType:InteractionMaster.Type) -> void:
 	set_process(false)
 	# Initialise Compenents
 	fader = $Fader;
@@ -20,26 +20,26 @@ func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type, interType:Interactio
 				#Vanish(); # Fade starts as invisible.
 				return;
 			1:
-				Spawn_RandomInteraction(gPos, biomeType);
+				Spawn_RandomInteraction(biomeType);
 
 # [ 1 / 4 ] Functions: Spawning ----------------------------------------------------------------------------------------------------
 
-func Spawn_Interaction(gPos:Vector2i, interType:InteractionMaster.Type, resetChance:bool = false) -> void:
+func Spawn_Interaction(interType:InteractionMaster.Type, resetChance:bool = false) -> void:
 	Set_Interaction(interType);
 	Update_Sprite(interType);
 	Appear();
 	if resetChance:
 		World.Reset_Chance(interType);
 
-func Spawn_RandomInteraction(gPos:Vector2i, biomeType:Biome_Master.Type) -> void:
+func Spawn_RandomInteraction(biomeType:Biome_Master.Type) -> void:
 	
 	if biomeType == Biome_Master.Type.Water:
-		Try_Spawn(gPos, biomeType, InteractionMaster.WaterInteractions().pick_random());
+		Try_Spawn(biomeType, InteractionMaster.WaterInteractions().pick_random());
 		return;
 	
-	Try_Spawn(gPos, biomeType, randi_range(1, InteractionMaster.Type.size() - 1));
+	Try_Spawn(biomeType, randi_range(1, InteractionMaster.Type.size() - 1));
 
-func Try_Spawn(gPos:Vector2i, biomeType:Biome_Master.Type, interType:InteractionMaster.Type) -> void:
+func Try_Spawn(biomeType:Biome_Master.Type, interType:InteractionMaster.Type) -> void:
 	
 	if !Should_Spawn(interType):
 		
@@ -61,21 +61,21 @@ func Try_Spawn(gPos:Vector2i, biomeType:Biome_Master.Type, interType:Interaction
 		InteractionMaster.Type.Dog:
 		
 			if biomeType != Biome_Master.Type.Water or World.Win_ImprobableRoll():
-				Spawn_Interaction(gPos, interType, true);
+				Spawn_Interaction(interType, true);
 				InGameDebugger.Say("Spawn: Dog");
 				return;
 			
 		InteractionMaster.Type.Fish:
 			
 			if biomeType == Biome_Master.Type.Water or World.Win_ImprobableRoll():
-				Spawn_Interaction(gPos, interType);
+				Spawn_Interaction(interType);
 				InGameDebugger.Say("Spawn: Fish");
 				return;
 				
 		InteractionMaster.Type.Boat:
 			
 			if biomeType == Biome_Master.Type.Water or World.Win_ImprobableRoll():
-				Spawn_Interaction(gPos, interType, true);
+				Spawn_Interaction(interType, true);
 				InGameDebugger.Say("Spawn: Boat");
 				return;
 			
