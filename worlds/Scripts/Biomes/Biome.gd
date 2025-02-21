@@ -2,7 +2,7 @@ extends Node2D;
 
 # Components
 var biomeSprite:Sprite2D;
-var interactionSpawner:Node;
+var interaction:Node;
 # Variables
 var type:Biome_Master.Type;
 var gridPos:Vector2i;
@@ -53,12 +53,15 @@ func Prep_Water() -> void:
 # Functions: Interactions ----------------------------------------------------------------------------------------------------
 
 func Initialise_Interaction(biomeType:Biome_Master.Type, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
-	if !interactionSpawner:
-		interactionSpawner = $"Interaction";
-	interactionSpawner.Initialise(biomeType, interType);
+	if !interaction:
+		interaction = $"Interaction";
+	interaction.Initialise(biomeType, interType);
+
+func Spawn_Interaction(interType:InteractionMaster.Type) -> void:
+	interaction.Spawn_Interaction(interType);
 
 func Get_Interaction() -> InteractionMaster.Type:
-	return interactionSpawner.Get_Interaction();
+	return interaction.Get_Interaction();
 
 # Functions: Grid Position ----------------------------------------------------------------------------------------------------
 

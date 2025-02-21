@@ -50,6 +50,7 @@ func MovePlayer_And_SpawnBiomes(inputDir:Vector2i) -> void:
 	currGridPos += inputDir;
 	# Spawn Biomes around new position
 	World.SpawnBiomes_AroundPlayer(currGridPos, prevGridPos);
+	World.Advance_Time();
 	var targPos = position + Vector2(inputDir) * World.cellSize;
 	# Move Player
 	position = targPos;

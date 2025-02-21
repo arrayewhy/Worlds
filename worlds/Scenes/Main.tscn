@@ -103,11 +103,3 @@ autoplay = true
 [node name="Forest" type="AudioStreamPlayer" parent="Audio"]
 stream = ExtResource("13_wbwr2")
 autoplay = true
-
-[node name="Forest2" type="AudioStreamPlayer" parent="Audio"]
-stream = ExtResource("13_wbwr2")
-autoplay = true
-
-[node name="Forest3" type="AudioStreamPlayer" parent="Audio"]
-stream = ExtResource("13_wbwr2")
-autoplay = true

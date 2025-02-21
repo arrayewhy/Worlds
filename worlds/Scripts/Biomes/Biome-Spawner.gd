@@ -9,9 +9,7 @@ func _ready() -> void:
 	World.SpawnBiomes.connect(Spawn_Around);
 	World.SpawnBiomesAroundPlayer.connect(On_SpawnAround);
 
-
 # [ 1 / 3 ] Functions: Biome Spawning ----------------------------------------------------------------------------------------------------
-
 
 func SpawnBiome(gPos:Vector2i, type:Biome_Master.Type, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
 	var newBiome:Object = biomePrefab.instantiate();
@@ -26,17 +24,14 @@ func SpawnBiome(gPos:Vector2i, type:Biome_Master.Type, interType:InteractionMast
 	# Debug Message
 	#InGameDebugger.Say(str(gPos, " : ", World.Get_BiomeType(gPos), ", ", World.Get_InteractionType(gPos)), true);
 
-
 func SpawnRandomBiome(gPos:Vector2i, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
 	SpawnBiome(gPos, Biome_Master.RandomBiomeType(), interType);
-
 
 func SpawnRandomBiomes(gPos:Vector2i, reach:int) -> void:
 	var empties:Array[Vector2i] = GridPos_Utils.Empties_Around(gPos, reach);
 	if empties.size() > 0:
 		for e in empties:
 			SpawnRandomBiome(e);
-
 
 func SpawnRandomBiomes_Influenced(currGPos:Vector2i, _prevGPos:Vector2i, spawnRange:int, influenceRange:int) -> void:
 	
@@ -68,19 +63,15 @@ func SpawnRandomBiomes_Influenced(currGPos:Vector2i, _prevGPos:Vector2i, spawnRa
 				break;
 	#InGameDebugger.Say("\n");
 
-
 func On_SpawnAround(currGPos:Vector2i, prevGPos:Vector2i) -> void:
 	SpawnRandomBiomes_Influenced(currGPos, prevGPos, 2, 1);
-
 
 func Spawn_Around(gPos:Vector2i) -> void:
 	var surroundingEmpties = GridPos_Utils.GridPositions_Around(gPos, 1);
 	for e in surroundingEmpties:
 		SpawnRandomBiome(e);
 
-
 # [ 2 / 3 ] Functions: Bias ----------------------------------------------------------------------------------------------------
-
 
 func Get_NeighbourBias(neighbourBiome:Biome_Master.Type) -> Array[Biome_Master.Type]:
 	

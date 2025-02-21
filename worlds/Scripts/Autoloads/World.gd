@@ -2,7 +2,7 @@ extends Node;
 
 const cellSize:int = 256;
 
-var discoveredBiomes = {}; # Grid Position : [Biome Object, Biome Type, Interaction]
+var discoveredBiomes = {}; # Grid Position : [Biome Object, Biome Type]
 
 var worldSize:int = 1;
 
@@ -14,6 +14,7 @@ const initChance_Boat:int = 0;
 
 signal SpawnBiomesAroundPlayer(currGPos, prevGPos);
 signal SpawnBiomes(gPos);
+signal TimeTick;
 
 func _ready() -> void:
 	Initialise_Chances();
@@ -25,6 +26,9 @@ func SpawnBiomes_AroundPlayer(currGPos:Vector2i, prevGPos:Vector2i) -> void:
 
 func SpawnBiomes_Around(gPos:Vector2i) -> void:
 	SpawnBiomes.emit(gPos);
+	
+func Advance_Time() -> void:
+	TimeTick.emit();
 
 # Functions: World Size ----------------------------------------------------------------------------------------------------
 
@@ -46,7 +50,7 @@ func Record_Biome(gPos:Vector2i, biome:Object, type:Biome_Master.Type) -> void:
 func Is_Occupied(gPos:Vector2i) -> bool:
 	return discoveredBiomes.has(gPos);
 
-func Get_BiomeNode(gPos:Vector2i) -> Object:
+func Get_BiomeObject(gPos:Vector2i) -> Object:
 	
 	if discoveredBiomes.has(gPos):
 		return discoveredBiomes[gPos][0];
