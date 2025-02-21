@@ -5,6 +5,7 @@ extends Node;
 @export var biomeHolder:Node;
 
 func _ready() -> void:
+	get_parent().SpawnInit.connect(SpawnInitBiomes);
 	get_parent().SpawnAround.connect(On_SpawnAround);
 
 # [ 1 / 4 ] Functions: Biome Spawning ----------------------------------------------------------------------------------------------------
@@ -42,7 +43,7 @@ func SpawnRandomBiomes_Influenced(currGPos:Vector2i, prevGPos:Vector2i, spawnRan
 	
 	# Remove a random spawn point just for fun!
 	if spawnPoints.size() > 1:
-		spawnPoints.remove_at(randi_range(0, spawnPoints.size()));
+		spawnPoints.remove_at(randi_range(0, spawnPoints.size() - 1));
 	
 	# Get Surrounding Biomes with Grid Positions used to compare with each Spawn Point and get
 	# its Adjacent Biome Type, which will determine the Influences used in selecting the
@@ -70,6 +71,12 @@ func SpawnRandomBiomes_Influenced(currGPos:Vector2i, prevGPos:Vector2i, spawnRan
 
 func On_SpawnAround(currGPos:Vector2i, prevGPos:Vector2i) -> void:
 	SpawnRandomBiomes_Influenced(currGPos, prevGPos, 2, 1);
+
+func SpawnInitBiomes(gPos:Vector2i) -> void:
+	var surroundingEmpties = GridPositions_Around(gPos, 1);
+	for e in surroundingEmpties:
+		SpawnRandomBiome(e);
+	get_parent().SpawnInit.disconnect(SpawnInitBiomes);
 
 # [ 2 / 4 ] Functions: Bias ----------------------------------------------------------------------------------------------------
 

@@ -7,6 +7,7 @@ extends Node2D;
 var initGridPos := Vector2i(0,0);
 var currGridPos:Vector2i;
 
+signal SpawnInit(gPos);
 signal SpawnAround(currGPos, prevGPos);
 
 func _ready() -> void:
@@ -43,7 +44,8 @@ func Get_DirectionInput(event:InputEvent) -> Vector2i:
 		
 func Spawn_InitialBiomes() -> void:
 	#biomeSpawner.SpawnRandomBiome(currGridPos);
-	biomeSpawner.SpawnRandomBiomes(Vector2i(0,0), 2);
+	SpawnInit.emit(currGridPos);
+	#biomeSpawner.SpawnRandomBiomes(Vector2i(0,0), 2);
 
 func MovePlayer_And_SpawnBiomes(inputDir:Vector2i) -> void:
 	var prevGridPos = currGridPos;
