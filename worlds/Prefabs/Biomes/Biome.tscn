@@ -18,18 +18,21 @@ texture = ExtResource("2_xqfes")
 region_enabled = true
 region_rect = Rect2(2048, 0, 256, 256)
 
-[node name="Interaction-Spawner" type="Node2D" parent="."]
+[node name="Interaction" type="Node2D" parent="."]
 script = ExtResource("3_hof4e")
 
-[node name="Interaction-Sprite" type="Sprite2D" parent="Interaction-Spawner"]
+[node name="Interaction-Sprite" type="Sprite2D" parent="Interaction"]
 z_index = 1
 texture = ExtResource("2_xqfes")
 region_enabled = true
 region_rect = Rect2(0, 1024, 256, 256)
 
-[node name="Fader" type="Node" parent="Interaction-Spawner" node_paths=PackedStringArray("target")]
+[node name="Fader" type="Node" parent="Interaction" node_paths=PackedStringArray("target")]
 script = ExtResource("4_tdtd5")
 target = NodePath("../Interaction-Sprite")
+startVisible = false
 
-[node name="Interaction-Mover" type="Node" parent="Interaction-Spawner"]
+[node name="Mover" type="Node" parent="Interaction"]
 script = SubResource("GDScript_g5468")
+
+[node name="Spawner" type="Node" parent="Interaction"]
