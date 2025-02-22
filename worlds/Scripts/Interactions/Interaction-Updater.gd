@@ -1,27 +1,14 @@
 extends Node;
 
-func _ready() -> void:
-	World.TimeTick.connect(On_WorldTick);
-	await get_tree().process_frame;
-	
-	#InGameDebugger.Say(get_incoming_connections().size());
-	#for i in get_incoming_connections().size():
-		#InGameDebugger.Say(get_incoming_connections()[i].callable);
-	#InGameDebugger.Say("\n-\n");
-
 func On_WorldTick() -> void:
-	if get_parent().Get_Interaction() == InteractionMaster.Type.NULL:
-		return;
-		
-	# Why is this firing multiple times?
-		
-	InGameDebugger.Say("Update", true);
 	match(get_parent().Get_Interaction()):
 		InteractionMaster.Type.Fish:
 			Update_Fish();
 
 func Update_Fish() -> void:
-
+	
+	InGameDebugger.Say(str("Updating: ", InteractionMaster.Type.keys()[get_parent().Get_Interaction()]), true);
+	
 	var gPos:Vector2i = get_parent().Get_GridPosition();
 	var surroundings:Array[Vector2i] = GridPos_Utils.Occupieds_Around(gPos, 1, true);
 
@@ -50,10 +37,19 @@ func Update_Fish() -> void:
 	if waters.size() == 0:
 		return;
 	
-	var targPos:Vector2i = waters.pick_random();
-	#InGameDebugger.Say(str(get_parent().Get_GridPosition(), targPos), true)
-	#InGameDebugger.Say("\n")
-	get_parent().Set_Interaction(InteractionMaster.Type.NULL);
-	get_parent().Vanish(4);
+	var targGPos:Vector2i = waters.pick_random();
 	
-	World.Get_BiomeObject(targPos).Spawn_Interaction(InteractionMaster.Type.Fish);
+	get_parent().Disable_Interaction(4);
+	
+	Disconnect_TimeTick();
+	
+	# Spawn Interaction through Target Biome Object
+	World.Get_BiomeObject(targGPos).Spawn_Interaction(InteractionMaster.Type.Fish);
+
+# Functions: Signals ----------------------------------------------------------------------------------------------------
+
+func Connect_TimeTick() -> void:
+	World.TimeTick.connect(On_WorldTick);
+
+func Disconnect_TimeTick() -> void:
+	World.TimeTick.disconnect(On_WorldTick);

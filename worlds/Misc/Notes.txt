@@ -1,3 +1,10 @@
-Bugs:
-	- Interaction-Updater function (On_WorldTick) connected to World.TimeTick fires between
+BUGS:
+
+FIXED:
+	- 1 Signal Emit, Multiple Function Calls:
+		Interaction-Updater function (On_WorldTick) connected to World.TimeTick fires between
 		1~3 times every time World.TimeTick is emitted.
+		
+		SOLUTION:
+			- Only connect Active Interactions to World.TimeTick, and 
+			disconnect them when NOT active (InteractionMaster.Type.NULL).

@@ -24,14 +24,12 @@ func _ready() -> void:
 
 func SpawnBiomes_AroundPlayer(currGPos:Vector2i, prevGPos:Vector2i) -> void:
 	playerGridPos = currGPos;
-	InGameDebugger.Say("PlayerMove");
 	SpawnBiomesAroundPlayer.emit(currGPos, prevGPos);
 
 func SpawnBiomes_Around(gPos:Vector2i) -> void:
 	SpawnBiomes.emit(gPos);
 	
 func Advance_Time() -> void:
-	InGameDebugger.Say("TimeTick")
 	TimeTick.emit();
 
 # Functions: World Size ----------------------------------------------------------------------------------------------------
