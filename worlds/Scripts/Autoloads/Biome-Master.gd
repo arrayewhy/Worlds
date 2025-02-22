@@ -1,6 +1,6 @@
 class_name Biome_Master extends Node;
 
-enum Type {NULL, Earth, Grass, Water};
+enum Type {NULL, Earth, Grass, Water, Stone};
 
 static func RandomBiomeType() -> int:
 	# Return an Int instead of a Type since this is faster.

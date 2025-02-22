@@ -30,6 +30,8 @@ func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type) -> void:
 			Prep_Grass();
 		Biome_Master.Type.Water:
 			Prep_Water();
+		Biome_Master.Type.Stone:
+			Prep_Stone();
 		_:
 			InGameDebugger.Warn("Failed to Initialise Biome: No type specified.");
 
@@ -49,6 +51,10 @@ func Prep_Grass() -> void:
 func Prep_Water() -> void:
 	type = Biome_Master.Type.Water;
 	biomeSprite.region_rect.position = Vector2i(0, 0);
+
+func Prep_Stone() -> void:
+	type = Biome_Master.Type.Stone;
+	biomeSprite.region_rect.position = Vector2i(512, 0);
 
 # Functions: Interactions ----------------------------------------------------------------------------------------------------
 
