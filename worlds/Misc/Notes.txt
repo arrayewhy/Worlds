@@ -1,4 +1,17 @@
-BUGS:
+UPCOMING ----------------------------------------------------------------------------------------------------
+
+HIGH PRIORITY:
+	- Tween Player Movement
+	- Time of Day & Search Range
+	- Spawn: Trees
+	
+SPECULATIVE:
+	- Inventory
+	- Biome Mouse Hover
+
+BUGS ----------------------------------------------------------------------------------------------------
+
+HIGH PRIORITY:
 
 FIXED:
 	- 1 Signal Emit, Multiple Function Calls:
