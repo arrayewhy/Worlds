@@ -58,7 +58,7 @@ func Initialise_Interaction(biomeType:Biome_Master.Type, interType:InteractionMa
 	interaction.Initialise(biomeType, interType);
 
 func Spawn_Interaction(interType:InteractionMaster.Type) -> void:
-	interaction.Spawn_Interaction(interType);
+	interaction.Spawn(interType);
 
 func Get_Interaction() -> InteractionMaster.Type:
 	return interaction.Get_Interaction();

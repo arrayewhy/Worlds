@@ -15,6 +15,32 @@ func _ready() -> void:
 	#if Input.is_action_just_pressed("Enter"):
 		#InGameDebugger.Say(str("Player Process: ", GridPos_Utils.GridPositions_Around(currGridPos, 1, true).size()));
 
+#func _process(delta: float) -> void:
+	#
+	#var inputDir:Vector2i = Vector2i.ZERO;
+	#
+	## Move and Spawn Repeater
+	#
+	#if Input.is_action_just_pressed("One"):
+		#MovePlayer_And_SpawnBiomes_Repeated(inputDir, 5000);
+		#return;
+	#
+	## Normal Player Move and Biome Spawn
+	#
+	#if Input.is_action_just_pressed("Up"):
+		#inputDir = Vector2i.UP;
+	#elif Input.is_action_just_pressed("Down"):
+		#inputDir = Vector2i.DOWN;
+	#elif Input.is_action_just_pressed("Left"):
+		#inputDir = Vector2i.LEFT;
+	#elif Input.is_action_just_pressed("Right"):
+		#inputDir = Vector2i.RIGHT;
+	#
+	##inputDir = Get_DirectionInput(event);
+	#if inputDir != Vector2i(0,0):
+		#MovePlayer_And_SpawnBiomes(inputDir);
+		#return;
+
 func _unhandled_key_input(event: InputEvent) -> void:
 	
 	var inputDir:Vector2i = Vector2i.ZERO;
@@ -49,12 +75,14 @@ func MovePlayer_And_SpawnBiomes(inputDir:Vector2i) -> void:
 	currGridPos += inputDir;
 	# Spawn Biomes around new position
 	World.SpawnBiomes_AroundPlayer(currGridPos, prevGridPos);
-	World.Advance_Time();
 	var targPos = position + Vector2(inputDir) * World.cellSize;
 	# Move Player
 	position = targPos;
 	# Move Camera
 	camMover.StartMove(targPos);
+	
+	await get_tree().process_frame;
+	World.Advance_Time();
 
 # Functions: Debug ----------------------------------------------------------------------------------------------------
 

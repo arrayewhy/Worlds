@@ -49,21 +49,21 @@ func Try_Spawn(biomeType:Biome_Master.Type, interType:InteractionMaster.Type) ->
 		InteractionMaster.Type.Dog:
 		
 			if biomeType != Biome_Master.Type.Water or World.Win_ImprobableRoll():
-				Spawn_Interaction(interType, true);
+				Spawn(interType, true);
 				InGameDebugger.Say("Spawn: Dog");
 				return;
 			
 		InteractionMaster.Type.Fish:
 			
 			if biomeType == Biome_Master.Type.Water or World.Win_ImprobableRoll():
-				Spawn_Interaction(interType);
+				Spawn(interType);
 				#InGameDebugger.Say("Spawn: Fish");
 				return;
 				
 		InteractionMaster.Type.Boat:
 			
 			if biomeType == Biome_Master.Type.Water or World.Win_ImprobableRoll():
-				Spawn_Interaction(interType, true);
+				Spawn(interType, true);
 				InGameDebugger.Say("Spawn: Boat");
 				return;
 			
@@ -73,7 +73,7 @@ func Try_Spawn(biomeType:Biome_Master.Type, interType:InteractionMaster.Type) ->
 func Should_Spawn(interType:InteractionMaster.Type) -> bool:
 	return randi_range(0, World.Get_Chance(interType)) == 0;
 
-func Spawn_Interaction(interType:InteractionMaster.Type, resetChance:bool = false) -> void:
+func Spawn(interType:InteractionMaster.Type, resetChance:bool = false) -> void:
 	Set_Interaction(interType);
 	Update_Sprite(interType);
 	Appear();

@@ -1,17 +1,18 @@
 extends Node;
 
+# Constants
 const cellSize:int = 256;
-
+# Variables: World
 var discoveredBiomes = {}; # Grid Position : [Biome Object, Biome Type]
-
 var worldSize:int = 1;
-
+var playerGridPos:Vector2i;
+# Variables: Interaction
 const maxChance:int = 999;
 var chances:Dictionary; # InteractionMaster.Type : int
 const initChance_Dog:int = 0;
 const initChance_Fish:int = 990;
 const initChance_Boat:int = 0;
-
+# Signals
 signal SpawnBiomesAroundPlayer(currGPos, prevGPos);
 signal SpawnBiomes(gPos);
 signal TimeTick;
@@ -22,12 +23,15 @@ func _ready() -> void:
 # Functions: Signals ----------------------------------------------------------------------------------------------------
 
 func SpawnBiomes_AroundPlayer(currGPos:Vector2i, prevGPos:Vector2i) -> void:
+	playerGridPos = currGPos;
+	InGameDebugger.Say("PlayerMove");
 	SpawnBiomesAroundPlayer.emit(currGPos, prevGPos);
 
 func SpawnBiomes_Around(gPos:Vector2i) -> void:
 	SpawnBiomes.emit(gPos);
 	
 func Advance_Time() -> void:
+	InGameDebugger.Say("TimeTick")
 	TimeTick.emit();
 
 # Functions: World Size ----------------------------------------------------------------------------------------------------
@@ -132,3 +136,8 @@ func Get_MaxChance() -> int:
 
 func Win_ImprobableRoll() -> bool:
 	return randi_range(0, Get_MaxChance()) == 0;
+
+# Functions: Player ----------------------------------------------------------------------------------------------------
+
+func PlayerGridPos() -> Vector2i:
+	return playerGridPos;
