@@ -1,6 +1,6 @@
 extends Node;
 
-@onready var biomePrefab:PackedScene = preload("res://Prefabs/Biomes/Biome.tscn");
+@onready var biomePrefab:PackedScene = preload("res://Prefabs/Biome.tscn");
 
 @export var biomeHolder:Node;
 

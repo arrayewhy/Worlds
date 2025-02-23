@@ -1,34 +1,34 @@
 [gd_scene load_steps=6 format=3 uid="uid://dp8o013p58rw7"]
 
-[ext_resource type="Script" path="res://Scripts/Biomes/Biome.gd" id="1_hkqds"]
-[ext_resource type="Texture2D" uid="uid://dk06eplgkeoi2" path="res://Sprites/Clack_Map_SpriteSheet_2048.png" id="2_xqfes"]
-[ext_resource type="Script" path="res://Scripts/Interactions/Interaction.gd" id="3_dd44l"]
-[ext_resource type="Script" path="res://Scripts/Fader.gd" id="4_tdtd5"]
-[ext_resource type="Script" path="res://Scripts/Interactions/Interaction-Updater.gd" id="5_bdkr0"]
+[ext_resource type="Script" path="res://Scripts/Biomes/Biome.gd" id="1_mcdx6"]
+[ext_resource type="Texture2D" uid="uid://dk06eplgkeoi2" path="res://Sprites/Clack_Map_SpriteSheet_2048.png" id="2_tsunu"]
+[ext_resource type="Script" path="res://Scripts/Interactions/Interaction.gd" id="3_1dk8w"]
+[ext_resource type="Script" path="res://Scripts/Fader.gd" id="4_10jla"]
+[ext_resource type="Script" path="res://Scripts/Interactions/Interaction-Updater.gd" id="5_tenxf"]
 
 [node name="Biome" type="Node2D"]
-script = ExtResource("1_hkqds")
+script = ExtResource("1_mcdx6")
 
 [node name="Biome-Sprite" type="Sprite2D" parent="."]
-texture = ExtResource("2_xqfes")
+texture = ExtResource("2_tsunu")
 region_enabled = true
 region_rect = Rect2(2048, 0, 256, 256)
 
 [node name="Interaction" type="Node2D" parent="."]
-script = ExtResource("3_dd44l")
+script = ExtResource("3_1dk8w")
 
 [node name="Interaction-Sprite" type="Sprite2D" parent="Interaction"]
 z_index = 1
-texture = ExtResource("2_xqfes")
+texture = ExtResource("2_tsunu")
 region_enabled = true
 region_rect = Rect2(0, 1024, 256, 256)
 
 [node name="Fader" type="Node" parent="Interaction" node_paths=PackedStringArray("target")]
-script = ExtResource("4_tdtd5")
+script = ExtResource("4_10jla")
 target = NodePath("../Interaction-Sprite")
 startVisible = false
 
 [node name="Updater" type="Node" parent="Interaction"]
-script = ExtResource("5_bdkr0")
+script = ExtResource("5_tenxf")
 
 [node name="Spawner" type="Node" parent="Interaction"]

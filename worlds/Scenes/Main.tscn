@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://dpw5ih7gg3btv"]
+[gd_scene load_steps=17 format=3 uid="uid://dpw5ih7gg3btv"]
 
 [ext_resource type="Script" path="res://Scripts/Main-Camera.gd" id="1_e4dtk"]
 [ext_resource type="Texture2D" uid="uid://dk06eplgkeoi2" path="res://Sprites/Clack_Map_SpriteSheet_2048.png" id="1_ntyhy"]
@@ -13,6 +13,45 @@
 [ext_resource type="Script" path="res://Scripts/UI/Black-Bars.gd" id="8_umww4"]
 [ext_resource type="AudioStream" uid="uid://sos25qvtf0mq" path="res://Audio/SFX/Desert-Wind_611257__newlocknew__windsynth-3winter3osc.wav" id="12_py2jo"]
 [ext_resource type="AudioStream" uid="uid://cgv7itiiugmiq" path="res://Audio/SFX/Forest_634315__klankbeeld__border-forestfarmfield-727am-nl-eu-220515_0345.wav" id="13_wbwr2"]
+
+[sub_resource type="GDScript" id="GDScript_acxdq"]
+resource_name = "Hover"
+script/source = "extends Node2D;
+
+var moving:Dictionary = {};
+
+var detectionRange:float = 128;
+var offset:float = -48;
+
+func _process(_delta: float) -> void:
+	
+	var mousePos:Vector2 = get_global_mouse_position();
+	
+	for i in World.discoveredBiomes:
+		
+		# If mouse is near biome object
+		var worldPos:Vector2 = i * float(World.cellSize);
+		if worldPos.distance_to(mousePos) < detectionRange:
+			
+			# If it has already been offset, skip it.
+			if moving.has(i):
+				continue;
+			
+			# 1. Get the biome's object
+			var biomeObj:Object = World.discoveredBiomes.get(i)[0];
+			# 2. Record its position
+			moving[i] = biomeObj.position;
+			# 3. Offset its Y
+			biomeObj.position.y += offset;
+			return;
+			
+		# If mouse is NOT near biome object, and it was offset
+		if moving.has(i):
+			# Reset its position
+			World.discoveredBiomes.get(i)[0].position = moving[i];
+			# Remove its record
+			moving.erase(i);
+"
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_bu5ns"]
 size = Vector2(1920, 48)
@@ -47,7 +86,12 @@ region_rect = Rect2(0, 1536, 256, 256)
 script = ExtResource("5_nwltf")
 biomeHolder = NodePath("../../Biome-Holder")
 
-[node name="Biome-Holder" type="Node" parent="."]
+[node name="Hover" type="Node2D" parent="Player"]
+script = SubResource("GDScript_acxdq")
+
+[node name="Biome-Holder" type="Node2D" parent="."]
+y_sort_enabled = true
+metadata/_edit_lock_ = true
 
 [node name="Illuminations-Layer" type="CanvasLayer" parent="."]
 visible = false
