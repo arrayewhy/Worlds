@@ -23,21 +23,21 @@ static func InteractionsWith_IncreasingChance() -> Array[Type]:
 
 # Functions ----------------------------------------------------------------------------------------------------
 
-static func Get_InteractionType(biomes:Dictionary, gPos:Vector2i) -> Interaction_Master.Type:
-	if !biomes.has(gPos):
+static func Get_InteractionType(gPos:Vector2i, discBiomes:Dictionary = World.DiscoveredBiomes()) -> Interaction_Master.Type:
+	if !discBiomes.has(gPos):
 		InGameDebugger.Warn(str("No Biome, so no Interaction: ", gPos));
 		return Interaction_Master.Type.NULL;
 	else:
-		return biomes[gPos][0].Get_Interaction();
+		return discBiomes[gPos][0].Get_Interaction();
 
-static func Get_Chance(interChances:Dictionary, type:Interaction_Master.Type) -> int:
+static func Get_Chance(type:Interaction_Master.Type, interChances:Dictionary = World.InteractionChances()) -> int:
 	return interChances[type];
 	
-static func Increase_Chance(interChances:Dictionary, type:Interaction_Master.Type, rate:int = 1) -> void:
+static func Increase_Chance(type:Interaction_Master.Type, rate:int = 1, interChances:Dictionary = World.InteractionChances()) -> void:
 	if interChances[type] < Get_MaxChance():
 		interChances[type] += rate;
 
-static func Reset_Chance(interChances:Dictionary, type:Interaction_Master.Type) -> void:
+static func Reset_Chance(type:Interaction_Master.Type, interChances:Dictionary = World.InteractionChances()) -> void:
 	match type:
 		Interaction_Master.Type.Dog:
 			interChances[type] = initChance_Dog;
@@ -54,7 +54,7 @@ static func Initialise_Chances(interChances:Dictionary) -> void:
 		interChances[i] = 0;
 
 	for c in interChances.keys():
-		Reset_Chance(interChances, c);
+		Reset_Chance(c);
 
 static func Get_MaxChance() -> int:
 	return maxChance;

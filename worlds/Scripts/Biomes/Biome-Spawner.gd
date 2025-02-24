@@ -18,7 +18,7 @@ func SpawnBiome(gPos:Vector2i, type:Biome_Master.Type, interType:Interaction_Mas
 	# Position New Biome in World Space
 	newBiome.position = Vector2(gPos) * World.cellSize;
 	# Record the biome
-	Biome_Master.Record_Biome(World.DiscoveredBiomes(), gPos, newBiome, type);
+	Biome_Master.Record_Biome(gPos, newBiome, type);
 	newBiome.Initialise_Interaction(type, interType);
 	World.IncreaseWorldSize();
 	# Debug Message

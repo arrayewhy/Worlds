@@ -23,7 +23,7 @@ func Update_Fish() -> void:
 	
 	for i in surroundings.size():
 		
-		var biomeObject:Object = Biome_Master.Get_BiomeObject(World.DiscoveredBiomes(), surroundings[i]);
+		var biomeObject:Object = Biome_Master.Get_BiomeObject(surroundings[i]);
 		
 		if biomeObject.Get_BiomeType() != Biome_Master.Type.Water:
 			continue;
@@ -44,7 +44,7 @@ func Update_Fish() -> void:
 	Disconnect_TimeTick();
 	
 	# Spawn Interaction through Target Biome Object
-	var biomeObj:Object = Biome_Master.Get_BiomeObject(World.DiscoveredBiomes(), targGPos);
+	var biomeObj:Object = Biome_Master.Get_BiomeObject(targGPos);
 	biomeObj.Spawn_Interaction(Interaction_Master.Type.Fish);
 
 # Functions: Signals ----------------------------------------------------------------------------------------------------

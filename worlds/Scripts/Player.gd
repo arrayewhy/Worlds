@@ -32,6 +32,10 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	
 	inputDir = Get_DirectionInput(event);
 	if inputDir != Vector2i(0,0):
+		
+		#if Biome_Master.Get_BiomeType(currGridPos + inputDir) == Biome_Master.Type.Water:
+			#return;
+		
 		MovePlayer_And_SpawnBiomes(inputDir);
 		World.Roll_Dice();
 		return;
@@ -73,7 +77,7 @@ func MovePlayer_And_SpawnBiomes_Repeated(inputDir:Vector2i, repetitions:int = 10
 		MovePlayer_And_SpawnBiomes(inputDir);
 		
 	hover.set_process(true);
-	InGameDebugger.Say(World.discoveredBiomes.size());
+	InGameDebugger.Say(World.DiscoveredBiomes().size());
 
 func Get_RandDirection() -> Vector2i:
 	match randi_range(0, 3):

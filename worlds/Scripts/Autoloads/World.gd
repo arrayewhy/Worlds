@@ -4,11 +4,11 @@ extends Node;
 const cellSize:int = 256;
 # Variables: World
 var worldSize:int = 1;
-var playerGridPos:Vector2i;
+var _playerGridPos:Vector2i;
 # Variables: Biomes
-var discoveredBiomes = {}; # Grid Position : [Biome Object, Biome Type]
+var _discoveredBiomes = {}; # Grid Position : [Biome Object, Biome Type]
 # Variables: Interaction
-var interChances:Dictionary; # Interaction_Master.Type : int
+var _interChances:Dictionary; # Interaction_Master.Type : int
 
 
 # Signals
@@ -19,7 +19,7 @@ signal TimeTick;
 signal RollDice;
 
 func _ready() -> void:
-	Interaction_Master.Initialise_Chances(interChances);
+	Interaction_Master.Initialise_Chances(_interChances);
 
 func Roll_Dice() -> void:
 	RollDice.emit();
@@ -27,7 +27,7 @@ func Roll_Dice() -> void:
 # Functions: Signals ----------------------------------------------------------------------------------------------------
 
 func SpawnBiomes_AroundPlayer(currGPos:Vector2i, prevGPos:Vector2i) -> void:
-	playerGridPos = currGPos;
+	_playerGridPos = currGPos;
 	SpawnBiomesAroundPlayer.emit(currGPos, prevGPos);
 
 func SpawnBiomes_Around(gPos:Vector2i) -> void:
@@ -45,20 +45,20 @@ func Get_WorldSize() -> int:
 	return worldSize;
 
 func IncreaseWorldSize() -> void:
-	if discoveredBiomes.size() % 1000 == 0:
+	if _discoveredBiomes.size() % 1000 == 0:
 		Increase_WorldSize();
 
 # Functions: Interactions ----------------------------------------------------------------------------------------------------
 
 func InteractionChances() -> Dictionary:
-	return interChances;
+	return _interChances;
 
 # Functions: Biomes ----------------------------------------------------------------------------------------------------
 
 func DiscoveredBiomes() -> Dictionary:
-	return discoveredBiomes;
+	return _discoveredBiomes;
 
 # Functions: Player ----------------------------------------------------------------------------------------------------
 
 func PlayerGridPos() -> Vector2i:
-	return playerGridPos;
+	return _playerGridPos;

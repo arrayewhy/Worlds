@@ -37,7 +37,7 @@ func Try_Spawn(biomeType:Biome_Master.Type, interType:Interaction_Master.Type) -
 	if !Should_Spawn(interType):
 			
 		if Interaction_Master.InteractionsWith_IncreasingChance().has(interType):
-			Interaction_Master.Increase_Chance(World.InteractionChances() ,interType);
+			Interaction_Master.Increase_Chance(interType);
 		
 		Disable_Interaction(0);
 		return;
@@ -72,14 +72,14 @@ func Try_Spawn(biomeType:Biome_Master.Type, interType:Interaction_Master.Type) -
 	return;
 
 func Should_Spawn(interType:Interaction_Master.Type) -> bool:
-	return Interaction_Master.Pass_ProbabilityCheck(Interaction_Master.Get_Chance(World.InteractionChances(), interType));
+	return Interaction_Master.Pass_ProbabilityCheck(Interaction_Master.Get_Chance(interType));
 
 func Spawn(interType:Interaction_Master.Type, resetChance:bool = false) -> void:
 	Enable_Interaction(interType);
 	#InGameDebugger.Say(str("Spawned: ", Interaction_Master.Type.keys()[interType]));
 	#InGameDebugger.Say(str(Interaction_Master.Type.keys()[interType], " Chance: ", World.Get_Chance(interType)));
 	if resetChance:
-		Interaction_Master.Reset_Chance(World.InteractionChances(), interType);
+		Interaction_Master.Reset_Chance(interType);
 
 # [ 2 / 4 ] Functions: Get Set Interaction ----------------------------------------------------------------------------------------------------
 

@@ -9,13 +9,13 @@ static func RandomBiomeType() -> int:
 
 # Functions: Biomes ----------------------------------------------------------------------------------------------------
 
-static func Record_Biome(discBiomes:Dictionary, gPos:Vector2i, biome:Object, type:Biome_Master.Type) -> void:
+static func Record_Biome(gPos:Vector2i, biome:Object, type:Biome_Master.Type, discBiomes:Dictionary = World.DiscoveredBiomes()) -> void:
 	discBiomes[gPos] = [biome, type];
 
-static func Is_Occupied(discBiomes:Dictionary, gPos:Vector2i) -> bool:
+static func Is_Occupied(gPos:Vector2i, discBiomes:Dictionary = World.DiscoveredBiomes()) -> bool:
 	return discBiomes.has(gPos);
 
-static func Get_BiomeObject(discBiomes:Dictionary, gPos:Vector2i) -> Object:
+static func Get_BiomeObject(gPos:Vector2i, discBiomes:Dictionary = World.DiscoveredBiomes()) -> Object:
 	
 	if discBiomes.has(gPos):
 		return discBiomes[gPos][0];
@@ -23,7 +23,7 @@ static func Get_BiomeObject(discBiomes:Dictionary, gPos:Vector2i) -> Object:
 	InGameDebugger.Warn(str("Biome NOT found: ", gPos));
 	return null;
 
-static func Get_BiomeType(discBiomes:Dictionary, gPos:Vector2i) -> Biome_Master.Type:
+static func Get_BiomeType(gPos:Vector2i, discBiomes:Dictionary = World.DiscoveredBiomes()) -> Biome_Master.Type:
 	
 	if discBiomes.has(gPos):
 		return discBiomes[gPos][1];
@@ -51,6 +51,6 @@ static func Surrounding_Biomes_WithGPos(gPos:Vector2i, reach:int) -> Array[Array
 	var biomesAround:Array[Array]; # Array[Grid Pos, Biome Type]
 	
 	for p in surrounding_GPos:
-		biomesAround.append([p, Biome_Master.Get_BiomeType(World.DiscoveredBiomes(), p)]);
+		biomesAround.append([p, Biome_Master.Get_BiomeType(p)]);
 	
 	return biomesAround;
