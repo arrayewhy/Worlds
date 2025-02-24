@@ -1,7 +1,7 @@
 extends Node;
 
 # Constants
-const cellSize:int = 256;
+const _cellSize:int = 256;
 # Variables: World
 var worldSize:int = 1;
 var _playerGridPos:Vector2i;
@@ -37,6 +37,9 @@ func Advance_Time() -> void:
 	TimeTick.emit();
 
 # Functions: World Size ----------------------------------------------------------------------------------------------------
+
+func CellSize() -> int:
+	return _cellSize;
 
 func Increase_WorldSize() -> void:
 	worldSize += 1;

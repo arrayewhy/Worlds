@@ -92,6 +92,7 @@ script = ExtResource("1_e4dtk")
 [node name="Mover" type="Node" parent="Camera2D" node_paths=PackedStringArray("master")]
 script = ExtResource("1_vinv6")
 master = NodePath("..")
+speed = 1.0
 
 [node name="Cam-Zoom" type="Node" parent="Camera2D"]
 script = ExtResource("3_xox30")
@@ -110,6 +111,14 @@ region_rect = Rect2(0, 1536, 256, 256)
 [node name="Biome-Spawner" type="Node" parent="Player" node_paths=PackedStringArray("biomeHolder")]
 script = ExtResource("5_nwltf")
 biomeHolder = NodePath("../../Biome-Holder")
+
+[node name="Mover" type="Node" parent="Player" node_paths=PackedStringArray("master")]
+script = ExtResource("1_vinv6")
+master = NodePath("..")
+speed = 4.5
+minDist = 10.0
+frameByFrame = true
+emitSignal = true
 
 [node name="Biome-Holder" type="Node2D" parent="."]
 y_sort_enabled = true

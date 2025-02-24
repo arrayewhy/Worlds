@@ -39,7 +39,7 @@ static func Surrounding_Biomes(gPos:Vector2i, reach:int) -> Array[Biome_Master.T
 	var biomesAround:Array[Biome_Master.Type]; # Array[Biome Type]
 	
 	for p in surrounding_GPos:
-		biomesAround.append(World.Get_BiomeType(p));
+		biomesAround.append(Biome_Master.Get_BiomeType(p));
 	
 	return biomesAround;
 

@@ -16,7 +16,7 @@ func SpawnBiome(gPos:Vector2i, type:Biome_Master.Type, interType:Interaction_Mas
 	newBiome.Initialise(gPos, type);
 	biomeHolder.add_child(newBiome);
 	# Position New Biome in World Space
-	newBiome.position = Vector2(gPos) * World.cellSize;
+	newBiome.position = Vector2(gPos) * World.CellSize();
 	# Record the biome
 	Biome_Master.Record_Biome(gPos, newBiome, type);
 	newBiome.Initialise_Interaction(type, interType);

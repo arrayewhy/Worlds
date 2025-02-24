@@ -1,7 +1,6 @@
 UPCOMING ----------------------------------------------------------------------------------------------------
 
 HIGH PRIORITY:
-	- Tween Player Movement
 	
 LOW PRIORITY:
 	- Merge signals SpawnBiomesAroundPlayer & SpawnBiomes in World.gd
@@ -15,6 +14,7 @@ SPECULATIVE:
 	
 >>> DONE:
 	- Spawn: Trees
+	- Tween Player Movement
 
 BUGS ----------------------------------------------------------------------------------------------------
 
