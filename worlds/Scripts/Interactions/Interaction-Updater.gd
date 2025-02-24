@@ -2,12 +2,12 @@ extends Node;
 
 func On_WorldTick() -> void:
 	match(get_parent().Get_Interaction()):
-		InteractionMaster.Type.Fish:
+		Interaction_Master.Type.Fish:
 			Update_Fish();
 
 func Update_Fish() -> void:
 	
-	#InGameDebugger.Say(str("Updating: ", InteractionMaster.Type.keys()[get_parent().Get_Interaction()]), true);
+	#InGameDebugger.Say(str("Updating: ", Interaction_Master.Type.keys()[get_parent().Get_Interaction()]), true);
 	
 	var gPos:Vector2i = get_parent().Get_GridPosition();
 	var surroundings:Array[Vector2i] = GridPos_Utils.Occupieds_Around(gPos, 1, true);
@@ -23,11 +23,11 @@ func Update_Fish() -> void:
 	
 	for i in surroundings.size():
 		
-		var biomeObject:Object = World.Get_BiomeObject(surroundings[i]);
+		var biomeObject:Object = Biome_Master.Get_BiomeObject(World.DiscoveredBiomes(), surroundings[i]);
 		
 		if biomeObject.Get_BiomeType() != Biome_Master.Type.Water:
 			continue;
-		if biomeObject.Get_Interaction() != InteractionMaster.Type.NULL:
+		if biomeObject.Get_Interaction() != Interaction_Master.Type.NULL:
 			continue;
 		if surroundings[i] == World.PlayerGridPos():
 			continue;
@@ -44,7 +44,8 @@ func Update_Fish() -> void:
 	Disconnect_TimeTick();
 	
 	# Spawn Interaction through Target Biome Object
-	World.Get_BiomeObject(targGPos).Spawn_Interaction(InteractionMaster.Type.Fish);
+	var biomeObj:Object = Biome_Master.Get_BiomeObject(World.DiscoveredBiomes(), targGPos);
+	biomeObj.Spawn_Interaction(Interaction_Master.Type.Fish);
 
 # Functions: Signals ----------------------------------------------------------------------------------------------------
 

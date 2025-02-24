@@ -11,20 +11,20 @@ func _ready() -> void:
 
 # [ 1 / 2 ] Functions: Biome Spawning ----------------------------------------------------------------------------------------------------
 
-func SpawnBiome(gPos:Vector2i, type:Biome_Master.Type, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
+func SpawnBiome(gPos:Vector2i, type:Biome_Master.Type, interType:Interaction_Master.Type = Interaction_Master.Type.NULL) -> void:
 	var newBiome:Object = biomePrefab.instantiate();
 	newBiome.Initialise(gPos, type);
 	biomeHolder.add_child(newBiome);
 	# Position New Biome in World Space
 	newBiome.position = Vector2(gPos) * World.cellSize;
 	# Record the biome
-	World.Record_Biome(gPos, newBiome, type);
+	Biome_Master.Record_Biome(World.DiscoveredBiomes(), gPos, newBiome, type);
 	newBiome.Initialise_Interaction(type, interType);
 	World.IncreaseWorldSize();
 	# Debug Message
 	#InGameDebugger.Say(str(gPos, " : ", World.Get_BiomeType(gPos), ", ", World.Get_InteractionType(gPos)), true);
 
-func SpawnRandomBiome(gPos:Vector2i, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
+func SpawnRandomBiome(gPos:Vector2i, interType:Interaction_Master.Type = Interaction_Master.Type.NULL) -> void:
 	SpawnBiome(gPos, Biome_Master.RandomBiomeType(), interType);
 
 func SpawnRandomBiomes(gPos:Vector2i, reach:int) -> void:
@@ -43,7 +43,7 @@ func SpawnRandomBiomes_Influenced(currGPos:Vector2i, _prevGPos:Vector2i, spawnRa
 	# Get Surrounding Biomes with Grid Positions used to compare with each Spawn Point and get
 	# its Adjacent Biome Type, which will determine the Influences used in selecting the
 	# Type of the newly Spawned Biome.
-	var biomes_WithGPos:Array[Array] = World.Surrounding_Biomes_WithGPos(currGPos, influenceRange);
+	var biomes_WithGPos:Array[Array] = Biome_Master.Surrounding_Biomes_WithGPos(currGPos, influenceRange);
 	
 	var influences:Array[Biome_Master.Type] = [];
 	for b in biomes_WithGPos:

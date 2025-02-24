@@ -5,16 +5,16 @@ var fader:Node;
 var sprite:Sprite2D;
 var updater:Node;
 # Variables
-var currInteraction:InteractionMaster.Type = InteractionMaster.Type.NULL;
+var currInteraction:Interaction_Master.Type = Interaction_Master.Type.NULL;
 
-func Initialise(biomeType:Biome_Master.Type, interType:InteractionMaster.Type) -> void:
+func Initialise(biomeType:Biome_Master.Type, interType:Interaction_Master.Type) -> void:
 
 	# Initialise Compenents
 	fader = $Fader;
 	sprite = $"Interaction-Sprite";
 	updater = $Updater;
 	
-	if interType != InteractionMaster.Type.NULL:
+	if interType != Interaction_Master.Type.NULL:
 		Spawn(interType);
 		return;
 		
@@ -26,18 +26,18 @@ func Spawn_RandomInteraction(biomeType:Biome_Master.Type) -> void:
 	
 	# Spawn interactions specific to the water biome
 	if biomeType == Biome_Master.Type.Water:
-		Try_Spawn(biomeType, InteractionMaster.WaterInteractions().pick_random());
+		Try_Spawn(biomeType, Interaction_Master.WaterInteractions().pick_random());
 		return;
 	
-	#Try_Spawn(biomeType, randi_range(1, InteractionMaster.Type.size() - 1));
-	Try_Spawn(biomeType, InteractionMaster.LandInteractions().pick_random());
+	#Try_Spawn(biomeType, randi_range(1, Interaction_Master.Type.size() - 1));
+	Try_Spawn(biomeType, Interaction_Master.LandInteractions().pick_random());
 
-func Try_Spawn(biomeType:Biome_Master.Type, interType:InteractionMaster.Type) -> void:
+func Try_Spawn(biomeType:Biome_Master.Type, interType:Interaction_Master.Type) -> void:
 	
 	if !Should_Spawn(interType):
 			
-		if InteractionMaster.InteractionsWith_IncreasingChance().has(interType):
-			World.Increase_Chance(interType);
+		if Interaction_Master.InteractionsWith_IncreasingChance().has(interType):
+			Interaction_Master.Increase_Chance(World.InteractionChances() ,interType);
 		
 		Disable_Interaction(0);
 		return;
@@ -47,23 +47,23 @@ func Try_Spawn(biomeType:Biome_Master.Type, interType:InteractionMaster.Type) ->
 
 	match interType:
 			
-		InteractionMaster.Type.Dog:
+		Interaction_Master.Type.Dog:
 			if biomeType != Biome_Master.Type.Water or World.Win_ImprobableRoll():
 				Spawn(interType, true);
 				AudioMaster.PlaySFX_DogBark(global_position);
 				return;
 				
-		InteractionMaster.Type.Forest:
+		Interaction_Master.Type.Forest:
 			if biomeType == Biome_Master.Type.Grass:
 				Spawn(interType);
 				return;
 			
-		InteractionMaster.Type.Fish:
+		Interaction_Master.Type.Fish:
 			if biomeType == Biome_Master.Type.Water or World.Win_ImprobableRoll():
 				Spawn(interType);
 				return;
 				
-		InteractionMaster.Type.Boat:
+		Interaction_Master.Type.Boat:
 			if biomeType == Biome_Master.Type.Water or World.Win_ImprobableRoll():
 				Spawn(interType, true);
 				return;
@@ -71,19 +71,19 @@ func Try_Spawn(biomeType:Biome_Master.Type, interType:InteractionMaster.Type) ->
 	Disable_Interaction(0);
 	return;
 
-func Should_Spawn(interType:InteractionMaster.Type) -> bool:
-	return World.Pass_ProbabilityCheck(World.Get_Chance(interType));
+func Should_Spawn(interType:Interaction_Master.Type) -> bool:
+	return Interaction_Master.Pass_ProbabilityCheck(Interaction_Master.Get_Chance(World.InteractionChances(), interType));
 
-func Spawn(interType:InteractionMaster.Type, resetChance:bool = false) -> void:
+func Spawn(interType:Interaction_Master.Type, resetChance:bool = false) -> void:
 	Enable_Interaction(interType);
-	#InGameDebugger.Say(str("Spawned: ", InteractionMaster.Type.keys()[interType]));
-	#InGameDebugger.Say(str(InteractionMaster.Type.keys()[interType], " Chance: ", World.Get_Chance(interType)));
+	#InGameDebugger.Say(str("Spawned: ", Interaction_Master.Type.keys()[interType]));
+	#InGameDebugger.Say(str(Interaction_Master.Type.keys()[interType], " Chance: ", World.Get_Chance(interType)));
 	if resetChance:
-		World.Reset_Chance(interType);
+		Interaction_Master.Reset_Chance(World.InteractionChances(), interType);
 
 # [ 2 / 4 ] Functions: Get Set Interaction ----------------------------------------------------------------------------------------------------
 
-func Enable_Interaction(interType:InteractionMaster.Type) -> void:
+func Enable_Interaction(interType:Interaction_Master.Type) -> void:
 	Set_Interaction(interType);
 	Update_Sprite(interType);
 	Appear();
@@ -93,15 +93,15 @@ func Enable_Interaction(interType:InteractionMaster.Type) -> void:
 	updater.Connect_TimeTick();
 	
 func Disable_Interaction(vanishSpd:float = 2) -> void:
-	Set_Interaction(InteractionMaster.Type.NULL);
+	Set_Interaction(Interaction_Master.Type.NULL);
 	if vanishSpd == 0:
 		return;
 	Vanish(vanishSpd);
 
-func Set_Interaction(type:InteractionMaster.Type) -> void:
+func Set_Interaction(type:Interaction_Master.Type) -> void:
 	currInteraction = type;
 
-func Get_Interaction() -> InteractionMaster.Type:
+func Get_Interaction() -> Interaction_Master.Type:
 	return currInteraction;
 
 # [ 3 / 4 ] Functions: Sprite ----------------------------------------------------------------------------------------------------
@@ -112,15 +112,15 @@ func Vanish(speed:float = 2) -> void:
 func Appear(speed:float = 2) -> void:
 	fader.FadeToOpaque(speed);
 	
-func Update_Sprite(interType:InteractionMaster.Type) -> void:
+func Update_Sprite(interType:Interaction_Master.Type) -> void:
 	match interType:
-		InteractionMaster.Type.Dog:
+		Interaction_Master.Type.Dog:
 			sprite.region_rect.position = Vector2i(0, 2048);
-		InteractionMaster.Type.Forest:
+		Interaction_Master.Type.Forest:
 			sprite.region_rect.position = Vector2i(1792, 1536);
-		InteractionMaster.Type.Fish:
+		Interaction_Master.Type.Fish:
 			sprite.region_rect.position = Vector2i(0, 1792);
-		InteractionMaster.Type.Boat:
+		Interaction_Master.Type.Boat:
 			sprite.region_rect.position = Vector2i(256, 1536);
 		_:
 			InGameDebugger.Warn(str("Failed to update sprite, Interaction: "), interType);

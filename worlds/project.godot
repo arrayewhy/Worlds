@@ -19,7 +19,6 @@ config/icon="res://icon.svg"
 
 World="*res://Scripts/Autoloads/World.gd"
 InGameDebugger="*res://Scripts/Debug/InGameDebugger.gd"
-InteractionMaster="*res://Scripts/Autoloads/Interaction-Master.gd"
 AudioMaster="*res://Prefabs/Audio-Master.tscn"
 
 [display]

@@ -63,13 +63,13 @@ static func Are_GridPosNeighbours(gPos:Vector2i, neighbourGPos:Vector2i, diagona
 static func Remove_Occupied(gPosArray:Array[Vector2i]) -> Array[Vector2i]:
 	var empties:Array[Vector2i] = [];
 	for gPos in gPosArray:
-		if !World.Is_Occupied(gPos):
+		if !Biome_Master.Is_Occupied(World.DiscoveredBiomes(), gPos):
 			empties.append(gPos);
 	return empties;
 	
 static func Remove_Empty(gPosArray:Array[Vector2i]) -> Array[Vector2i]:
 	var occupied:Array[Vector2i] = [];
 	for gPos in gPosArray:
-		if World.Is_Occupied(gPos):
+		if Biome_Master.Is_Occupied(World.DiscoveredBiomes(), gPos):
 			occupied.append(gPos);
 	return occupied;

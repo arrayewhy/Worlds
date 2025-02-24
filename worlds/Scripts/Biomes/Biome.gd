@@ -58,15 +58,15 @@ func Prep_Water() -> void:
 
 # Functions: Interactions ----------------------------------------------------------------------------------------------------
 
-func Initialise_Interaction(biomeType:Biome_Master.Type, interType:InteractionMaster.Type = InteractionMaster.Type.NULL) -> void:
+func Initialise_Interaction(biomeType:Biome_Master.Type, interType:Interaction_Master.Type = Interaction_Master.Type.NULL) -> void:
 	if !interaction:
 		interaction = $"Interaction";
 	interaction.Initialise(biomeType, interType);
 
-func Spawn_Interaction(interType:InteractionMaster.Type) -> void:
+func Spawn_Interaction(interType:Interaction_Master.Type) -> void:
 	interaction.Spawn(interType);
 
-func Get_Interaction() -> InteractionMaster.Type:
+func Get_Interaction() -> Interaction_Master.Type:
 	return interaction.Get_Interaction();
 
 # Functions: Grid Position ----------------------------------------------------------------------------------------------------
