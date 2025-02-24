@@ -35,6 +35,8 @@ func _process(delta: float) -> void:
 		
 	var change = (targPos - master.position) * speed * delta;
 	
+	# We determine the actual intended position before deciding to 
+	# assign it to the target or not.
 	currPos += change;
 	
 	if frameByFrame:

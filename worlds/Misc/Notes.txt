@@ -2,6 +2,7 @@ UPCOMING -----------------------------------------------------------------------
 
 HIGH PRIORITY:
 	- World Edge
+	- Fade Biomes
 	
 LOW PRIORITY:
 	- Merge signals SpawnBiomesAroundPlayer & SpawnBiomes in World.gd
