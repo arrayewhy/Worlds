@@ -1,6 +1,7 @@
 UPCOMING ----------------------------------------------------------------------------------------------------
 
 HIGH PRIORITY:
+	- World Edge
 	
 LOW PRIORITY:
 	- Merge signals SpawnBiomesAroundPlayer & SpawnBiomes in World.gd
@@ -10,11 +11,14 @@ SPECULATIVE:
 	- Consider making Interaction Sprites look as if they are seen from "higher up", so we would see
 		Forests instead of a single Tree. Schools instead of a single fish.
 	- Inventory
-	- Biome Mouse Hover
+	- Caverns
+	- House in the Woods
+	- Riding the Fish
 	
 >>> DONE:
 	- Spawn: Trees
 	- Tween Player Movement
+	- Biome Mouse Hover
 
 BUGS ----------------------------------------------------------------------------------------------------
 

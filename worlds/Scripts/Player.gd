@@ -29,7 +29,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	
 	if event.is_action_pressed("One"):
 		hover.set_process(false);
-		MovePlayer_And_SpawnBiomes_Repeated(inputDir, 5000);
+		RandomReveal(inputDir, 5000);
 		return;
 	
 	# Normal Player Move and Biome Spawn
@@ -89,13 +89,28 @@ func On_Mover_Done() -> void:
 
 # Functions: Debug ----------------------------------------------------------------------------------------------------
 
-func MovePlayer_And_SpawnBiomes_Repeated(inputDir:Vector2i, repetitions:int = 1000) -> void:
+func RandomReveal(inputDir:Vector2i, repetitions:int = 1000) -> void:
+	
+	var gPos:Vector2i = currGridPos
 	
 	for i in repetitions:
 		
 		inputDir = Get_RandDirection();
 		
-		MovePlayer_And_SpawnBiomes(inputDir);
+		#var prevGridPos = currGridPos;
+		# Update Current Grid Position
+		gPos += inputDir;
+		# Spawn Biomes around new position
+		World.SpawnBiomes_AroundPlayer(gPos, gPos);
+		#var targPos = position + Vector2(inputDir) * World.CellSize();
+		# Move Player
+		#mover.StartMove(targPos);
+		#position = targPos;
+		# Move Camera
+		#camMover.StartMove(targPos);
+		
+		await get_tree().process_frame;
+		World.Advance_Time();
 		
 	hover.set_process(true);
 	InGameDebugger.Say(World.DiscoveredBiomes().size());
