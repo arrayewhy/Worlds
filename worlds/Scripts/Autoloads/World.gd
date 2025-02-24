@@ -17,8 +17,13 @@ signal SpawnBiomesAroundPlayer(currGPos, prevGPos);
 signal SpawnBiomes(gPos);
 signal TimeTick;
 
+signal RollDice;
+
 func _ready() -> void:
 	Initialise_Chances();
+
+func Roll_Dice() -> void:
+	RollDice.emit();
 
 # Functions: Signals ----------------------------------------------------------------------------------------------------
 

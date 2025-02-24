@@ -5,6 +5,9 @@ HIGH PRIORITY:
 	- Time of Day & Search Range
 	- Spawn: Trees
 	
+LOW PRIORITY:
+	- Merge signals SpawnBiomesAroundPlayer & SpawnBiomes in World.gd
+	
 SPECULATIVE:
 	- Consider making Interaction Sprites look as if they are seen from "higher up", so we would see
 		Forests instead of a single Tree. Schools instead of a single fish.

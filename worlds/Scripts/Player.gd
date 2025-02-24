@@ -31,6 +31,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	inputDir = Get_DirectionInput(event);
 	if inputDir != Vector2i(0,0):
 		MovePlayer_And_SpawnBiomes(inputDir);
+		World.Roll_Dice();
 		return;
 	
 func Get_DirectionInput(event:InputEvent) -> Vector2i:

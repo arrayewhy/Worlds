@@ -1,0 +1,289 @@
+[gd_scene load_steps=4 format=3 uid="uid://cf233120e3l52"]
+
+[ext_resource type="Texture2D" uid="uid://dk06eplgkeoi2" path="res://Sprites/Clack_Map_SpriteSheet_2048.png" id="1_qut7h"]
+
+[sub_resource type="GDScript" id="GDScript_capcq"]
+resource_name = "Dice"
+script/source = "extends Node2D
+
+@onready var area:Area2D = $Area2D;
+
+@onready var side_1:Sprite2D = $\"1\";
+@onready var side_2:Sprite2D = $\"2\";
+@onready var side_3:Sprite2D = $\"3\";
+@onready var side_4:Sprite2D = $\"4\";
+
+var top:Sprite2D;
+var front:Sprite2D;
+var bottom:Sprite2D;
+var back:Sprite2D;
+
+const offset:float = 128;
+
+var rolling:bool;
+
+func _ready() -> void:
+
+	top = side_1;
+	front = side_2;
+	bottom = side_3;
+	back = side_4;
+	
+	top.scale = Vector2(1, 1);
+	front.scale = Vector2(0, 0);
+	bottom.scale = Vector2(0, 0);
+	back.scale = Vector2(0, 0);
+	
+	World.RollDice.connect(Roll);
+	area.input_event.connect(On_Click);
+	
+func On_Click(viewPort:Viewport, e:InputEvent, shapeIndex:int) -> void:
+	if e.is_pressed():
+		Roll();
+
+func Roll() -> void:
+	
+	if rolling:
+		return;
+	
+	rolling = true;
+	
+	var rolls:int = randi_range(3, 6);
+	var dur:float = .125;
+	var rand:int;
+	
+	#self.rotation = 0;
+	#var rotDice = create_tween();
+	##var rot:float = randf_range(-2, 2);
+	#var rot:float = 6.25 * 2;
+	#rotDice.tween_property(self, \"rotation\", rot, dur);
+	##rotDice.tween_property(self, \"rotation\", -rot, transDur / 2);
+	##rotDice.tween_property(self, \"rotation\", rot, transDur / 2);
+	##rotDice.tween_property(self, \"rotation\", 0, transDur / 2);
+	
+	for r in rolls:
+		
+		rand = randi_range(0, 1)
+		dur += 0.025;
+		
+		match(rand):
+			0:
+				Roll_Up(dur);
+			1:
+				Roll_Down(dur);
+		await get_tree().create_timer(dur).timeout;
+		
+	rolling = false;
+	
+func Roll_Up(transDur:float = .25) -> void:
+	
+	var scaleDice = create_tween();
+	#scaleDice.tween_property(self, \"scale\", Vector2(0.5, 0.5), transDur / 2);
+	scaleDice.tween_property(self, \"scale\", Vector2(2.0, 2.0), transDur / 4);
+	scaleDice.tween_property(self, \"scale\", Vector2(1, 1), transDur / 2);
+	scaleDice.tween_property(self, \"scale\", Vector2(1.5, 1.5), transDur / 4);
+	scaleDice.tween_property(self, \"scale\", Vector2(1, 1), transDur / 2);
+	
+	#self.rotation = 0;
+	var rotDice = create_tween();
+	var rot:float = randf_range(-2, 2);
+	#var rot:float = 6.25;
+	#rotDice.tween_property(self, \"rotation\", rot, transDur);
+	rotDice.tween_property(self, \"rotation\", -rot, transDur / 2);
+	rotDice.tween_property(self, \"rotation\", rot, transDur / 2);
+	rotDice.tween_property(self, \"rotation\", 0, transDur / 2);
+	
+	# Upper
+	
+	var upperSide:Sprite2D = top;
+	
+	upperSide.scale = Vector2(1, 1);
+	upperSide.position = Vector2(0, 0);
+	upperSide.modulate = Color.WHITE;
+	
+	var scaleUpper = create_tween();
+	scaleUpper.tween_property(upperSide, \"scale\", Vector2(upperSide.scale.x, 0), transDur);
+	
+	var moveUpper = create_tween();
+	moveUpper.tween_property(upperSide, \"position\", Vector2(upperSide.position.x, upperSide.position.y - offset), transDur);
+	
+	var fadeUpper = create_tween();
+	fadeUpper.tween_property(upperSide, \"modulate\", Color.DARK_SLATE_GRAY, transDur / 4).set_delay(transDur / 4);
+	
+	# Lower
+	
+	var lowerSide:Sprite2D = front;
+	
+	lowerSide.scale = Vector2(1, 0);
+	lowerSide.position = Vector2(0, offset);
+	lowerSide.modulate = Color.DARK_SLATE_GRAY;
+	
+	var scaleLower = create_tween();
+	scaleLower.tween_property(lowerSide, \"scale\", Vector2(lowerSide.scale.x, 1), transDur);
+	
+	var moveLower = create_tween();
+	moveLower.tween_property(lowerSide, \"position\", Vector2(lowerSide.position.x, lowerSide.position.y - offset), transDur);
+	
+	var fadeLower = create_tween();
+	fadeLower.tween_property(lowerSide, \"modulate\", Color.WHITE, transDur);
+	
+	# ReAssign
+	
+	top = ReAssign_RollUp(top);
+	front = ReAssign_RollUp(front);
+	bottom = ReAssign_RollUp(bottom);
+	back = ReAssign_RollUp(back);
+
+func Roll_Down(transDur:float = .25) -> void:
+	
+	var scaleDice = create_tween();
+	#scaleDice.tween_property(self, \"scale\", Vector2(0.5, 0.5), transDur / 2);
+	scaleDice.tween_property(self, \"scale\", Vector2(2.0, 2.0), transDur / 4);
+	scaleDice.tween_property(self, \"scale\", Vector2(1, 1), transDur / 2);
+	scaleDice.tween_property(self, \"scale\", Vector2(1.5, 1.5), transDur / 4);
+	scaleDice.tween_property(self, \"scale\", Vector2(1, 1), transDur / 2);
+	
+	#self.rotation = 0;
+	var rotDice = create_tween();
+	var rot:float = randf_range(-2, 2);
+	#var rot:float = 6.25;
+	#rotDice.tween_property(self, \"rotation\", rot, transDur);
+	rotDice.tween_property(self, \"rotation\", -rot, transDur / 2);
+	rotDice.tween_property(self, \"rotation\", rot, transDur / 2);
+	rotDice.tween_property(self, \"rotation\", 0, transDur / 2);
+	
+	# Upper
+	
+	var upperSide:Sprite2D = back;
+	
+	upperSide.scale = Vector2(1, 0);
+	upperSide.position.y = -offset;
+	upperSide.modulate = Color.DARK_SLATE_GRAY;
+	
+	var scaleUpper = create_tween();
+	scaleUpper.tween_property(upperSide, \"scale\", Vector2(upperSide.scale.x, 1), transDur);
+	
+	var moveUpper = create_tween();
+	moveUpper.tween_property(upperSide, \"position\", Vector2(upperSide.position.x, upperSide.position.y + offset), transDur);
+	
+	var fadeUpper = create_tween();
+	fadeUpper.tween_property(upperSide, \"modulate\", Color.WHITE, transDur);
+	
+	# Lower
+	
+	var lowerSide:Sprite2D = top;
+	
+	lowerSide.scale = Vector2(1, 1);
+	lowerSide.position.y = 0;
+	lowerSide.modulate = Color.WHITE;
+	
+	var scaleLower = create_tween();
+	scaleLower.tween_property(lowerSide, \"scale\", Vector2(lowerSide.scale.x, 0), transDur);
+	
+	var moveLower = create_tween();
+	moveLower.tween_property(lowerSide, \"position\", Vector2(lowerSide.position.x, lowerSide.position.y + offset), transDur);
+
+	var fadeLower = create_tween();
+	fadeLower.tween_property(lowerSide, \"modulate\", Color.DARK_SLATE_GRAY, transDur / 4).set_delay(transDur / 4);
+
+	# ReAssign
+
+	top = ReAssign_RollDown(top);
+	front = ReAssign_RollDown(front);
+	bottom = ReAssign_RollDown(bottom);
+	back = ReAssign_RollDown(back);
+
+func ReAssign_RollUp(side:Sprite2D) -> Sprite2D:
+	match side:
+		side_1:
+			return side_2;
+		side_2:
+			return side_3;
+		side_3:
+			return side_4;
+		side_4:
+			return side_1;
+		_:
+			return null;
+			
+func ReAssign_RollDown(side:Sprite2D) -> Sprite2D:
+	match side:
+		side_1:
+			return side_4;
+		side_2:
+			return side_1;
+		side_3:
+			return side_2;
+		side_4:
+			return side_3;
+		_:
+			return null;
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_o6dtp"]
+size = Vector2(512, 512)
+
+[node name="Dice" type="Node2D"]
+position = Vector2(960, 540)
+script = SubResource("GDScript_capcq")
+
+[node name="1" type="Sprite2D" parent="."]
+z_index = 1
+texture = ExtResource("1_qut7h")
+region_enabled = true
+region_rect = Rect2(1024, 0, 256, 256)
+
+[node name="Sprite2D" type="Sprite2D" parent="1"]
+texture = ExtResource("1_qut7h")
+region_enabled = true
+region_rect = Rect2(256, 1024, 256, 256)
+
+[node name="2" type="Sprite2D" parent="."]
+z_index = 1
+position = Vector2(0, 256)
+texture = ExtResource("1_qut7h")
+region_enabled = true
+region_rect = Rect2(1024, 0, 256, 256)
+
+[node name="Sprite2D" type="Sprite2D" parent="2"]
+texture = ExtResource("1_qut7h")
+region_enabled = true
+region_rect = Rect2(1024, 1536, 256, 256)
+
+[node name="3" type="Sprite2D" parent="."]
+z_index = 1
+position = Vector2(0, 512)
+texture = ExtResource("1_qut7h")
+region_enabled = true
+region_rect = Rect2(1024, 0, 256, 256)
+
+[node name="Sprite2D" type="Sprite2D" parent="3"]
+texture = ExtResource("1_qut7h")
+region_enabled = true
+region_rect = Rect2(1536, 1536, 256, 256)
+
+[node name="4" type="Sprite2D" parent="."]
+z_index = 1
+position = Vector2(0, 768)
+texture = ExtResource("1_qut7h")
+region_enabled = true
+region_rect = Rect2(1024, 0, 256, 256)
+
+[node name="Sprite2D" type="Sprite2D" parent="4"]
+texture = ExtResource("1_qut7h")
+region_enabled = true
+region_rect = Rect2(1792, 1536, 256, 256)
+
+[node name="Background" type="Sprite2D" parent="."]
+modulate = Color(0, 0, 0, 0.490196)
+scale = Vector2(1.125, 1.125)
+texture = ExtResource("1_qut7h")
+region_enabled = true
+region_rect = Rect2(512, 0, 256, 256)
+
+[node name="Area2D" type="Area2D" parent="."]
+metadata/_edit_lock_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("RectangleShape2D_o6dtp")
+metadata/_edit_lock_ = true
