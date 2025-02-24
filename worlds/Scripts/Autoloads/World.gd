@@ -10,10 +10,10 @@ var playerGridPos:Vector2i;
 const maxChance:int = 10000;
 const improbChance:int = 100000;
 var chances:Dictionary; # InteractionMaster.Type : int
-const initChance_Dog:int = 0;
+const initChance_Dog:int = -500;
 const initChance_Forest:int = 10000;
 const initChance_Fish:int = 1000;
-const initChance_Boat:int = 0;
+const initChance_Boat:int = -1000;
 
 # Signals
 signal SpawnBiomesAroundPlayer(currGPos, prevGPos);
@@ -142,8 +142,22 @@ func Win_ImprobableRoll() -> bool:
 	return randi_range(0, improbChance) == 0;
 
 func Pass_ProbabilityCheck(chance:int) -> bool:
-	var result = randi_range(0, maxChance - 1);
-	return result > maxChance - chance;
+	
+	var result:int;
+	
+	# If chance is a Negative value, randomly pick between 0 and maxChance plus the the absolute of chance, 
+	# and see if the number is 0;
+	# Example: Aim for 0 in [0, 10000 + abs(-500)]
+	
+	if chance < 0:
+		result = randi_range(0, maxChance + abs(chance));
+		return result == 0;
+	
+	# If chance is a positive value, randomly pick between 0 and maxChance, 
+	# and see if the number is between 0 and chance.
+	
+	result = randi_range(0, maxChance);
+	return result < chance;
 
 # Functions: Player ----------------------------------------------------------------------------------------------------
 

@@ -1,4 +1,4 @@
-extends Node;
+extends Node2D;
 
 # Components
 var fader:Node;
@@ -33,7 +33,7 @@ func Spawn_RandomInteraction(biomeType:Biome_Master.Type) -> void:
 	Try_Spawn(biomeType, InteractionMaster.LandInteractions().pick_random());
 
 func Try_Spawn(biomeType:Biome_Master.Type, interType:InteractionMaster.Type) -> void:
-	#InGameDebugger.Say("Trying to Spawn Interaction");
+	
 	if !Should_Spawn(interType):
 			
 		if InteractionMaster.InteractionsWith_IncreasingChance().has(interType):
@@ -44,28 +44,26 @@ func Try_Spawn(biomeType:Biome_Master.Type, interType:InteractionMaster.Type) ->
 	
 	# We still check for Water Biomes here because random combinations 
 	# like Water Biome + Dog can still occur.
-	
+
 	match interType:
 			
 		InteractionMaster.Type.Dog:
-		
 			if biomeType != Biome_Master.Type.Water or World.Win_ImprobableRoll():
+				Spawn(interType, true);
+				AudioMaster.PlaySFX_DogBark(global_position);
 				return;
 				
 		InteractionMaster.Type.Forest:
-			
-			if biomeType != Biome_Master.Type.Water:
+			if biomeType == Biome_Master.Type.Grass:
 				Spawn(interType);
 				return;
 			
 		InteractionMaster.Type.Fish:
-			
 			if biomeType == Biome_Master.Type.Water or World.Win_ImprobableRoll():
 				Spawn(interType);
 				return;
 				
 		InteractionMaster.Type.Boat:
-			
 			if biomeType == Biome_Master.Type.Water or World.Win_ImprobableRoll():
 				Spawn(interType, true);
 				return;
@@ -78,19 +76,8 @@ func Should_Spawn(interType:InteractionMaster.Type) -> bool:
 
 func Spawn(interType:InteractionMaster.Type, resetChance:bool = false) -> void:
 	Enable_Interaction(interType);
-	
-	match(interType):
-		InteractionMaster.Type.Fish:
-			pass;
-		InteractionMaster.Type.Forest:
-			pass;
-		InteractionMaster.Type.Dog:
-			InGameDebugger.Say(str("Spawned: ", InteractionMaster.Type.keys()[interType]));
-			InGameDebugger.Say(str(InteractionMaster.Type.keys()[interType], " Chance: ", World.Get_Chance(interType)));
-		InteractionMaster.Type.Boat:
-			InGameDebugger.Say(str("Spawned: ", InteractionMaster.Type.keys()[interType]));
-			InGameDebugger.Say(str(InteractionMaster.Type.keys()[interType], " Chance: ", World.Get_Chance(interType)));
-	
+	#InGameDebugger.Say(str("Spawned: ", InteractionMaster.Type.keys()[interType]));
+	#InGameDebugger.Say(str(InteractionMaster.Type.keys()[interType], " Chance: ", World.Get_Chance(interType)));
 	if resetChance:
 		World.Reset_Chance(interType);
 

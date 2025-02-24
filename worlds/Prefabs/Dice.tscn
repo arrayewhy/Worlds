@@ -37,7 +37,7 @@ func _ready() -> void:
 	World.RollDice.connect(Roll);
 	area.input_event.connect(On_Click);
 	
-func On_Click(viewPort:Viewport, e:InputEvent, shapeIndex:int) -> void:
+func On_Click(_viewPort:Viewport, e:InputEvent, _shapeIndex:int) -> void:
 	if e.is_pressed():
 		Roll();
 

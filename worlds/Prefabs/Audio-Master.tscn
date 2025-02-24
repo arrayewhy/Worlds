@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3 uid="uid://c3iyxquql1s7n"]
+
+[ext_resource type="Script" path="res://Scripts/Autoloads/Audio-Master.gd" id="1_ha7p5"]
+
+[sub_resource type="GDScript" id="GDScript_3ekme"]
+script/source = "extends AudioStreamPlayer2D
+
+@onready var dogBark:AudioStreamWAV = preload(\"res://Audio/SFX/Dog-Bark_700748__robinhood76__11780-labrador-dog-barks.wav\");
+
+func PlayAudio_DogBark(pos:Vector2) -> void:
+	self.position = pos;
+	PlayAudio(dogBark);
+
+func PlayAudio(sound) -> void:
+	stream = sound;
+	play();
+"
+
+[node name="Audio-Master" type="Node"]
+script = ExtResource("1_ha7p5")
+
+[node name="SFX" type="AudioStreamPlayer2D" parent="."]
+script = SubResource("GDScript_3ekme")

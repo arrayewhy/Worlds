@@ -13,9 +13,9 @@ func _ready() -> void:
 	currGridPos = initGridPos;
 	World.SpawnBiomes_Around(currGridPos);
 
-#func _process(delta: float) -> void:
+#func _process(_delta: float) -> void:
 	#if Input.is_action_just_pressed("Enter"):
-		#InGameDebugger.Say(str("Player Process: ", GridPos_Utils.GridPositions_Around(currGridPos, 1, true).size()));
+		#AudioMaster.PlaySFX_DogBark(position);
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	
