@@ -7,11 +7,13 @@ var discoveredBiomes = {}; # Grid Position : [Biome Object, Biome Type]
 var worldSize:int = 1;
 var playerGridPos:Vector2i;
 # Variables: Interaction
-const maxChance:int = 999;
+#const maxChance:int = 999;
+const maxChance:int = 100;
+const improbChance:int = 1;
 var chances:Dictionary; # InteractionMaster.Type : int
 const initChance_Dog:int = 0;
-const initChance_Forest:int = maxChance;
-const initChance_Fish:int = 990;
+const initChance_Forest:int = 100;
+const initChance_Fish:int = 50;
 const initChance_Boat:int = 0;
 # Signals
 signal SpawnBiomesAroundPlayer(currGPos, prevGPos);
@@ -108,11 +110,12 @@ func Get_InteractionType(gPos:Vector2i) -> InteractionMaster.Type:
 		return discoveredBiomes[gPos][0].Get_Interaction();
 
 func Get_Chance(type:InteractionMaster.Type) -> int:
+	return chances[type];
 	# We pick from a random range [0, chance], so if the chance starts at ZERO, 
 	# and we pick from [0, 0], it is a 100% instead of what we intend which is 0% Chance.
 	# So to make it work as intended, we minus the Chance from 999, and return that.
 	# This way, we are picking 1 from [0, 999] at a very low Chance.
-	return Get_MaxChance() - chances[type];
+	#return Get_MaxChance() - chances[type];
 	
 func Increase_Chance(type:InteractionMaster.Type, rate:int = 1) -> void:
 	if chances[type] < Get_MaxChance():
@@ -141,7 +144,7 @@ func Get_MaxChance() -> int:
 	return maxChance;
 
 func Win_ImprobableRoll() -> bool:
-	return randi_range(0, Get_MaxChance()) == 0;
+	return randi_range(0, improbChance) == 0;
 
 # Functions: Player ----------------------------------------------------------------------------------------------------
 

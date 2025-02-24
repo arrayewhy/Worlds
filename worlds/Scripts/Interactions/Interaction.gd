@@ -14,14 +14,11 @@ func Initialise(biomeType:Biome_Master.Type, interType:InteractionMaster.Type) -
 	sprite = $"Interaction-Sprite";
 	updater = $Updater;
 	
-	if interType == InteractionMaster.Type.NULL:
+	if interType != InteractionMaster.Type.NULL:
+		Spawn(interType);
+		return;
 		
-		match randi_range(0, 1):
-			0:
-				Disable_Interaction(0);
-				return;
-			1:
-				Spawn_RandomInteraction(biomeType);
+	Spawn_RandomInteraction(biomeType);
 
 # [ 1 / 4 ] Functions: Spawning ----------------------------------------------------------------------------------------------------
 
@@ -32,10 +29,11 @@ func Spawn_RandomInteraction(biomeType:Biome_Master.Type) -> void:
 		Try_Spawn(biomeType, InteractionMaster.WaterInteractions().pick_random());
 		return;
 	
-	Try_Spawn(biomeType, randi_range(1, InteractionMaster.Type.size() - 1));
+	#Try_Spawn(biomeType, randi_range(1, InteractionMaster.Type.size() - 1));
+	Try_Spawn(biomeType, InteractionMaster.LandInteractions().pick_random());
 
 func Try_Spawn(biomeType:Biome_Master.Type, interType:InteractionMaster.Type) -> void:
-	
+	#InGameDebugger.Say("Trying to Spawn Interaction");
 	if !Should_Spawn(interType):
 			
 		if InteractionMaster.InteractionsWith_IncreasingChance().has(interType):
@@ -58,9 +56,11 @@ func Try_Spawn(biomeType:Biome_Master.Type, interType:InteractionMaster.Type) ->
 				
 		InteractionMaster.Type.Forest:
 			
-			Spawn(interType);
-			InGameDebugger.Say("Spawn: Forest");
-			return;
+			if biomeType != Biome_Master.Type.Water:
+				Spawn(interType);
+				InGameDebugger.Say("Spawn: Forest");
+				InGameDebugger.Say("");
+				return;
 			
 		InteractionMaster.Type.Fish:
 			
@@ -80,7 +80,15 @@ func Try_Spawn(biomeType:Biome_Master.Type, interType:InteractionMaster.Type) ->
 	return;
 
 func Should_Spawn(interType:InteractionMaster.Type) -> bool:
-	return randi_range(0, World.Get_Chance(interType)) == 0;
+	
+	var picker:Array[int];
+	
+	for i in World.Get_Chance(interType):
+		picker.append(1);
+		
+	picker.resize(100);
+	
+	return picker.pick_random() == 1;
 
 func Spawn(interType:InteractionMaster.Type, resetChance:bool = false) -> void:
 	Enable_Interaction(interType);
