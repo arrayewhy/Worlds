@@ -50,48 +50,47 @@ func Try_Spawn(biomeType:Biome_Master.Type, interType:InteractionMaster.Type) ->
 		InteractionMaster.Type.Dog:
 		
 			if biomeType != Biome_Master.Type.Water or World.Win_ImprobableRoll():
-				Spawn(interType, true);
-				InGameDebugger.Say("Spawn: Dog");
 				return;
 				
 		InteractionMaster.Type.Forest:
 			
 			if biomeType != Biome_Master.Type.Water:
 				Spawn(interType);
-				InGameDebugger.Say("Spawn: Forest");
-				InGameDebugger.Say("");
 				return;
 			
 		InteractionMaster.Type.Fish:
 			
 			if biomeType == Biome_Master.Type.Water or World.Win_ImprobableRoll():
 				Spawn(interType);
-				#InGameDebugger.Say("Spawn: Fish");
 				return;
 				
 		InteractionMaster.Type.Boat:
 			
 			if biomeType == Biome_Master.Type.Water or World.Win_ImprobableRoll():
 				Spawn(interType, true);
-				InGameDebugger.Say("Spawn: Boat");
 				return;
 			
 	Disable_Interaction(0);
 	return;
 
 func Should_Spawn(interType:InteractionMaster.Type) -> bool:
-	
-	var picker:Array[int];
-	
-	for i in World.Get_Chance(interType):
-		picker.append(1);
-		
-	picker.resize(100);
-	
-	return picker.pick_random() == 1;
+	return World.Pass_ProbabilityCheck(World.Get_Chance(interType));
 
 func Spawn(interType:InteractionMaster.Type, resetChance:bool = false) -> void:
 	Enable_Interaction(interType);
+	
+	match(interType):
+		InteractionMaster.Type.Fish:
+			pass;
+		InteractionMaster.Type.Forest:
+			pass;
+		InteractionMaster.Type.Dog:
+			InGameDebugger.Say(str("Spawned: ", InteractionMaster.Type.keys()[interType]));
+			InGameDebugger.Say(str(InteractionMaster.Type.keys()[interType], " Chance: ", World.Get_Chance(interType)));
+		InteractionMaster.Type.Boat:
+			InGameDebugger.Say(str("Spawned: ", InteractionMaster.Type.keys()[interType]));
+			InGameDebugger.Say(str(InteractionMaster.Type.keys()[interType], " Chance: ", World.Get_Chance(interType)));
+	
 	if resetChance:
 		World.Reset_Chance(interType);
 
@@ -129,7 +128,7 @@ func Appear(speed:float = 2) -> void:
 func Update_Sprite(interType:InteractionMaster.Type) -> void:
 	match interType:
 		InteractionMaster.Type.Dog:
-			sprite.region_rect.position = Vector2i(0, 1024);
+			sprite.region_rect.position = Vector2i(0, 2048);
 		InteractionMaster.Type.Forest:
 			sprite.region_rect.position = Vector2i(1792, 1536);
 		InteractionMaster.Type.Fish:
