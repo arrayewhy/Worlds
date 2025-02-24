@@ -67,7 +67,7 @@ func On_SpawnAround(currGPos:Vector2i, prevGPos:Vector2i) -> void:
 	SpawnRandomBiomes_Influenced(currGPos, prevGPos, 2, 1);
 
 func Spawn_Around(gPos:Vector2i) -> void:
-	var surroundingEmpties = GridPos_Utils.GridPositions_Around(gPos, 1);
+	var surroundingEmpties = GridPos_Utils.GridPositions_Around(gPos, 2);
 	for e in surroundingEmpties:
 		SpawnRandomBiome(e);
 

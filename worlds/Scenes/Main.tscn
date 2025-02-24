@@ -15,6 +15,35 @@
 [ext_resource type="AudioStream" uid="uid://cgv7itiiugmiq" path="res://Audio/SFX/Forest_634315__klankbeeld__border-forestfarmfield-727am-nl-eu-220515_0345.wav" id="13_wbwr2"]
 [ext_resource type="PackedScene" uid="uid://cf233120e3l52" path="res://Prefabs/Dice.tscn" id="14_1cw2s"]
 
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_bu5ns"]
+size = Vector2(1920, 48)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_dwwpb"]
+size = Vector2(48, 1080)
+
+[sub_resource type="Gradient" id="Gradient_236ax"]
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_o4abh"]
+gradient = SubResource("Gradient_236ax")
+width = 32
+height = 32
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[sub_resource type="GDScript" id="GDScript_8l2ys"]
+resource_name = "Sun"
+script/source = "extends PointLight2D;
+
+func _ready() -> void:
+	World.TimeTick.connect(On_TimeTick);
+	
+func On_TimeTick() -> void:
+	position.x += 128;
+	self.energy -= 0.001;
+"
+
 [sub_resource type="GDScript" id="GDScript_acxdq"]
 resource_name = "Hover"
 script/source = "extends Node2D;
@@ -54,35 +83,6 @@ func _process(_delta: float) -> void:
 			moving.erase(i);
 "
 
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_bu5ns"]
-size = Vector2(1920, 48)
-
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_dwwpb"]
-size = Vector2(48, 1080)
-
-[sub_resource type="Gradient" id="Gradient_236ax"]
-colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_o4abh"]
-gradient = SubResource("Gradient_236ax")
-width = 32
-height = 32
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(0.5, 0)
-
-[sub_resource type="GDScript" id="GDScript_8l2ys"]
-resource_name = "Sun"
-script/source = "extends PointLight2D;
-
-func _ready() -> void:
-	World.TimeTick.connect(On_TimeTick);
-	
-func On_TimeTick() -> void:
-	position.x += 128;
-	self.energy -= 0.001;
-"
-
 [node name="World" type="Node2D"]
 
 [node name="Camera2D" type="Camera2D" parent="."]
@@ -96,9 +96,10 @@ master = NodePath("..")
 [node name="Cam-Zoom" type="Node" parent="Camera2D"]
 script = ExtResource("3_xox30")
 
-[node name="Player" type="Node2D" parent="." node_paths=PackedStringArray("camMover")]
+[node name="Player" type="Node2D" parent="." node_paths=PackedStringArray("hover", "camMover")]
 z_index = 100
 script = ExtResource("2_54uhw")
+hover = NodePath("../Misc/Hover")
 camMover = NodePath("../Camera2D/Mover")
 
 [node name="Sprite2D" type="Sprite2D" parent="Player"]
@@ -109,9 +110,6 @@ region_rect = Rect2(0, 1536, 256, 256)
 [node name="Biome-Spawner" type="Node" parent="Player" node_paths=PackedStringArray("biomeHolder")]
 script = ExtResource("5_nwltf")
 biomeHolder = NodePath("../../Biome-Holder")
-
-[node name="Hover" type="Node2D" parent="Player"]
-script = SubResource("GDScript_acxdq")
 
 [node name="Biome-Holder" type="Node2D" parent="."]
 y_sort_enabled = true
@@ -172,14 +170,6 @@ autoplay = true
 stream = ExtResource("13_wbwr2")
 autoplay = true
 
-[node name="PointLight2D" type="PointLight2D" parent="."]
-scale = Vector2(4096, 4096)
-texture = SubResource("GradientTexture2D_o4abh")
-script = SubResource("GDScript_8l2ys")
-
-[node name="CanvasModulate" type="CanvasModulate" parent="."]
-color = Color(0, 0, 0, 1)
-
 [node name="Visual-Reference" type="Node2D" parent="."]
 process_mode = 4
 visible = false
@@ -237,9 +227,22 @@ texture = ExtResource("1_ntyhy")
 region_enabled = true
 region_rect = Rect2(0, 0, 256, 256)
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
-scale = Vector2(0.125, 0.125)
-transform = Transform2D(0.125, 0, 0, 0.125, 0, 0)
+[node name="Misc" type="Node2D" parent="."]
+process_mode = 4
+visible = false
 
-[node name="Dice" parent="CanvasLayer" instance=ExtResource("14_1cw2s")]
-position = Vector2(7680, 2160)
+[node name="Sun" type="Node2D" parent="Misc"]
+
+[node name="PointLight2D" type="PointLight2D" parent="Misc/Sun"]
+scale = Vector2(4096, 4096)
+texture = SubResource("GradientTexture2D_o4abh")
+script = SubResource("GDScript_8l2ys")
+
+[node name="CanvasModulate" type="CanvasModulate" parent="Misc/Sun"]
+color = Color(0, 0, 0, 1)
+
+[node name="Dice" parent="Misc" instance=ExtResource("14_1cw2s")]
+position = Vector2(0, 0)
+
+[node name="Hover" type="Node2D" parent="Misc"]
+script = SubResource("GDScript_acxdq")

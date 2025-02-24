@@ -10,6 +10,7 @@ var playerGridPos:Vector2i;
 const maxChance:int = 999;
 var chances:Dictionary; # InteractionMaster.Type : int
 const initChance_Dog:int = 0;
+const initChance_Forest:int = maxChance;
 const initChance_Fish:int = 990;
 const initChance_Boat:int = 0;
 # Signals
@@ -121,6 +122,8 @@ func Reset_Chance(type:InteractionMaster.Type) -> void:
 	match type:
 		InteractionMaster.Type.Dog:
 			chances[type] = initChance_Dog;
+		InteractionMaster.Type.Forest:
+			chances[type] = initChance_Forest;
 		InteractionMaster.Type.Fish:
 			chances[type] = initChance_Fish;
 		InteractionMaster.Type.Boat:

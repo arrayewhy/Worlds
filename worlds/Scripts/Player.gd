@@ -2,6 +2,8 @@ extends Node2D;
 
 #@onready var biomeSpawner = $"Biome-Spawner";
 
+@export var hover:Node;
+
 @export var camMover:Node;
 
 var initGridPos := Vector2i(0,0);
@@ -22,7 +24,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	# Move and Spawn Repeater
 	
 	if event.is_action_pressed("One"):
-		$Hover.set_process(false);
+		hover.set_process(false);
 		MovePlayer_And_SpawnBiomes_Repeated(inputDir, 5000);
 		return;
 	
@@ -70,7 +72,7 @@ func MovePlayer_And_SpawnBiomes_Repeated(inputDir:Vector2i, repetitions:int = 10
 		
 		MovePlayer_And_SpawnBiomes(inputDir);
 		
-	$Hover.set_process(true);
+	hover.set_process(true);
 	InGameDebugger.Say(World.discoveredBiomes.size());
 
 func Get_RandDirection() -> Vector2i:

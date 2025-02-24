@@ -27,6 +27,7 @@ func Initialise(biomeType:Biome_Master.Type, interType:InteractionMaster.Type) -
 
 func Spawn_RandomInteraction(biomeType:Biome_Master.Type) -> void:
 	
+	# Spawn interactions specific to the water biome
 	if biomeType == Biome_Master.Type.Water:
 		Try_Spawn(biomeType, InteractionMaster.WaterInteractions().pick_random());
 		return;
@@ -47,13 +48,19 @@ func Try_Spawn(biomeType:Biome_Master.Type, interType:InteractionMaster.Type) ->
 	# like Water Biome + Dog can still occur.
 	
 	match interType:
-		
+			
 		InteractionMaster.Type.Dog:
 		
 			if biomeType != Biome_Master.Type.Water or World.Win_ImprobableRoll():
 				Spawn(interType, true);
 				InGameDebugger.Say("Spawn: Dog");
 				return;
+				
+		InteractionMaster.Type.Forest:
+			
+			Spawn(interType);
+			InGameDebugger.Say("Spawn: Forest");
+			return;
 			
 		InteractionMaster.Type.Fish:
 			
@@ -115,6 +122,8 @@ func Update_Sprite(interType:InteractionMaster.Type) -> void:
 	match interType:
 		InteractionMaster.Type.Dog:
 			sprite.region_rect.position = Vector2i(0, 1024);
+		InteractionMaster.Type.Forest:
+			sprite.region_rect.position = Vector2i(1792, 1536);
 		InteractionMaster.Type.Fish:
 			sprite.region_rect.position = Vector2i(0, 1792);
 		InteractionMaster.Type.Boat:

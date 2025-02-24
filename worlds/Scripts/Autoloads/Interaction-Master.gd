@@ -1,9 +1,9 @@
 extends Node;
 
-enum Type {NULL, Dog, Fish, Boat};
+enum Type {NULL, Dog, Forest, Fish, Boat};
 
 func LandInteractions() -> Array[Type]:
-	return [Type.Dog];
+	return [Type.Dog, Type.Forest];
 
 func WaterInteractions() -> Array[Type]:
 	return [Type.Fish, Type.Boat];

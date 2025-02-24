@@ -7,7 +7,7 @@ func On_WorldTick() -> void:
 
 func Update_Fish() -> void:
 	
-	InGameDebugger.Say(str("Updating: ", InteractionMaster.Type.keys()[get_parent().Get_Interaction()]), true);
+	#InGameDebugger.Say(str("Updating: ", InteractionMaster.Type.keys()[get_parent().Get_Interaction()]), true);
 	
 	var gPos:Vector2i = get_parent().Get_GridPosition();
 	var surroundings:Array[Vector2i] = GridPos_Utils.Occupieds_Around(gPos, 1, true);
