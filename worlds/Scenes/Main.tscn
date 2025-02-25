@@ -183,7 +183,6 @@ master = NodePath("..")
 speed = 5.0
 minDist = 10.0
 frameByFrame = true
-emitSignal = true
 
 [node name="Biome-Holder" type="Node2D" parent="."]
 y_sort_enabled = true

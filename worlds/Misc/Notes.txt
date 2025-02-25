@@ -15,6 +15,8 @@ SPECULATIVE:
 	- Inventory
 	- Riding the Fish
 	- Slow Random Biome Reveal phenomenon that does its own thing
+	- Interior
+	
 	- Time of Day & Search Range
 	
 >>> DONE:

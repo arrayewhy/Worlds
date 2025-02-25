@@ -9,79 +9,80 @@ extends Node2D;
 
 @export var camMover:Node;
 
-var initGridPos := Vector2i(0,0);
+const initGridPos := Vector2i(0,0);
+const movementInterval:float = 0.5;
+
 var currGridPos:Vector2i;
 
 var moving:bool;
 var hiddenFromView:bool;
-#var timeSkips:int;
+
+var timeSkips:int;
 #var queuedDir:Vector2i;
 
 func _ready() -> void:
 	currGridPos = initGridPos;
 	World.SpawnBiomes_Around(currGridPos);
 
-#func _process(_delta: float) -> void:
-		
-	#if timeSkips > 0:
-		#InGameDebugger.Say("Skipping");
-		#timeSkips -= 1;
-		#World.Advance_Time();
-		#await get_tree().create_timer(5).timeout;
-		#return;
-		
-	#if queuedDir != Vector2i(0, 0):
-		#InGameDebugger.Say("Moving Player")
-		#MovePlayer_And_SpawnBiomes(queuedDir);
-		#queuedDir = Vector2i(0, 0);
-		
-		
-	#if Input.is_action_just_pressed("Enter"):
-		#AudioMaster.PlaySFX_DogBark(position);
-
 func _unhandled_key_input(event: InputEvent) -> void:
 	
-	var inputDir:Vector2i = Vector2i.ZERO;
-	
 	# Move and Spawn Repeater
-	
 	if event.is_action_pressed("One"):
 		hover.set_process(false);
-		RandomReveal(inputDir, 5000);
+		RandomReveal(5000);
 		return;
 	
-	# Normal Player Move and Biome Spawn
-	
-	inputDir = Get_DirectionInput(event);
-	if inputDir != Vector2i(0,0):
-
-		if moving:
-			return;
-
-		var nextGPos:Vector2i = currGridPos + inputDir;
-		
-		var nextInteraction = Interaction_Master.Get_InteractionType(nextGPos);
-		
-		if nextInteraction == Interaction_Master.Type.Forest:
-			if !hiddenFromView:
-				MultiFader.FadeTo_Trans(playerSpr);
-				hiddenFromView = true;
-			#InGameDebugger.Say("Set Skip");
-			#timeSkips = 2;
-			#queuedDir = inputDir;
-		elif nextInteraction != Interaction_Master.Type.Forest:
-			MultiFader.FadeTo_Opaque(playerSpr);
-			hiddenFromView = false;
-		
-		# Blocked by Water
-		#if Biome_Master.Get_BiomeType(nextGPos) == Biome_Master.Type.Water:
-			#var surroundingBiomes:Array = Biome_Master.Surrounding_Biomes(nextGPos, 1);
-			#if !surroundingBiomes.has(Biome_Master.Type.Earth) and !surroundingBiomes.has(Biome_Master.Type.Grass):
-				#return;
-
-		MovePlayer_And_SpawnBiomes(inputDir);
-		World.Roll_Dice();
+	if moving:
 		return;
+	
+	var inputDir:Vector2i = Get_DirectionInput(event);
+	
+	if inputDir == Vector2i(0,0):
+		return;
+	
+	# Time Skip from spending more time moving through forests
+	
+	#if timeSkips > 0:
+		#InGameDebugger.Say("Time Skip");
+		#timeSkips -= 1;
+		#World.Advance_Time();
+		##moving = true;
+		##await get_tree().create_timer(movementInterval).timeout;
+		##moving = false;
+		#return;
+	
+	# Interaction Fade
+	
+	var nextGPos:Vector2i = currGridPos + inputDir;
+		
+	var nextInteraction = Interaction_Master.Get_InteractionType(nextGPos);
+	
+	if nextInteraction == Interaction_Master.Type.Forest:
+		if !hiddenFromView:
+			MultiFader.FadeTo_Trans(playerSpr);
+			hiddenFromView = true;
+		#timeSkips = 1;
+	elif nextInteraction != Interaction_Master.Type.Forest:
+		MultiFader.FadeTo_Opaque(playerSpr);
+		hiddenFromView = false;
+		
+	# Move and Spawn
+		
+	Do_PlayerMove_BiomeSpawn_InterractionSpawn(inputDir);
+	
+func Do_PlayerMove_BiomeSpawn_InterractionSpawn(inputDir:Vector2i) -> void:
+	
+	# Blocked by Water
+	#if Biome_Master.Get_BiomeType(nextGPos) == Biome_Master.Type.Water:
+		#var surroundingBiomes:Array = Biome_Master.Surrounding_Biomes(nextGPos, 1);
+		#if !surroundingBiomes.has(Biome_Master.Type.Earth) and !surroundingBiomes.has(Biome_Master.Type.Grass):
+			#return;
+
+	MovePlayer_And_SpawnBiomes(inputDir);
+	
+	World.Roll_Dice();
+	
+	return;
 	
 func Get_DirectionInput(event:InputEvent) -> Vector2i:
 	if event.is_action("Up"):
@@ -98,7 +99,7 @@ func MovePlayer_And_SpawnBiomes(inputDir:Vector2i, moveCam:bool = true) -> void:
 	
 	moving = true;
 	
-	mover.Done.connect(On_Mover_Done);
+	#mover.Done.connect(On_Mover_Done);
 	
 	var prevGridPos = currGridPos;
 	# Update Current Grid Position
@@ -115,14 +116,19 @@ func MovePlayer_And_SpawnBiomes(inputDir:Vector2i, moveCam:bool = true) -> void:
 	
 	await get_tree().process_frame;
 	World.Advance_Time();
-
-func On_Mover_Done() -> void:
+	
+	await get_tree().create_timer(movementInterval).timeout;
 	moving = false;
-	mover.Done.disconnect(On_Mover_Done);
+
+#func On_Mover_Done() -> void:
+	#moving = false;
+	#mover.Done.disconnect(On_Mover_Done);
 
 # Functions: Debug ----------------------------------------------------------------------------------------------------
 
-func RandomReveal(inputDir:Vector2i, repetitions:int = 1000) -> void:
+func RandomReveal(repetitions:int = 1000) -> void:
+	
+	var inputDir:Vector2i;
 	
 	var gPos:Vector2i = currGridPos
 	
