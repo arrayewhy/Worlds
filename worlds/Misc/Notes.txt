@@ -4,6 +4,9 @@ HIGH PRIORITY:
 	- World Template / World Edge through Sprite Pixel Info
 	
 LOW PRIORITY:
+	- Properly implement random Interaction Spawning:
+		Instead of spawning randomly when passed a NULL interaction, consider something like an
+		explicit RANDOM interaction type.
 	
 SPECULATIVE:
 	- Caverns

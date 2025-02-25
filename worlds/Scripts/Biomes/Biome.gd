@@ -46,7 +46,6 @@ func Check_Surroundings() -> void:
 	if type != Biome_Master.Type.Water:
 		return;
 	
-	#print("Water: Connecting");
 	World.TimeTick.connect(On_TimeTick);
 		
 func On_TimeTick() -> void:
@@ -54,21 +53,27 @@ func On_TimeTick() -> void:
 	var dist:float = gridPos.distance_to(World.PlayerGridPos());
 	
 	if dist >= 2:
-		biomeSprite.modulate.a = 0.5;
+		#biomeSprite.modulate.a = 0.5; # PRETTY WATER DEPTHS (Refer to Notes)
 		return;
 		
-	biomeSprite.modulate.a = 1;
+	#biomeSprite.modulate.a = 1; # PRETTY WATER DEPTHS (Refer to Notes)
 	
 	if GridPos_Utils.Empties_Around(gridPos, 1, true).size() > 0:
 		return;
 		
 	if !Biome_Master.Surrounding_Biomes(gridPos, 1, true).has(Biome_Master.Type.Water):
 		MultiFader.FadeTo_Trans(biomeSprite);
+		World.TimeTick.connect(On_TimeTick_QueueFree);
 		Biome_Master.SpawnBiome(gridPos, Biome_Master.RandomBiomeType_Land(), get_parent(), Interaction_Master.Type.NULL);
-	else:
-		biomeSprite.modulate.a = 0.25;
+		
+	#else: # PRETTY WATER DEPTHS (Refer to Notes)
+		#biomeSprite.modulate.a = 0.25; # PRETTY WATER DEPTHS (Refer to Notes)
 	
 	World.TimeTick.disconnect(On_TimeTick);
+
+func On_TimeTick_QueueFree() -> void:
+	World.TimeTick.disconnect(On_TimeTick_QueueFree);
+	queue_free();
 
 # Functions: Biome Type ----------------------------------------------------------------------------------------------------
 
