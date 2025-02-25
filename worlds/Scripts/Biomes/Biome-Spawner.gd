@@ -6,21 +6,33 @@ extends Node;
 
 
 func _ready() -> void:
-	World.SpawnBiomes.connect(Spawn_Around);
-	World.SpawnBiomesAroundPlayer.connect(On_SpawnAround);
+	#World.SpawnBiomes.connect(On_SpawnRandomAround);
+	#World.SpawnBiomesAroundPlayer.connect(On_SpawnInfluencedAround);
+	World.SpawnBiomesAround.connect(On_SpawnBiomesAround)
 
 # [ 1 / 2 ] Functions: Biome Spawning ----------------------------------------------------------------------------------------------------
 
 func SpawnRandomBiome(gPos:Vector2i, interType:Interaction_Master.Type = Interaction_Master.Type.NULL) -> void:
 	Biome_Master.SpawnBiome(gPos, Biome_Master.RandomBiomeType(), biomeHolder, interType);
 
-func SpawnRandomBiomes(gPos:Vector2i, reach:int) -> void:
-	var empties:Array[Vector2i] = GridPos_Utils.Empties_Around(gPos, reach, false);
-	if empties.size() > 0:
-		for e in empties:
-			SpawnRandomBiome(e);
+#func SpawnRandomBiomes(gPos:Vector2i, reach:int) -> void:
+	#var empties:Array[Vector2i] = GridPos_Utils.Empties_Around(gPos, reach, false);
+	#if empties.size() > 0:
+		#for e in empties:
+			#SpawnRandomBiome(e);
 
-func SpawnRandomBiomes_Influenced(currGPos:Vector2i, _prevGPos:Vector2i, spawnRange:int, influenceRange:int) -> void:
+func SpawnRandomAround(gPos:Vector2i, spawnRange:int) -> void:
+	var surroundingEmpties = GridPos_Utils.Empties_Around(gPos, spawnRange, false);
+	for e in surroundingEmpties:
+		SpawnRandomBiome(e);
+
+func On_SpawnBiomesAround(gPos:Vector2i, spawnRange:int, influenceRange:int):
+	if influenceRange == 0:
+		SpawnRandomAround(gPos, spawnRange);
+		return;
+	SpawnRandomBiomes_Influenced(gPos, spawnRange, influenceRange);
+
+func SpawnRandomBiomes_Influenced(currGPos:Vector2i, spawnRange:int, influenceRange:int) -> void:
 	
 	var spawnPoints:Array[Vector2i] = GridPos_Utils.Empties_Around(currGPos, spawnRange, false);
 	
@@ -40,8 +52,11 @@ func SpawnRandomBiomes_Influenced(currGPos:Vector2i, _prevGPos:Vector2i, spawnRa
 	influences.append(Biome_Master.RandomBiomeType());
 	
 	for point in spawnPoints:
+		
 		for i in biomes_WithGPos:
+			
 			if GridPos_Utils.Are_GridPosNeighbours(point, i[0]):
+				
 				var neighbourBias:Array[Biome_Master.Type] = influences;
 				# Add One-Off bias for Neighbouring Biome
 				neighbourBias.append_array(Get_NeighbourBias(i[1]));
@@ -50,13 +65,8 @@ func SpawnRandomBiomes_Influenced(currGPos:Vector2i, _prevGPos:Vector2i, spawnRa
 				break;
 	#InGameDebugger.Say("\n");
 
-func On_SpawnAround(currGPos:Vector2i, prevGPos:Vector2i) -> void:
-	SpawnRandomBiomes_Influenced(currGPos, prevGPos, 2, 1);
-
-func Spawn_Around(gPos:Vector2i) -> void:
-	var surroundingEmpties = GridPos_Utils.GridPositions_Around(gPos, 2);
-	for e in surroundingEmpties:
-		SpawnRandomBiome(e);
+#func On_SpawnInfluencedAround(currGPos:Vector2i, range:int, influenceRange:int) -> void:
+	#SpawnRandomBiomes_Influenced(currGPos, range, influenceRange);
 
 # [ 2 / 2 ] Functions: Bias ----------------------------------------------------------------------------------------------------
 

@@ -2,7 +2,6 @@ UPCOMING -----------------------------------------------------------------------
 
 HIGH PRIORITY:
 	- World Template / World Edge through Sprite Pixel Info
-	- Merge signals SpawnBiomesAroundPlayer & SpawnBiomes in World.gd
 	
 LOW PRIORITY:
 	- House in the Woods
@@ -24,6 +23,7 @@ SPECULATIVE:
 	- Tween Player Movement
 	- Biome Mouse Hover
 	- Fade Biomes
+	- Merge signals SpawnBiomesAroundPlayer & SpawnBiomes in World.gd
 
 BUGS ----------------------------------------------------------------------------------------------------
 

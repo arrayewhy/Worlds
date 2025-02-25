@@ -12,8 +12,8 @@ var _interChances:Dictionary; # Interaction_Master.Type : int
 
 
 # Signals
-signal SpawnBiomesAroundPlayer(currGPos, prevGPos);
-signal SpawnBiomes(gPos);
+#signal SpawnBiomesAroundPlayer(currGPos, prevGPos);
+signal SpawnBiomesAround(gPos, range, influenceRange);
 signal TimeTick;
 
 signal RollDice;
@@ -26,12 +26,13 @@ func Roll_Dice() -> void:
 
 # Functions: Signals ----------------------------------------------------------------------------------------------------
 
-func SpawnBiomes_AroundPlayer(currGPos:Vector2i, prevGPos:Vector2i) -> void:
+func SpawnBiomesAround_Player(currGPos:Vector2i, spawnRange:int = 2, influenceRange:int = 1) -> void:
 	_playerGridPos = currGPos;
-	SpawnBiomesAroundPlayer.emit(currGPos, prevGPos);
+	#SpawnBiomesAround.emit(currGPos, 3, true);
+	SpawnBiomes_Around(currGPos, spawnRange, influenceRange);
 
-func SpawnBiomes_Around(gPos:Vector2i) -> void:
-	SpawnBiomes.emit(gPos);
+func SpawnBiomes_Around(gPos:Vector2i, spawnRange:int = 1, influenceRange:int = 0) -> void:
+	SpawnBiomesAround.emit(gPos, spawnRange, influenceRange);
 	
 func Advance_Time() -> void:
 	TimeTick.emit();

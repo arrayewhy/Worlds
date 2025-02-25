@@ -22,7 +22,7 @@ var timeSkips:int;
 
 func _ready() -> void:
 	currGridPos = initGridPos;
-	World.SpawnBiomes_Around(currGridPos);
+	World.SpawnBiomes_Around(currGridPos, 2);
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	
@@ -99,11 +99,12 @@ func MovePlayer_And_SpawnBiomes(inputDir:Vector2i, moveCam:bool = true) -> void:
 	
 	moving = true;
 	
-	var prevGridPos = currGridPos;
+	#var prevGridPos = currGridPos;
 	# Update Current Grid Position
 	currGridPos += inputDir;
 	# Spawn Biomes around new position
-	World.SpawnBiomes_AroundPlayer(currGridPos, prevGridPos);
+	#World.SpawnBiomes_AroundPlayer(currGridPos, prevGridPos);
+	World.SpawnBiomesAround_Player(currGridPos);
 	var targPos = position + Vector2(inputDir) * World.CellSize();
 	# Move Player
 	mover.StartMove(targPos);
