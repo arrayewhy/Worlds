@@ -235,6 +235,7 @@ target = NodePath("../Illumination-Spawner")
 startVisible = false
 
 [node name="Audio" type="Node" parent="."]
+process_mode = 4
 
 [node name="Desert-Wind" type="AudioStreamPlayer" parent="Audio"]
 stream = ExtResource("12_py2jo")

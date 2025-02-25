@@ -3,6 +3,7 @@ extends Node2D;
 #@onready var biomeSpawner = $"Biome-Spawner";
 
 @onready var mover:Node = $Mover;
+@onready var playerSpr:Sprite2D = $Sprite2D;
 
 @export var hover:Node;
 
@@ -12,12 +13,29 @@ var initGridPos := Vector2i(0,0);
 var currGridPos:Vector2i;
 
 var moving:bool;
+var hiddenFromView:bool;
+#var timeSkips:int;
+#var queuedDir:Vector2i;
 
 func _ready() -> void:
 	currGridPos = initGridPos;
 	World.SpawnBiomes_Around(currGridPos);
 
 #func _process(_delta: float) -> void:
+		
+	#if timeSkips > 0:
+		#InGameDebugger.Say("Skipping");
+		#timeSkips -= 1;
+		#World.Advance_Time();
+		#await get_tree().create_timer(5).timeout;
+		#return;
+		
+	#if queuedDir != Vector2i(0, 0):
+		#InGameDebugger.Say("Moving Player")
+		#MovePlayer_And_SpawnBiomes(queuedDir);
+		#queuedDir = Vector2i(0, 0);
+		
+		
 	#if Input.is_action_just_pressed("Enter"):
 		#AudioMaster.PlaySFX_DogBark(position);
 
@@ -36,17 +54,31 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	
 	inputDir = Get_DirectionInput(event);
 	if inputDir != Vector2i(0,0):
+
+		if moving:
+			return;
+
+		var nextGPos:Vector2i = currGridPos + inputDir;
+		
+		var nextInteraction = Interaction_Master.Get_InteractionType(nextGPos);
+		
+		if nextInteraction == Interaction_Master.Type.Forest:
+			if !hiddenFromView:
+				MultiFader.FadeTo_Trans(playerSpr);
+				hiddenFromView = true;
+			#InGameDebugger.Say("Set Skip");
+			#timeSkips = 2;
+			#queuedDir = inputDir;
+		elif nextInteraction != Interaction_Master.Type.Forest:
+			MultiFader.FadeTo_Opaque(playerSpr);
+			hiddenFromView = false;
 		
 		# Blocked by Water
-		#var nextGPos:Vector2i = currGridPos + inputDir;
 		#if Biome_Master.Get_BiomeType(nextGPos) == Biome_Master.Type.Water:
 			#var surroundingBiomes:Array = Biome_Master.Surrounding_Biomes(nextGPos, 1);
 			#if !surroundingBiomes.has(Biome_Master.Type.Earth) and !surroundingBiomes.has(Biome_Master.Type.Grass):
 				#return;
-		
-		if moving:
-			return;
-		
+
 		MovePlayer_And_SpawnBiomes(inputDir);
 		World.Roll_Dice();
 		return;
@@ -62,7 +94,7 @@ func Get_DirectionInput(event:InputEvent) -> Vector2i:
 		return Vector2i.RIGHT;
 	return Vector2i.ZERO;
 
-func MovePlayer_And_SpawnBiomes(inputDir:Vector2i) -> void:
+func MovePlayer_And_SpawnBiomes(inputDir:Vector2i, moveCam:bool = true) -> void:
 	
 	moving = true;
 	
@@ -78,7 +110,8 @@ func MovePlayer_And_SpawnBiomes(inputDir:Vector2i) -> void:
 	mover.StartMove(targPos);
 	#position = targPos;
 	# Move Camera
-	camMover.StartMove(targPos);
+	if moveCam:
+		camMover.StartMove(targPos);
 	
 	await get_tree().process_frame;
 	World.Advance_Time();
