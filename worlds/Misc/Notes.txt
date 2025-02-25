@@ -1,25 +1,27 @@
 UPCOMING ----------------------------------------------------------------------------------------------------
 
 HIGH PRIORITY:
-	- World Edge
-	- Fade Biomes
+	- World Template / World Edge through Sprite Pixel Info
+	- Merge signals SpawnBiomesAroundPlayer & SpawnBiomes in World.gd
 	
 LOW PRIORITY:
-	- Merge signals SpawnBiomesAroundPlayer & SpawnBiomes in World.gd
-	- Time of Day & Search Range
+	- House in the Woods
 	
 SPECULATIVE:
+	- Caverns
+	- Entering Forests and Towns opens a Zoom View, slowing Overworld Movement
 	- Consider making Interaction Sprites look as if they are seen from "higher up", so we would see
 		Forests instead of a single Tree. Schools instead of a single fish.
 	- Inventory
-	- Caverns
-	- House in the Woods
 	- Riding the Fish
+	- Slow Random Biome Reveal phenomenon that does its own thing
+	- Time of Day & Search Range
 	
 >>> DONE:
 	- Spawn: Trees
 	- Tween Player Movement
 	- Biome Mouse Hover
+	- Fade Biomes
 
 BUGS ----------------------------------------------------------------------------------------------------
 
