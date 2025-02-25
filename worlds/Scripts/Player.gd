@@ -96,21 +96,14 @@ func RandomReveal(inputDir:Vector2i, repetitions:int = 1000) -> void:
 	for i in repetitions:
 		
 		inputDir = Get_RandDirection();
-		
-		#var prevGridPos = currGridPos;
-		# Update Current Grid Position
 		gPos += inputDir;
 		# Spawn Biomes around new position
 		World.SpawnBiomes_AroundPlayer(gPos, gPos);
-		#var targPos = position + Vector2(inputDir) * World.CellSize();
-		# Move Player
-		#mover.StartMove(targPos);
-		#position = targPos;
-		# Move Camera
-		#camMover.StartMove(targPos);
 		
 		await get_tree().process_frame;
 		World.Advance_Time();
+		
+		await get_tree().create_timer(1).timeout;
 		
 	hover.set_process(true);
 	InGameDebugger.Say(World.DiscoveredBiomes().size());
