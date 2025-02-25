@@ -11,21 +11,8 @@ func _ready() -> void:
 
 # [ 1 / 2 ] Functions: Biome Spawning ----------------------------------------------------------------------------------------------------
 
-func SpawnBiome(gPos:Vector2i, type:Biome_Master.Type, interType:Interaction_Master.Type = Interaction_Master.Type.NULL) -> void:
-	var newBiome:Object = biomePrefab.instantiate();
-	newBiome.Initialise(gPos, type);
-	biomeHolder.add_child(newBiome);
-	# Position New Biome in World Space
-	newBiome.position = Vector2(gPos) * World.CellSize();
-	# Record the biome
-	Biome_Master.Record_Biome(gPos, newBiome, type);
-	newBiome.Initialise_Interaction(type, interType);
-	World.IncreaseWorldSize();
-	# Debug Message
-	#InGameDebugger.Say(str(gPos, " : ", World.Get_BiomeType(gPos), ", ", World.Get_InteractionType(gPos)), true);
-
 func SpawnRandomBiome(gPos:Vector2i, interType:Interaction_Master.Type = Interaction_Master.Type.NULL) -> void:
-	SpawnBiome(gPos, Biome_Master.RandomBiomeType(), interType);
+	Biome_Master.SpawnBiome(gPos, Biome_Master.RandomBiomeType(), biomeHolder, interType);
 
 func SpawnRandomBiomes(gPos:Vector2i, reach:int) -> void:
 	var empties:Array[Vector2i] = GridPos_Utils.Empties_Around(gPos, reach, false);
@@ -58,7 +45,7 @@ func SpawnRandomBiomes_Influenced(currGPos:Vector2i, _prevGPos:Vector2i, spawnRa
 				var neighbourBias:Array[Biome_Master.Type] = influences;
 				# Add One-Off bias for Neighbouring Biome
 				neighbourBias.append_array(Get_NeighbourBias(i[1]));
-				SpawnBiome(point, neighbourBias.pick_random());
+				Biome_Master.SpawnBiome(point, neighbourBias.pick_random(), biomeHolder, Interaction_Master.Type.NULL);
 				#InGameDebugger.Say("Spawn!")
 				break;
 	#InGameDebugger.Say("\n");

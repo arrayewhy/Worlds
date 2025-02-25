@@ -16,7 +16,7 @@ func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type) -> void:
 	if !biomeSprite:
 		biomeSprite = $"Biome-Sprite";
 	
-	MultiFader.FadeTo_Opaque(biomeSprite, 4, true);
+	MultiFader.FadeTo_Opaque(biomeSprite, 2, true);
 	
 	# A bit of Visual Styling
 	biomeSprite.rotate(randf_range(-rotRandLimit, rotRandLimit));

@@ -2,6 +2,8 @@ class_name Biome_Master extends Node;
 
 enum Type {NULL, Earth, Grass, Water};
 
+const biomePrefab:PackedScene = preload("res://Prefabs/Biome.tscn");
+
 static func RandomBiomeType() -> int:
 	# Return an Int instead of a Type since this is faster.
 	# If this doesn't suffice, do a Match and return the appropriate Type as a String.
@@ -54,3 +56,19 @@ static func Surrounding_Biomes_WithGPos(gPos:Vector2i, reach:int) -> Array[Array
 		biomesAround.append([p, Biome_Master.Get_BiomeType(p)]);
 	
 	return biomesAround;
+
+static func SpawnBiome(gPos:Vector2i, type:Biome_Master.Type, holder:Node, interType:Interaction_Master.Type) -> void:
+	
+	var newBiome:Object = biomePrefab.instantiate();
+	newBiome.Initialise(gPos, type);
+	holder.add_child(newBiome);
+	
+	# Position New Biome in World Space
+	newBiome.position = Vector2(gPos) * World.CellSize();
+	
+	# Record the biome
+	Biome_Master.Record_Biome(gPos, newBiome, type);
+	
+	newBiome.Initialise_Interaction(type, interType);
+	
+	World.IncreaseWorldSize();
