@@ -43,8 +43,8 @@ func Check_Surroundings() -> void:
 	if GridPos_Utils.Empties_Around(gridPos, 1, true).size() == 0:
 		return;
 
-	if type != Biome_Master.Type.Water:
-		return;
+	#if type != Biome_Master.Type.Water:
+		#return;
 	
 	World.TimeTick.connect(On_TimeTick);
 		
@@ -60,14 +60,28 @@ func On_TimeTick() -> void:
 	
 	if GridPos_Utils.Empties_Around(gridPos, 1, true).size() > 0:
 		return;
+
+	match type:
 		
-	if !Biome_Master.Surrounding_Biomes(gridPos, 1, true).has(Biome_Master.Type.Water):
-		MultiFader.FadeTo_Trans(biomeSprite);
-		World.TimeTick.connect(On_TimeTick_QueueFree);
-		Biome_Master.SpawnBiome(gridPos, Biome_Master.RandomBiomeType_Land(), get_parent(), Interaction_Master.Type.NULL);
-		
-	#else: # PRETTY WATER DEPTHS (Refer to Notes)
-		#biomeSprite.modulate.a = 0.25; # PRETTY WATER DEPTHS (Refer to Notes)
+		Biome_Master.Type.Water:
+
+			if !Biome_Master.Surrounding_Biomes(gridPos, 1, true).has(Biome_Master.Type.Water):
+				MultiFader.FadeTo_Trans(biomeSprite);
+				World.TimeTick.connect(On_TimeTick_QueueFree);
+				Biome_Master.SpawnBiome(gridPos, Biome_Master.RandomBiomeType_Land(), get_parent(), Interaction_Master.Type.NULL);
+				
+			#else: # PRETTY WATER DEPTHS (Refer to Notes)
+				#biomeSprite.modulate.a = 0.25; # PRETTY WATER DEPTHS (Refer to Notes)
+
+		_: # Landed biomes stranded in water
+			
+			var surroundingBiomes:Array[Biome_Master.Type] = Biome_Master.Surrounding_Biomes(gridPos, 1, true);
+			if surroundingBiomes.count(Biome_Master.Type.Water) < 8:
+				return;
+				
+			MultiFader.FadeTo_Trans(biomeSprite);
+			World.TimeTick.connect(On_TimeTick_QueueFree);
+			Biome_Master.SpawnBiome(gridPos, Biome_Master.Type.Water, get_parent(), Interaction_Master.Type.NULL);
 	
 	World.TimeTick.disconnect(On_TimeTick);
 

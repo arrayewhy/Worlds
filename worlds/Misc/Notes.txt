@@ -18,7 +18,7 @@ SPECULATIVE:
 	- Inventory
 	- Riding the Fish
 	- Slow Random Biome Reveal phenomenon that does its own thing
-	- Water Depths
+	- PRETTY WATER DEPTHS
 	
 	- Time of Day & Search Range
 	
@@ -32,6 +32,8 @@ SPECULATIVE:
 BUGS ----------------------------------------------------------------------------------------------------
 
 HIGH PRIORITY:
+	- Biome Melding Queue Free Issue:
+		Sometimes, we try to free a biome object when it is still fading, crashing the Multi-Fader
 	
 LOW PRIORITY:
 	- Interactions on Initial Biomes aren't visible
