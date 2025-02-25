@@ -99,8 +99,6 @@ func MovePlayer_And_SpawnBiomes(inputDir:Vector2i, moveCam:bool = true) -> void:
 	
 	moving = true;
 	
-	#mover.Done.connect(On_Mover_Done);
-	
 	var prevGridPos = currGridPos;
 	# Update Current Grid Position
 	currGridPos += inputDir;
@@ -119,10 +117,6 @@ func MovePlayer_And_SpawnBiomes(inputDir:Vector2i, moveCam:bool = true) -> void:
 	
 	await get_tree().create_timer(movementInterval).timeout;
 	moving = false;
-
-#func On_Mover_Done() -> void:
-	#moving = false;
-	#mover.Done.disconnect(On_Mover_Done);
 
 # Functions: Debug ----------------------------------------------------------------------------------------------------
 
