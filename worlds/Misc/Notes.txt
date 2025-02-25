@@ -4,17 +4,18 @@ HIGH PRIORITY:
 	- World Template / World Edge through Sprite Pixel Info
 	
 LOW PRIORITY:
-	- House in the Woods
 	
 SPECULATIVE:
 	- Caverns
+	- Interior
 	- Entering Forests and Towns opens a Zoom View, slowing Overworld Movement
+	- House in the Woods
 	- Consider making Interaction Sprites look as if they are seen from "higher up", so we would see
 		Forests instead of a single Tree. Schools instead of a single fish.
 	- Inventory
 	- Riding the Fish
 	- Slow Random Biome Reveal phenomenon that does its own thing
-	- Interior
+	- Water Depths
 	
 	- Time of Day & Search Range
 	

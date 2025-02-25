@@ -22,7 +22,7 @@ func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type) -> void:
 	biomeSprite.rotate(randf_range(-rotRandLimit, rotRandLimit));
 	biomeSprite.position += Vector2(randf_range(-posRandLimit, posRandLimit), randf_range(-posRandLimit, posRandLimit));
 	#InGameDebugger.Say(position)
-	#position += rand;
+
 	biomeSprite.modulate.v = randf_range(.9, 1);
 	
 	match biomeType:
@@ -36,6 +36,39 @@ func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type) -> void:
 			#Prep_Stone();
 		_:
 			InGameDebugger.Warn("Failed to Initialise Biome: No type specified.");
+			
+	Check_Surroundings();
+		
+func Check_Surroundings() -> void:
+	if GridPos_Utils.Empties_Around(gridPos, 1, true).size() == 0:
+		return;
+
+	if type != Biome_Master.Type.Water:
+		return;
+	
+	#print("Water: Connecting");
+	World.TimeTick.connect(On_TimeTick);
+		
+func On_TimeTick() -> void:
+	
+	var dist:float = gridPos.distance_to(World.PlayerGridPos());
+	
+	if dist >= 2:
+		biomeSprite.modulate.a = 0.5;
+		return;
+		
+	biomeSprite.modulate.a = 1;
+	
+	if GridPos_Utils.Empties_Around(gridPos, 1, true).size() > 0:
+		return;
+		
+	if !Biome_Master.Surrounding_Biomes(gridPos, 1, true).has(Biome_Master.Type.Water):
+		MultiFader.FadeTo_Trans(biomeSprite);
+		Biome_Master.SpawnBiome(gridPos, Biome_Master.RandomBiomeType_Land(), get_parent(), Interaction_Master.Type.NULL);
+	else:
+		biomeSprite.modulate.a = 0.25;
+	
+	World.TimeTick.disconnect(On_TimeTick);
 
 # Functions: Biome Type ----------------------------------------------------------------------------------------------------
 

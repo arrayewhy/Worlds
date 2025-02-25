@@ -8,8 +8,15 @@ static func RandomBiomeType() -> int:
 	# Return an Int instead of a Type since this is faster.
 	# If this doesn't suffice, do a Match and return the appropriate Type as a String.
 	return randi_range(1, Type.keys().size() - 1);
+	
+static func RandomBiomeType_Land() -> int:
+	# Return an Int instead of a Type since this is faster.
+	# If this doesn't suffice, do a Match and return the appropriate Type as a String.
+	var types = Type.keys();
+	types.erase(Type.Water);
+	return randi_range(1, types.size() - 1);
 
-# Functions: Biomes ----------------------------------------------------------------------------------------------------
+# Functions ----------------------------------------------------------------------------------------------------
 
 static func Record_Biome(gPos:Vector2i, biome:Object, type:Biome_Master.Type, discBiomes:Dictionary = World.DiscoveredBiomes()) -> void:
 	discBiomes[gPos] = [biome, type];
@@ -33,8 +40,8 @@ static func Get_BiomeType(gPos:Vector2i, discBiomes:Dictionary = World.Discovere
 	InGameDebugger.Warn(str("Biome NOT found: ", gPos));
 	return Biome_Master.Type.NULL;
 
-static func Surrounding_Biomes(gPos:Vector2i, reach:int) -> Array[Biome_Master.Type]:
-	var surrounding_GPos:Array[Vector2i] = GridPos_Utils.GridPositions_Around(gPos, reach);
+static func Surrounding_Biomes(gPos:Vector2i, reach:int, removeCent:bool) -> Array[Biome_Master.Type]:
+	var surrounding_GPos:Array[Vector2i] = GridPos_Utils.GridPositions_Around(gPos, reach, removeCent);
 	# Remove Empty Positions in case we are at the World Edge
 	surrounding_GPos = GridPos_Utils.Remove_Empty(surrounding_GPos);
 	
@@ -67,7 +74,7 @@ static func SpawnBiome(gPos:Vector2i, type:Biome_Master.Type, holder:Node, inter
 	newBiome.position = Vector2(gPos) * World.CellSize();
 	
 	# Record the biome
-	Biome_Master.Record_Biome(gPos, newBiome, type);
+	Record_Biome(gPos, newBiome, type);
 	
 	newBiome.Initialise_Interaction(type, interType);
 	
