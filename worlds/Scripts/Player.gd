@@ -102,20 +102,24 @@ func MovePlayer_And_SpawnBiomes(inputDir:Vector2i, moveCam:bool = true) -> void:
 	#var prevGridPos = currGridPos;
 	# Update Current Grid Position
 	currGridPos += inputDir;
+	
 	# Spawn Biomes around new position
-	#World.SpawnBiomes_AroundPlayer(currGridPos, prevGridPos);
 	World.SpawnBiomesAround_Player(currGridPos);
-	var targPos = position + Vector2(inputDir) * World.CellSize();
+	
 	# Move Player
+	var targPos = position + Vector2(inputDir) * World.CellSize();
 	mover.StartMove(targPos);
 	#position = targPos;
+	
 	# Move Camera
 	if moveCam:
 		camMover.StartMove(targPos);
-	
+		
+	# Prevent Interactions from Updating as soon as they Spawn by advancing time in the next frame.
 	await get_tree().process_frame;
 	World.Advance_Time();
 	
+	# Movement Interval
 	await get_tree().create_timer(movementInterval).timeout;
 	moving = false;
 

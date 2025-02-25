@@ -9,10 +9,7 @@ var _playerGridPos:Vector2i;
 var _discoveredBiomes = {}; # Grid Position : [Biome Object, Biome Type]
 # Variables: Interaction
 var _interChances:Dictionary; # Interaction_Master.Type : int
-
-
 # Signals
-#signal SpawnBiomesAroundPlayer(currGPos, prevGPos);
 signal SpawnBiomesAround(gPos, range, influenceRange);
 signal TimeTick;
 
@@ -28,7 +25,6 @@ func Roll_Dice() -> void:
 
 func SpawnBiomesAround_Player(currGPos:Vector2i, spawnRange:int = 2, influenceRange:int = 1) -> void:
 	_playerGridPos = currGPos;
-	#SpawnBiomesAround.emit(currGPos, 3, true);
 	SpawnBiomes_Around(currGPos, spawnRange, influenceRange);
 
 func SpawnBiomes_Around(gPos:Vector2i, spawnRange:int = 1, influenceRange:int = 0) -> void:
