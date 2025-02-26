@@ -7,6 +7,7 @@ extends Node2D;
 
 @export var hover:Node;
 
+@export var microView:CanvasLayer;
 @export var camMover:Node;
 
 const initGridPos := Vector2i(0,0);
@@ -15,10 +16,11 @@ const movementInterval:float = 0.5;
 var currGridPos:Vector2i;
 
 var moving:bool;
-var hiddenFromView:bool;
+var insideInteraction:bool;
 
 var timeSkips:int;
-#var queuedDir:Vector2i;
+
+signal EnterInteraction(state);
 
 func _ready() -> void:
 	currGridPos = initGridPos;
@@ -58,13 +60,16 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	var nextInteraction = Interaction_Master.Get_InteractionType(nextGPos);
 	
 	if nextInteraction == Interaction_Master.Type.Forest:
-		if !hiddenFromView:
+		if !insideInteraction:
 			MultiFader.FadeTo_Trans(playerSpr);
-			hiddenFromView = true;
+			insideInteraction = true;
+			EnterInteraction.emit(true);
 		#timeSkips = 1;
 	elif nextInteraction != Interaction_Master.Type.Forest:
-		MultiFader.FadeTo_Opaque(playerSpr);
-		hiddenFromView = false;
+		if insideInteraction:
+			MultiFader.FadeTo_Opaque(playerSpr);
+			insideInteraction = false;
+			EnterInteraction.emit(false);
 		
 	# Move and Spawn
 		

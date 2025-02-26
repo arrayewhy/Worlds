@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://dpw5ih7gg3btv"]
+[gd_scene load_steps=24 format=3 uid="uid://dpw5ih7gg3btv"]
 
 [ext_resource type="Script" path="res://Scripts/Main-Camera.gd" id="1_e4dtk"]
 [ext_resource type="Texture2D" uid="uid://dk06eplgkeoi2" path="res://Sprites/Clack_Map_SpriteSheet_2048.png" id="1_ntyhy"]
@@ -148,6 +148,46 @@ func ImageToColArray(img:Image) -> Array[Color]:
 	return colArray;
 "
 
+[sub_resource type="GDScript" id="GDScript_s5h60"]
+script/source = "extends ColorRect;
+
+@export var player:Node2D;
+
+var _fadeIn:bool;
+
+func _ready() -> void:
+	
+	color.a = 0;
+	
+	player.EnterInteraction.connect(On_EnterInteraction);
+
+func _process(delta: float) -> void:
+	
+	var speed:float = 2;
+	
+	if _fadeIn:
+		if color.a < 1:
+			color.a += delta * speed;
+			return;
+		else:
+			color.a = 1;
+			set_process(false);
+			return;
+			
+	if color.a > 0:
+			color.a -= delta * speed;
+			return;
+	else:
+		color.a = 0;
+		get_parent().hide();
+		set_process(false);
+
+func On_EnterInteraction(state:bool) -> void:
+	_fadeIn = state;
+	get_parent().show();
+	set_process(true);
+"
+
 [node name="World" type="Node2D"]
 
 [node name="Camera2D" type="Camera2D" parent="."]
@@ -162,10 +202,11 @@ speed = 0.5
 [node name="Cam-Zoom" type="Node" parent="Camera2D"]
 script = ExtResource("3_xox30")
 
-[node name="Player" type="Node2D" parent="." node_paths=PackedStringArray("hover", "camMover")]
+[node name="Player" type="Node2D" parent="." node_paths=PackedStringArray("hover", "microView", "camMover")]
 z_index = 100
 script = ExtResource("2_54uhw")
 hover = NodePath("../Misc/Hover")
+microView = NodePath("../CanvasLayer")
 camMover = NodePath("../Camera2D/Mover")
 
 [node name="Sprite2D" type="Sprite2D" parent="Player"]
@@ -246,7 +287,6 @@ autoplay = true
 
 [node name="Visual-Reference" type="Node2D" parent="."]
 process_mode = 4
-visible = false
 
 [node name="Sprite2D" type="Sprite2D" parent="Visual-Reference"]
 position = Vector2(-256, -256)
@@ -325,3 +365,20 @@ script = SubResource("GDScript_acxdq")
 script = SubResource("GDScript_1rs1b")
 worldTemplate = ExtResource("15_y08cy")
 biomeHolder = NodePath("../../Biome-Holder")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer" node_paths=PackedStringArray("player")]
+z_index = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 512.0
+offset_top = 256.0
+offset_right = -512.0
+offset_bottom = -256.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 0, 1, 1)
+script = SubResource("GDScript_s5h60")
+player = NodePath("../../Player")

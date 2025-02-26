@@ -1,18 +1,19 @@
 UPCOMING ----------------------------------------------------------------------------------------------------
 
 HIGH PRIORITY:
+	- Entering Forests and Towns opens a Zoom View, slowing Overworld Movement
 	- World Template / World Edge through Sprite Pixel Info
 	
 LOW PRIORITY:
 	- Properly implement random Interaction Spawning:
-		Instead of spawning randomly when passed a NULL interaction, consider something like an
-		explicit RANDOM interaction type.
+		Sometimes we want to explicitly set an Interaction as NULL. So, instead of spawning randomly 
+		when passed a NULL interaction, consider something like an explicit RANDOM interaction type.
+	- House in the Woods
+	- Cavern connects to town through tunnel
 	
 SPECULATIVE:
 	- Caverns
-	- Interior
-	- Entering Forests and Towns opens a Zoom View, slowing Overworld Movement
-	- House in the Woods
+	- Microview Interior
 	- Consider making Interaction Sprites look as if they are seen from "higher up", so we would see
 		Forests instead of a single Tree. Schools instead of a single fish.
 	- Inventory
@@ -46,3 +47,8 @@ LOW PRIORITY:
 		SOLUTION:
 			- Only connect Active Interactions to World.TimeTick, and 
 			disconnect them when NOT active (InteractionMaster.Type.NULL).
+
+STORY ----------------------------------------------------------------------------------------------------
+
+SPECULATIVE:
+	- Forced to cross channel between 2 river mouths (war at one mouth, danger at the other)

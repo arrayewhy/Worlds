@@ -52,7 +52,7 @@ func On_TimeTick() -> void:
 	
 	var dist:float = gridPos.distance_to(World.PlayerGridPos());
 	
-	if dist >= 2:
+	if dist >= 3:
 		#biomeSprite.modulate.a = 0.5; # PRETTY WATER DEPTHS (Refer to Notes)
 		return;
 		
