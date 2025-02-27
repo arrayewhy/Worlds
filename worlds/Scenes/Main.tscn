@@ -157,6 +157,10 @@ var _fadeIn:bool;
 
 func _ready() -> void:
 	
+	if !player:
+		set_process(false);
+		return;
+	
 	color.a = 0;
 	
 	player.EnterInteraction.connect(On_EnterInteraction);
@@ -367,10 +371,11 @@ worldTemplate = ExtResource("15_y08cy")
 biomeHolder = NodePath("../../Biome-Holder")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
+visible = false
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer" node_paths=PackedStringArray("player")]
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer"]
 z_index = 1
-anchors_preset = -1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 512.0
@@ -381,4 +386,3 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(1, 0, 1, 1)
 script = SubResource("GDScript_s5h60")
-player = NodePath("../../Player")

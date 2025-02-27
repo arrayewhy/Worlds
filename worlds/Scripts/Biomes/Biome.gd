@@ -67,8 +67,11 @@ func On_TimeTick() -> void:
 
 			if !Biome_Master.Surrounding_Biomes(gridPos, 1, true).has(Biome_Master.Type.Water):
 				MultiFader.FadeTo_Trans(biomeSprite);
-				World.TimeTick.connect(On_TimeTick_QueueFree);
 				Biome_Master.SpawnBiome(gridPos, Biome_Master.RandomBiomeType_Land(), get_parent(), Interaction_Master.Type.NULL);
+				# HOTFIX
+				await get_tree().create_timer(2).timeout;
+				queue_free();
+				#World.TimeTick.connect(On_TimeTick_QueueFree);
 				
 			#else: # PRETTY WATER DEPTHS (Refer to Notes)
 				#biomeSprite.modulate.a = 0.25; # PRETTY WATER DEPTHS (Refer to Notes)
@@ -80,14 +83,17 @@ func On_TimeTick() -> void:
 				return;
 				
 			MultiFader.FadeTo_Trans(biomeSprite);
-			World.TimeTick.connect(On_TimeTick_QueueFree);
 			Biome_Master.SpawnBiome(gridPos, Biome_Master.Type.Water, get_parent(), Interaction_Master.Type.NULL);
+			# HOTFIX
+			await get_tree().create_timer(2).timeout;
+			queue_free();
+			#World.TimeTick.connect(On_TimeTick_QueueFree);
 	
 	World.TimeTick.disconnect(On_TimeTick);
 
-func On_TimeTick_QueueFree() -> void:
-	World.TimeTick.disconnect(On_TimeTick_QueueFree);
-	queue_free();
+#func On_TimeTick_QueueFree() -> void:
+	#World.TimeTick.disconnect(On_TimeTick_QueueFree);
+	#queue_free();
 
 # Functions: Biome Type ----------------------------------------------------------------------------------------------------
 
