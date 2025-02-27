@@ -80,3 +80,6 @@ interType:Interaction_Master.Type, posOffset:Vector2 = Vector2.ZERO) -> void:
 	newBiome.Initialise_Interaction(type, interType);
 	
 	World.IncreaseWorldSize();
+
+	await holder.get_tree().process_frame
+	newBiome.Check_Surroundings();

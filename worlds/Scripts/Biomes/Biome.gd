@@ -32,19 +32,20 @@ func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type) -> void:
 			MultiFader.FadeTo_Opaque(biomeSprite, 2, true);
 		Biome_Master.Type.Water:
 			Prep_Water();
-			MultiFader.FadeTo_Alpha(biomeSprite, .5, 0, 1);
+			MultiFader.FadeTo_Alpha(biomeSprite, .2, 0, 1);
 		#Biome_Master.Type.Stone:
 			#Prep_Stone();
 		_:
 			InGameDebugger.Warn("Failed to Initialise Biome: No type specified.");
 			
-	Check_Surroundings();
+	#Check_Surroundings();
 		
 func Check_Surroundings() -> void:
 	if GridPos_Utils.Empties_Around(gridPos, 1, true).size() == 0:
 		
 		if type == Biome_Master.Type.Water:
-			MultiFader.FadeTo_Opaque(biomeSprite);
+			print(true)
+			MultiFader.FadeTo_Alpha(biomeSprite, 1, biomeSprite.modulate.a, 1);
 		
 		return;
 
@@ -70,6 +71,7 @@ func On_TimeTick() -> void:
 	var newBiomeOffset := Vector2(0, -10);
 
 	var surroundingBiomes:Array[Biome_Master.Type] = Biome_Master.Surrounding_Biomes(gridPos, 1, true);
+	var waters:int = surroundingBiomes.count(Biome_Master.Type.Water);
 
 	match type:
 		
@@ -85,18 +87,22 @@ func On_TimeTick() -> void:
 			
 			# PRETTY WATER DEPTHS (Refer to Notes)
 			
-			var targDepth:float = 1 - (surroundingBiomes.count(Biome_Master.Type.Water) * 0.1);
+			var targDepth:float = 1 - (waters * 0.1);
 			
 			MultiFader.FadeTo_Alpha(biomeSprite, targDepth, biomeSprite.modulate.a, .5);
 
 		_: # Landed biomes stranded in Water
 			
-			if surroundingBiomes.count(Biome_Master.Type.Water) < 8:
+			if waters < 8 and waters > 5:
+				var tween:Tween = create_tween();
+				tween.tween_property(biomeSprite, "modulate", Color(1, 1, 1, .65), 4);
 				return;
 				
-			Biome_Master.SpawnBiome(gridPos, Biome_Master.Type.Water, get_parent(), Interaction_Master.Type.NULL, newBiomeOffset);
-			interaction.Disable();
-			FadeAndDelete(biomeSprite);
+			var tween:Tween = create_tween();
+			tween.tween_property(biomeSprite, "modulate", Color(1, 1, 1, .4), 4);
+			#Biome_Master.SpawnBiome(gridPos, Biome_Master.Type.Water, get_parent(), Interaction_Master.Type.NULL, newBiomeOffset);
+			#interaction.Disable();
+			#FadeAndDelete(biomeSprite);
 	
 	World.TimeTick.disconnect(On_TimeTick);
 

@@ -1,7 +1,11 @@
 extends Node;
 
 func On_WorldTick() -> void:
-	match(get_parent().Get_Interaction()):
+	
+	if !Interaction_Master.Pass_ProbabilityCheck(Interaction_Master.Get_MaxChance()/2):
+		return;
+	
+	match get_parent().Get_Interaction():
 		Interaction_Master.Type.Fish:
 			Update_Fish();
 
