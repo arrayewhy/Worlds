@@ -7,7 +7,7 @@ const improbChance:int = 100000;
 
 const initChance_Dog:int = -500;
 const initChance_Forest:int = 10000;
-const initChance_Fish:int = 1000;
+const initChance_Fish:int = 500;
 const initChance_Boat:int = -1000;
 
 # Functions ----------------------------------------------------------------------------------------------------
@@ -19,7 +19,7 @@ static func WaterInteractions() -> Array[Type]:
 	return [Type.Fish, Type.Boat];
 
 static func InteractionsWith_IncreasingChance() -> Array[Type]:
-	return [Type.Dog, Type.Boat];
+	return [Type.Dog, Type.Boat, Type.Fish];
 
 # Functions ----------------------------------------------------------------------------------------------------
 

@@ -21,7 +21,7 @@ func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type) -> void:
 	biomeSprite.position += Vector2(randf_range(-posRandLimit, posRandLimit), randf_range(-posRandLimit, posRandLimit));
 	#InGameDebugger.Say(position)
 
-	biomeSprite.modulate.v = randf_range(.9, 1);
+	#biomeSprite.modulate.v = randf_range(.9, 1);
 	
 	match biomeType:
 		Biome_Master.Type.Earth:
@@ -83,23 +83,23 @@ func On_TimeTick() -> void:
 				Interaction_Master.Type.NULL, Vector2(0, -10));
 				interaction.Disable();
 				FadeAndDelete(biomeSprite);
-				return;
+				
+			else:
 			
-			# PRETTY WATER DEPTHS (Refer to Notes)
-			
-			var targDepth:float = 1 - (waters * 0.1);
-			
-			MultiFader.FadeTo_Alpha(biomeSprite, targDepth, biomeSprite.modulate.a, .5);
+				# PRETTY WATER DEPTHS (Refer to Notes)
+				
+				var targDepth:float = 1 - (waters * 0.1);
+				MultiFader.FadeTo_Alpha(biomeSprite, targDepth, biomeSprite.modulate.a, .5);
 
 		_: # Landed biomes stranded in Water
 			
-			if waters < 8 and waters > 5:
+			if waters < 8:
+				if waters > 6:
+					var tween:Tween = create_tween();
+					tween.tween_property(biomeSprite, "modulate", Color(1, 1, 1, .65), 4);
+			else:
 				var tween:Tween = create_tween();
-				tween.tween_property(biomeSprite, "modulate", Color(1, 1, 1, .65), 4);
-				return;
-				
-			var tween:Tween = create_tween();
-			tween.tween_property(biomeSprite, "modulate", Color(1, 1, 1, .4), 4);
+				tween.tween_property(biomeSprite, "modulate", Color(1, 1, 1, .4), 4);
 			#Biome_Master.SpawnBiome(gridPos, Biome_Master.Type.Water, get_parent(), Interaction_Master.Type.NULL, newBiomeOffset);
 			#interaction.Disable();
 			#FadeAndDelete(biomeSprite);
