@@ -2,7 +2,7 @@ extends Node;
 
 var targets:Dictionary; # Sprite : Mode, Speed
 
-enum Mode { NULL, FadeTrans, FadeOpaque };
+enum Mode { NULL, FadeTrans, FadeOpaque, FadeAlpha };
 
 func _process(delta: float) -> void:
 	
@@ -12,21 +12,19 @@ func _process(delta: float) -> void:
 
 	for t in targets:
 		
-		if t == null:
-			InGameDebugger.Warn("Multi-Fader tried to fade Null Object.");
-			RemoveTarget(t);
-		
 		var targParams:Array = targets[t];
 		
 		match targParams[0]:
 			Mode.NULL:
 				InGameDebugger.Warn("Fader mode NOT set.");
 			Mode.FadeTrans:
-				Fade_Trans(t, targParams[1], delta);
+				Progress_Trans(t, targParams[1], delta);
 			Mode.FadeOpaque:
-				Fade_Opaque(t, targParams[1], delta);
+				Progress_Opaque(t, targParams[1], delta);
+			Mode.FadeAlpha:
+				Progress_Alpha(t, targParams[1], targParams[2], targParams[3], delta);
 
-func Fade_Trans(spr:Sprite2D, speed:float, delta:float) -> void:
+func Progress_Trans(spr:Sprite2D, speed:float, delta:float) -> void:
 	
 	var nextVal:float = spr.modulate.a - speed * delta;
 	
@@ -38,7 +36,7 @@ func Fade_Trans(spr:Sprite2D, speed:float, delta:float) -> void:
 		
 	spr.modulate.a = nextVal;
 	
-func Fade_Opaque(spr:Sprite2D, speed:float, delta:float) -> void:
+func Progress_Opaque(spr:Sprite2D, speed:float, delta:float) -> void:
 
 	var nextVal:float = spr.modulate.a + speed * delta;
 	
@@ -50,8 +48,28 @@ func Fade_Opaque(spr:Sprite2D, speed:float, delta:float) -> void:
 		
 	spr.modulate.a = nextVal;
 
+func Progress_Alpha(spr:Sprite2D, speed:float, targAlpha:float, dir:int, delta:float) -> void:
+	
+	var nextVal:float = spr.modulate.a + speed * dir * delta;
+	
+	if dir > 0 and nextVal < targAlpha:
+		spr.modulate.a = nextVal;
+		return;
+	
+	if dir < 0 and nextVal > targAlpha:
+		spr.modulate.a = nextVal;
+		return;
+	
+	spr.modulate.a = targAlpha;
+	RemoveTarget(spr);
+
 func Start(spr:Sprite2D, mode:Mode, spd:float) -> void:
 	targets[spr] = [mode, spd];
+	if !is_processing():
+		set_process(true);
+		
+func Start_Alpha(spr:Sprite2D, spd:float, targAlpha:float) -> void:
+	targets[spr] = [Mode.FadeAlpha, spd, targAlpha, sign(targAlpha - spr.modulate.a)];
 	if !is_processing():
 		set_process(true);
 
@@ -66,6 +84,10 @@ func FadeTo_Opaque(spr:Sprite2D, spd:float = 2, startFromTrans:bool = false) -> 
 	if startFromTrans:
 		spr.modulate.a = 0;
 	Start(spr, Mode.FadeOpaque, spd);
+
+func FadeTo_Alpha(spr:Sprite2D, targAlpha:float, startAlpha:float, spd:float = 2) -> void:
+	spr.modulate.a = startAlpha;
+	Start_Alpha(spr, spd, targAlpha);
 
 func RemoveTarget(spr:Sprite2D) -> void:
 	targets.erase(spr);

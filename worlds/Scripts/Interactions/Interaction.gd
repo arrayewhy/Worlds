@@ -7,6 +7,8 @@ var updater:Node;
 # Variables
 var currInteraction:Interaction_Master.Type = Interaction_Master.Type.NULL;
 
+var _disabled:bool;
+
 func Initialise(biomeType:Biome_Master.Type, interType:Interaction_Master.Type) -> void:
 
 	# Initialise Compenents
@@ -104,6 +106,12 @@ func Set_Interaction(type:Interaction_Master.Type) -> void:
 
 func Get_Interaction() -> Interaction_Master.Type:
 	return currInteraction;
+	
+func Disable() -> void:
+	_disabled = true;
+	
+func Is_Disabled() -> bool:
+	return _disabled;
 
 # [ 3 / 4 ] Functions: Sprite ----------------------------------------------------------------------------------------------------
 

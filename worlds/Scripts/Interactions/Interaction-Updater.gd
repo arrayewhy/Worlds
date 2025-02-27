@@ -29,6 +29,8 @@ func Update_Fish() -> void:
 			continue;
 		if biomeObject.Get_Interaction() != Interaction_Master.Type.NULL:
 			continue;
+		if biomeObject.Is_Interaction_Disabled():
+			continue;
 		if surroundings[i] == World.PlayerGridPos():
 			continue;
 		

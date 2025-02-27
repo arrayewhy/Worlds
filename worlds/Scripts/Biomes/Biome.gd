@@ -16,8 +16,6 @@ func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type) -> void:
 	if !biomeSprite:
 		biomeSprite = $"Biome-Sprite";
 	
-	MultiFader.FadeTo_Opaque(biomeSprite, 2, true);
-	
 	# A bit of Visual Styling
 	biomeSprite.rotate(randf_range(-rotRandLimit, rotRandLimit));
 	biomeSprite.position += Vector2(randf_range(-posRandLimit, posRandLimit), randf_range(-posRandLimit, posRandLimit));
@@ -28,10 +26,13 @@ func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type) -> void:
 	match biomeType:
 		Biome_Master.Type.Earth:
 			Prep_Earth();
+			MultiFader.FadeTo_Opaque(biomeSprite, 2, true);
 		Biome_Master.Type.Grass:
 			Prep_Grass();
+			MultiFader.FadeTo_Opaque(biomeSprite, 2, true);
 		Biome_Master.Type.Water:
 			Prep_Water();
+			MultiFader.FadeTo_Alpha(biomeSprite, .5, 0, 1);
 		#Biome_Master.Type.Stone:
 			#Prep_Stone();
 		_:
@@ -41,6 +42,10 @@ func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type) -> void:
 		
 func Check_Surroundings() -> void:
 	if GridPos_Utils.Empties_Around(gridPos, 1, true).size() == 0:
+		
+		if type == Biome_Master.Type.Water:
+			MultiFader.FadeTo_Opaque(biomeSprite);
+		
 		return;
 
 	#if type != Biome_Master.Type.Water:
@@ -52,9 +57,9 @@ func On_TimeTick() -> void:
 	
 	var dist:float = gridPos.distance_to(World.PlayerGridPos());
 	
-	if dist >= 3:
+	#if dist >= 3:
 		#biomeSprite.modulate.a = 0.5; # PRETTY WATER DEPTHS (Refer to Notes)
-		return;
+		#return;
 		
 	#biomeSprite.modulate.a = 1; # PRETTY WATER DEPTHS (Refer to Notes)
 	
@@ -64,26 +69,33 @@ func On_TimeTick() -> void:
 	# Make Y-Sort put the newly spawned biome behind the existing biome
 	var newBiomeOffset := Vector2(0, -10);
 
+	var surroundingBiomes:Array[Biome_Master.Type] = Biome_Master.Surrounding_Biomes(gridPos, 1, true);
+
 	match type:
 		
 		Biome_Master.Type.Water: # Water stranded on Land
 
-			if !Biome_Master.Surrounding_Biomes(gridPos, 1, true).has(Biome_Master.Type.Water):
+			if !surroundingBiomes.has(Biome_Master.Type.Water):
 				
 				Biome_Master.SpawnBiome(gridPos, Biome_Master.RandomBiomeType_Land(), get_parent(), \
 				Interaction_Master.Type.NULL, Vector2(0, -10));
+				interaction.Disable();
 				FadeAndDelete(biomeSprite);
-				
-			#else: # PRETTY WATER DEPTHS (Refer to Notes)
-				#biomeSprite.modulate.a = 0.25; # PRETTY WATER DEPTHS (Refer to Notes)
+				return;
+			
+			# PRETTY WATER DEPTHS (Refer to Notes)
+			
+			var targDepth:float = 1 - (surroundingBiomes.count(Biome_Master.Type.Water) * 0.1);
+			
+			MultiFader.FadeTo_Alpha(biomeSprite, targDepth, biomeSprite.modulate.a, .5);
 
 		_: # Landed biomes stranded in Water
 			
-			var surroundingBiomes:Array[Biome_Master.Type] = Biome_Master.Surrounding_Biomes(gridPos, 1, true);
 			if surroundingBiomes.count(Biome_Master.Type.Water) < 8:
 				return;
 				
 			Biome_Master.SpawnBiome(gridPos, Biome_Master.Type.Water, get_parent(), Interaction_Master.Type.NULL, newBiomeOffset);
+			interaction.Disable();
 			FadeAndDelete(biomeSprite);
 	
 	World.TimeTick.disconnect(On_TimeTick);
@@ -126,6 +138,9 @@ func Spawn_Interaction(interType:Interaction_Master.Type) -> void:
 
 func Get_Interaction() -> Interaction_Master.Type:
 	return interaction.Get_Interaction();
+	
+func Is_Interaction_Disabled() -> bool:
+	return interaction.Is_Disabled();
 
 # Functions: Grid Position ----------------------------------------------------------------------------------------------------
 
