@@ -64,14 +64,15 @@ static func Surrounding_Biomes_WithGPos(gPos:Vector2i, reach:int) -> Array[Array
 	
 	return biomesAround;
 
-static func SpawnBiome(gPos:Vector2i, type:Biome_Master.Type, holder:Node, interType:Interaction_Master.Type) -> void:
+static func SpawnBiome(gPos:Vector2i, type:Biome_Master.Type, holder:Node, \
+interType:Interaction_Master.Type, posOffset:Vector2 = Vector2.ZERO) -> void:
 	
 	var newBiome:Object = biomePrefab.instantiate();
 	newBiome.Initialise(gPos, type);
 	holder.add_child(newBiome);
 	
 	# Position New Biome in World Space
-	newBiome.position = Vector2(gPos) * World.CellSize();
+	newBiome.position = Vector2(gPos) * World.CellSize() + posOffset;
 	
 	# Record the biome
 	Record_Biome(gPos, newBiome, type);

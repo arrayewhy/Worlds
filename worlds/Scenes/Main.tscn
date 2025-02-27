@@ -278,9 +278,6 @@ script = ExtResource("8_u5mxs")
 target = NodePath("../Illumination-Spawner")
 startVisible = false
 
-[node name="Dice" parent="." instance=ExtResource("14_1cw2s")]
-position = Vector2(0, 0)
-
 [node name="Audio" type="Node" parent="."]
 
 [node name="Desert-Wind" type="AudioStreamPlayer" parent="Audio"]
@@ -295,6 +292,7 @@ autoplay = true
 
 [node name="Visual-Reference" type="Node2D" parent="."]
 process_mode = 4
+visible = false
 
 [node name="Sprite2D" type="Sprite2D" parent="Visual-Reference"]
 position = Vector2(-256, -256)
@@ -387,3 +385,6 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(1, 0, 1, 1)
 script = SubResource("GDScript_s5h60")
+
+[node name="Dice" parent="Misc" instance=ExtResource("14_1cw2s")]
+position = Vector2(0, 0)

@@ -61,39 +61,37 @@ func On_TimeTick() -> void:
 	if GridPos_Utils.Empties_Around(gridPos, 1, true).size() > 0:
 		return;
 
+	# Make Y-Sort put the newly spawned biome behind the existing biome
+	var newBiomeOffset := Vector2(0, -10);
+
 	match type:
 		
-		Biome_Master.Type.Water:
+		Biome_Master.Type.Water: # Water stranded on Land
 
 			if !Biome_Master.Surrounding_Biomes(gridPos, 1, true).has(Biome_Master.Type.Water):
-				MultiFader.FadeTo_Trans(biomeSprite);
-				Biome_Master.SpawnBiome(gridPos, Biome_Master.RandomBiomeType_Land(), get_parent(), Interaction_Master.Type.NULL);
-				# HOTFIX
-				await get_tree().create_timer(2).timeout;
-				queue_free();
-				#World.TimeTick.connect(On_TimeTick_QueueFree);
+				
+				Biome_Master.SpawnBiome(gridPos, Biome_Master.RandomBiomeType_Land(), get_parent(), \
+				Interaction_Master.Type.NULL, Vector2(0, -10));
+				FadeAndDelete(biomeSprite);
 				
 			#else: # PRETTY WATER DEPTHS (Refer to Notes)
 				#biomeSprite.modulate.a = 0.25; # PRETTY WATER DEPTHS (Refer to Notes)
 
-		_: # Landed biomes stranded in water
+		_: # Landed biomes stranded in Water
 			
 			var surroundingBiomes:Array[Biome_Master.Type] = Biome_Master.Surrounding_Biomes(gridPos, 1, true);
 			if surroundingBiomes.count(Biome_Master.Type.Water) < 8:
 				return;
 				
-			MultiFader.FadeTo_Trans(biomeSprite);
-			Biome_Master.SpawnBiome(gridPos, Biome_Master.Type.Water, get_parent(), Interaction_Master.Type.NULL);
-			# HOTFIX
-			await get_tree().create_timer(2).timeout;
-			queue_free();
-			#World.TimeTick.connect(On_TimeTick_QueueFree);
+			Biome_Master.SpawnBiome(gridPos, Biome_Master.Type.Water, get_parent(), Interaction_Master.Type.NULL, newBiomeOffset);
+			FadeAndDelete(biomeSprite);
 	
 	World.TimeTick.disconnect(On_TimeTick);
 
-#func On_TimeTick_QueueFree() -> void:
-	#World.TimeTick.disconnect(On_TimeTick_QueueFree);
-	#queue_free();
+func FadeAndDelete(spr:Sprite2D) -> void:
+	var tween:Tween = create_tween();
+	tween.tween_property(spr, "modulate", Color.TRANSPARENT, 4);
+	tween.tween_callback(queue_free);
 
 # Functions: Biome Type ----------------------------------------------------------------------------------------------------
 
