@@ -12,6 +12,10 @@ func _process(delta: float) -> void:
 
 	for t in targets:
 		
+		if t == null:
+			InGameDebugger.Warn("Multi-Fader tried to fade Null Object.");
+			RemoveTarget(t);
+		
 		var targParams:Array = targets[t];
 		
 		match targParams[0]:

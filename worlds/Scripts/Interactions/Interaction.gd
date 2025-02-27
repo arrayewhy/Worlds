@@ -1,7 +1,7 @@
 extends Node2D;
 
 # Components
-var fader:Node;
+#var fader:Node;
 var sprite:Sprite2D;
 var updater:Node;
 # Variables
@@ -10,8 +10,9 @@ var currInteraction:Interaction_Master.Type = Interaction_Master.Type.NULL;
 func Initialise(biomeType:Biome_Master.Type, interType:Interaction_Master.Type) -> void:
 
 	# Initialise Compenents
-	fader = $Fader;
+	#fader = $Fader;
 	sprite = $"Interaction-Sprite";
+	sprite.modulate.a = 0;
 	updater = $Updater;
 	
 	if interType != Interaction_Master.Type.NULL:
@@ -54,8 +55,8 @@ func Try_Spawn(biomeType:Biome_Master.Type, interType:Interaction_Master.Type) -
 				return;
 				
 		Interaction_Master.Type.Forest:
-			if biomeType == Biome_Master.Type.Grass:
-				Spawn(interType);
+			#if biomeType == Biome_Master.Type.Grass:
+				#Spawn(interType);
 				return;
 			
 		Interaction_Master.Type.Fish:
@@ -107,10 +108,12 @@ func Get_Interaction() -> Interaction_Master.Type:
 # [ 3 / 4 ] Functions: Sprite ----------------------------------------------------------------------------------------------------
 
 func Vanish(speed:float = 2) -> void:
-	fader.FadeToTrans(speed);
+	MultiFader.FadeTo_Trans(sprite, speed);
+	#fader.FadeToTrans(speed);
 
 func Appear(speed:float = 2) -> void:
-	fader.FadeToOpaque(speed);
+	MultiFader.FadeTo_Opaque(sprite, speed);
+	#fader.FadeToOpaque(speed);
 	
 func Update_Sprite(interType:Interaction_Master.Type) -> void:
 	match interType:
