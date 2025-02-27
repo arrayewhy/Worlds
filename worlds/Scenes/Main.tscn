@@ -210,7 +210,7 @@ script = ExtResource("3_xox30")
 z_index = 100
 script = ExtResource("2_54uhw")
 hover = NodePath("../Misc/Hover")
-microView = NodePath("../CanvasLayer")
+microView = NodePath("../Misc/MicroView")
 camMover = NodePath("../Camera2D/Mover")
 
 [node name="Sprite2D" type="Sprite2D" parent="Player"]
@@ -278,15 +278,19 @@ script = ExtResource("8_u5mxs")
 target = NodePath("../Illumination-Spawner")
 startVisible = false
 
+[node name="Dice" parent="." instance=ExtResource("14_1cw2s")]
+position = Vector2(0, 0)
+
 [node name="Audio" type="Node" parent="."]
-process_mode = 4
 
 [node name="Desert-Wind" type="AudioStreamPlayer" parent="Audio"]
 stream = ExtResource("12_py2jo")
+volume_db = -8.0
 autoplay = true
 
 [node name="Forest" type="AudioStreamPlayer" parent="Audio"]
 stream = ExtResource("13_wbwr2")
+volume_db = -8.0
 autoplay = true
 
 [node name="Visual-Reference" type="Node2D" parent="."]
@@ -359,9 +363,6 @@ script = SubResource("GDScript_8l2ys")
 [node name="CanvasModulate" type="CanvasModulate" parent="Misc/Sun"]
 color = Color(0, 0, 0, 1)
 
-[node name="Dice" parent="Misc" instance=ExtResource("14_1cw2s")]
-position = Vector2(0, 0)
-
 [node name="Hover" type="Node2D" parent="Misc"]
 script = SubResource("GDScript_acxdq")
 
@@ -370,10 +371,10 @@ script = SubResource("GDScript_1rs1b")
 worldTemplate = ExtResource("15_y08cy")
 biomeHolder = NodePath("../../Biome-Holder")
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="MicroView" type="CanvasLayer" parent="Misc"]
 visible = false
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer"]
+[node name="ColorRect" type="ColorRect" parent="Misc/MicroView"]
 z_index = 1
 anchors_preset = 15
 anchor_right = 1.0
