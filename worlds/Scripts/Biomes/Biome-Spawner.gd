@@ -6,7 +6,7 @@ extends Node;
 
 
 func _ready() -> void:
-	World.SpawnBiomesAround.connect(On_SpawnBiomesAround)
+	World.SpawnBiomesAround.connect(On_SpawnBiomesAround);
 
 # [ 1 / 3 ] Functions: Signal Handling ----------------------------------------------------------------------------------------------------
 
@@ -19,7 +19,7 @@ func On_SpawnBiomesAround(gPos:Vector2i, spawnRange:int, influenceRange:int):
 # [ 2 / 3 ] Functions: Biome Spawning ----------------------------------------------------------------------------------------------------
 
 func SpawnRandomBiome(gPos:Vector2i, interType:Interaction_Master.Type = Interaction_Master.Type.NULL) -> void:
-	Biome_Master.SpawnBiome(gPos, Biome_Master.RandomBiomeType(), biomeHolder, interType);
+	Biome_Master.SpawnBiome(gPos, Biome_Master.RandomBiomeType_Core(), biomeHolder, interType);
 
 func SpawnRandomAround(gPos:Vector2i, spawnRange:int) -> void:
 	var surroundingEmpties = GridPos_Utils.Empties_Around(gPos, spawnRange, false);
@@ -43,7 +43,9 @@ func SpawnRandomBiomes_Influenced(currGPos:Vector2i, spawnRange:int, influenceRa
 		influences.append(b[1]);
 	
 	# Add random biome to ensure there is always a chance to spawn a different biome region.
-	influences.append(Biome_Master.RandomBiomeType());
+	influences.append(Biome_Master.RandomBiomeType_Core());
+	#influences.append_array(World.WorldBiases());
+	print(influences);
 	
 	for point in spawnPoints:
 		
@@ -53,14 +55,15 @@ func SpawnRandomBiomes_Influenced(currGPos:Vector2i, spawnRange:int, influenceRa
 				
 				# Add One-Off bias for Neighbouring Biome
 				var neighbourBias:Array[Biome_Master.Type] = influences;
-				neighbourBias.append_array(Get_NeighbourBias(i[1]));
+				neighbourBias.append_array(NeighbourBias(i[1]));
 				
 				Biome_Master.SpawnBiome(point, neighbourBias.pick_random(), biomeHolder, Interaction_Master.Type.NULL);
 				break;
 
-# [ 3 / 3 ] Functions: Bias ----------------------------------------------------------------------------------------------------
+func On_UpdateBiases(moveDir:Vector2i) -> void:
+	pass;
 
-func Get_NeighbourBias(neighbourBiome:Biome_Master.Type) -> Array[Biome_Master.Type]:
+func NeighbourBias(neighbourBiome:Biome_Master.Type) -> Array[Biome_Master.Type]:
 	
 	var bias:Array[Biome_Master.Type] = [];
 	

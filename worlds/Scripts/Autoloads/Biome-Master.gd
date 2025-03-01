@@ -1,13 +1,18 @@
 class_name Biome_Master extends Node;
 
-enum Type {NULL, Earth, Grass, Water};
+enum Type {NULL, Grass, Water, Earth};
+#enum Type {NULL, Earth, Grass, Water, Stone};
 
 const biomePrefab:PackedScene = preload("res://Prefabs/Biome.tscn");
 
-static func RandomBiomeType() -> int:
-	# Return an Int instead of a Type since this is faster.
+static func RandomBiomeType_Core() -> int:
+	
+	# 1. Return an Int instead of a Type since this is faster.
 	# If this doesn't suffice, do a Match and return the appropriate Type as a String.
-	return randi_range(1, Type.keys().size() - 1);
+	
+	# 2. We treat Grass, and Water as core biomes.
+	
+	return randi_range(1, 2);
 	
 static func RandomBiomeType_Land() -> int:
 	# Return an Int instead of a Type since this is faster.

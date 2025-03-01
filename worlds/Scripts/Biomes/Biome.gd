@@ -35,6 +35,7 @@ func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type) -> void:
 			MultiFader.FadeTo_Alpha(biomeSprite, .2, 0, 1);
 		#Biome_Master.Type.Stone:
 			#Prep_Stone();
+			#MultiFader.FadeTo_Opaque(biomeSprite, 2, true);
 		_:
 			InGameDebugger.Warn("Failed to Initialise Biome: No type specified.");
 			
@@ -44,7 +45,6 @@ func Check_Surroundings() -> void:
 	if GridPos_Utils.Empties_Around(gridPos, 1, true).size() == 0:
 		
 		if type == Biome_Master.Type.Water:
-			print(true)
 			MultiFader.FadeTo_Alpha(biomeSprite, 1, biomeSprite.modulate.a, 1);
 		
 		return;

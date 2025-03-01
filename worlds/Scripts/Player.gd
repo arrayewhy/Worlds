@@ -42,6 +42,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if inputDir == Vector2i(0,0):
 		return;
 	
+	#World.UpdateBiases_AccordingTo_DistFromCenter(inputDir);
+	
 	# Time Skip from spending more time moving through forests
 	
 	#if timeSkips > 0:
@@ -75,20 +77,6 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		
 	Do_PlayerMove_BiomeSpawn_InterractionSpawn(inputDir);
 	
-func Do_PlayerMove_BiomeSpawn_InterractionSpawn(inputDir:Vector2i) -> void:
-	
-	# Blocked by Water
-	#if Biome_Master.Get_BiomeType(nextGPos) == Biome_Master.Type.Water:
-		#var surroundingBiomes:Array = Biome_Master.Surrounding_Biomes(nextGPos, 1);
-		#if !surroundingBiomes.has(Biome_Master.Type.Earth) and !surroundingBiomes.has(Biome_Master.Type.Grass):
-			#return;
-
-	MovePlayer_And_SpawnBiomes(inputDir);
-	
-	World.Roll_Dice();
-	
-	return;
-	
 func Get_DirectionInput(event:InputEvent) -> Vector2i:
 	if event.is_action("Up"):
 		return Vector2i.UP;
@@ -100,7 +88,13 @@ func Get_DirectionInput(event:InputEvent) -> Vector2i:
 		return Vector2i.RIGHT;
 	return Vector2i.ZERO;
 
-func MovePlayer_And_SpawnBiomes(inputDir:Vector2i, moveCam:bool = true) -> void:
+func Do_PlayerMove_BiomeSpawn_InterractionSpawn(inputDir:Vector2i, moveCam:bool = true) -> void:
+	
+	# Blocked by Water
+	#if Biome_Master.Get_BiomeType(nextGPos) == Biome_Master.Type.Water:
+		#var surroundingBiomes:Array = Biome_Master.Surrounding_Biomes(nextGPos, 1);
+		#if !surroundingBiomes.has(Biome_Master.Type.Earth) and !surroundingBiomes.has(Biome_Master.Type.Grass):
+			#return;
 	
 	moving = true;
 	
@@ -127,6 +121,8 @@ func MovePlayer_And_SpawnBiomes(inputDir:Vector2i, moveCam:bool = true) -> void:
 	# Movement Interval
 	await get_tree().create_timer(movementInterval).timeout;
 	moving = false;
+	
+	World.Roll_Dice();
 
 # Functions: Debug ----------------------------------------------------------------------------------------------------
 

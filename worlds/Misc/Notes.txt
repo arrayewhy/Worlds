@@ -1,6 +1,7 @@
 UPCOMING ----------------------------------------------------------------------------------------------------
 
 HIGH PRIORITY:
+	- Use player's distance from center to determine biases.
 	- Entering Forests and Towns opens a Zoom View, slowing Overworld Movement
 	- World Template / World Edge through Sprite Pixel Info
 	
@@ -10,9 +11,11 @@ LOW PRIORITY:
 		when passed a NULL interaction, consider something like an explicit RANDOM interaction type.
 	- House in the Woods
 	- Cavern connects to town through tunnel
+	- Make biomes with empties around darker.
 	
 SPECULATIVE:
 	- Caverns
+	- Treasure chests hidden along water's edge on a mountain side
 	- Microview Interior
 	- Consider making Interaction Sprites look as if they are seen from "higher up", so we would see
 		Forests instead of a single Tree. Schools instead of a single fish.

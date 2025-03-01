@@ -104,7 +104,7 @@ func SpawnBiomes_FromImage() -> void:
 		match colArray[i]:
 			
 			Color(255, 0, 255, 255):
-				Biome_Master.SpawnBiome(currgPos - offset, Biome_Master.RandomBiomeType(), biomeHolder, \\
+				Biome_Master.SpawnBiome(currgPos - offset, Biome_Master.RandomBiomeType_Core(), biomeHolder, \\
 				Interaction_Master.Type.NULL);
 			_:
 				pass;
@@ -292,13 +292,12 @@ autoplay = true
 
 [node name="Visual-Reference" type="Node2D" parent="."]
 process_mode = 4
-visible = false
 
 [node name="Sprite2D" type="Sprite2D" parent="Visual-Reference"]
 position = Vector2(-256, -256)
 texture = ExtResource("1_ntyhy")
 region_enabled = true
-region_rect = Rect2(0, 0, 256, 256)
+region_rect = Rect2(768, 0, 256, 256)
 
 [node name="Sprite2D2" type="Sprite2D" parent="Visual-Reference"]
 position = Vector2(0, -256)
@@ -347,6 +346,14 @@ texture = ExtResource("1_ntyhy")
 region_enabled = true
 region_rect = Rect2(0, 0, 256, 256)
 
+[node name="PointLight2D2" type="PointLight2D" parent="."]
+scale = Vector2(256, 256)
+texture = SubResource("GradientTexture2D_o4abh")
+texture_scale = 2.0
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+color = Color(0, 0, 0, 1)
+
 [node name="Misc" type="Node2D" parent="."]
 process_mode = 4
 visible = false
@@ -357,9 +364,6 @@ visible = false
 scale = Vector2(4096, 4096)
 texture = SubResource("GradientTexture2D_o4abh")
 script = SubResource("GDScript_8l2ys")
-
-[node name="CanvasModulate" type="CanvasModulate" parent="Misc/Sun"]
-color = Color(0, 0, 0, 1)
 
 [node name="Hover" type="Node2D" parent="Misc"]
 script = SubResource("GDScript_acxdq")
