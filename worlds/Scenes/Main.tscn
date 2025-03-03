@@ -201,6 +201,7 @@ func On_EnterInteraction(state:bool) -> void:
 "
 
 [node name="World" type="Node2D"]
+top_level = true
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(0.125, 0.125)

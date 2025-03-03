@@ -28,6 +28,9 @@ func _ready() -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	
+	if event.is_action_pressed("Cancel"):
+		PauseMenu.Toggle_Pause(name);
+	
 	# Move and Spawn Repeater
 	if event.is_action_pressed("One"):
 		hover.set_process(false);

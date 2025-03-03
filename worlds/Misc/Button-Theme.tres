@@ -1,0 +1,8 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://dj0864pi7lxvd"]
+
+[ext_resource type="FontFile" uid="uid://bn56m5j1acs0j" path="res://Misc/Fonts/Georgia.ttf" id="1_gib5b"]
+
+[resource]
+default_font = ExtResource("1_gib5b")
+default_font_size = 144
+/colors/Col = Color(0, 0, 0, 1)
