@@ -24,6 +24,8 @@ var timeSkips:int;
 
 signal EnterInteraction(state);
 
+var count:int = 0;
+
 func _ready() -> void:
 	currGridPos = initGridPos;
 	World.SpawnBiomes_Around(currGridPos, 2);
@@ -40,8 +42,24 @@ func _ready() -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	
+	if event.is_action_pressed("Enter"):
+		var targs:Array[Vector2i] = GridPos_Utils.GridPositions_Around(currGridPos, 5 + count, true);
+		targs = GridPos_Utils.Remove_Occupied(targs);
+		
+		for gp in targs:
+			if gp.distance_to(currGridPos) > 4 + count:
+				continue;
+			#Biome_Master.SpawnBiome(gp, Biome_Master.RandomBiomeType_Core(), biomeSpawner.biomeHolder, Interaction_Master.Type.NULL);
+			biomeSpawner.SpawnRandomBiomes_Influenced(gp, 1, 2);
+		
+		count += 1;
+		
+	
 	if event.is_action_pressed("Cancel"):
 		PauseMenu.Toggle_Pause(name);
+	
+	if PauseMenu.Is_Paused():
+		return;
 	
 	if moving:
 		return;

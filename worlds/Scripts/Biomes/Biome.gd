@@ -26,13 +26,13 @@ func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type) -> void:
 	match biomeType:
 		Biome_Master.Type.Earth:
 			Prep_Earth();
-			MultiFader.FadeTo_Opaque(biomeSprite, 2, true);
+			MultiFader.FadeTo_Opaque(biomeSprite, 1, true);
 		Biome_Master.Type.Grass:
 			Prep_Grass();
-			MultiFader.FadeTo_Opaque(biomeSprite, 2, true);
+			MultiFader.FadeTo_Opaque(biomeSprite, 1, true);
 		Biome_Master.Type.Water:
 			Prep_Water();
-			MultiFader.FadeTo_Alpha(biomeSprite, .2, 0, 1);
+			MultiFader.FadeTo_Alpha(biomeSprite, .2, 0, .25);
 		#Biome_Master.Type.Stone:
 			#Prep_Stone();
 			#MultiFader.FadeTo_Opaque(biomeSprite, 2, true);
@@ -45,8 +45,8 @@ func Check_Surroundings() -> void:
 	if GridPos_Utils.Empties_Around(gridPos, 1, true).size() == 0:
 		
 		# Retain Water Full Opacity
-		#if type == Biome_Master.Type.Water:
-			#MultiFader.FadeTo_Alpha(biomeSprite, 1, biomeSprite.modulate.a, 1);
+		if type == Biome_Master.Type.Water:
+			MultiFader.FadeTo_Alpha(biomeSprite, 1, biomeSprite.modulate.a, 0.8);
 		
 		return;
 
@@ -58,11 +58,11 @@ func Check_Surroundings() -> void:
 		
 func On_TimeTick() -> void:
 	
-	var dist:float = gridPos.distance_to(World.PlayerGridPos());
+	#var dist:float = gridPos.distance_to(World.PlayerGridPos());
 	
-	if dist >= 3:
+	#if dist >= 3:
 		#biomeSprite.modulate.a = 0.5; # PRETTY WATER DEPTHS (Refer to Notes)
-		return;
+		#return;
 		
 	#biomeSprite.modulate.a = 1; # PRETTY WATER DEPTHS (Refer to Notes)
 	
@@ -90,8 +90,8 @@ func On_TimeTick() -> void:
 			
 				# PRETTY WATER DEPTHS (Refer to Notes)
 				
-				var targDepth:float = 1 - (waters * 0.1);
-				MultiFader.FadeTo_Alpha(biomeSprite, targDepth, biomeSprite.modulate.a, .5);
+				var targDepth:float = 1 - (waters * .1);
+				MultiFader.FadeTo_Alpha(biomeSprite, targDepth, biomeSprite.modulate.a, targDepth);
 
 		_: # Landed biomes stranded in Water
 			

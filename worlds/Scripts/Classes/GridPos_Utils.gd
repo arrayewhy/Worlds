@@ -3,16 +3,12 @@ class_name GridPos_Utils extends Node;
 static func GridPositions_Around(gPos:Vector2i, reach:int, removeCenter:bool = false) -> Array[Vector2i]:
 	
 	var array:Array[Vector2i] = [];
-	
 	var size:int = reach * 2 + 1;
-	
 	var topLeft:Vector2i = gPos + Vector2i(-1, -1) * reach;
-	
 	var offset:Vector2i = Vector2i(0, 0);
 	
 	for row in size:
 		for col in size:
-			
 			var targ:Vector2i = topLeft + offset;
 			
 			if removeCenter and targ == gPos:
@@ -21,6 +17,7 @@ static func GridPositions_Around(gPos:Vector2i, reach:int, removeCenter:bool = f
 				array.append(targ);
 				
 			offset.x += 1;
+			
 		offset.x = 0;
 		offset.y += 1;
 	

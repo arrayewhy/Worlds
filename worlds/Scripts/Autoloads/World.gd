@@ -5,6 +5,7 @@ const _cellSize:int = 256;
 # Variables: World
 var worldSize:int = 1;
 var _playerGridPos:Vector2i;
+var _paused:bool;
 # Variables: Biomes
 var _discoveredBiomes = {}; # Grid Position : [Biome Object, Biome Type]
 #var _currBiases:Dictionary;

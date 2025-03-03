@@ -2,6 +2,7 @@ extends Node2D;
 
 # Components
 var sprite:Sprite2D;
+var fader:Node;
 var updater:Node;
 # Variables
 var currInteraction:Interaction_Master.Type = Interaction_Master.Type.NULL;
@@ -11,7 +12,7 @@ var _disabled:bool;
 func Initialise(biomeType:Biome_Master.Type, interType:Interaction_Master.Type) -> void:
 
 	# Initialise Compenents
-	#fader = $Fader;
+	fader = $Fader;
 	sprite = $"Interaction-Sprite";
 	sprite.modulate.a = 0;
 	updater = $Updater;
@@ -120,12 +121,12 @@ func Is_Disabled() -> bool:
 # [ 3 / 4 ] Functions: Sprite ----------------------------------------------------------------------------------------------------
 
 func Vanish(speed:float = 2) -> void:
-	MultiFader.FadeTo_Trans(sprite, speed);
-	#fader.FadeToTrans(speed);
+	#MultiFader.FadeTo_Trans(sprite, speed);
+	fader.FadeToTrans(speed);
 
 func Appear(speed:float = 2) -> void:
-	MultiFader.FadeTo_Opaque(sprite, speed);
-	#fader.FadeToOpaque(speed);
+	#MultiFader.FadeTo_Opaque(sprite, speed);
+	fader.FadeToOpaque(speed);
 	
 func Update_Sprite(interType:Interaction_Master.Type) -> void:
 	match interType:

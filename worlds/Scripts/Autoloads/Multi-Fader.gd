@@ -22,6 +22,7 @@ func _process(delta: float) -> void:
 			Mode.FadeOpaque:
 				Progress_Opaque(t, targParams[1], delta);
 			Mode.FadeAlpha:
+				# Sprite, Speed, Target Alpha, Direction, Delta
 				Progress_Alpha(t, targParams[1], targParams[2], targParams[3], delta);
 
 func Progress_Trans(spr:Sprite2D, speed:float, delta:float) -> void:
