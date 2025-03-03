@@ -234,9 +234,11 @@ biomeHolder = NodePath("../../Biome-Holder")
 [node name="Mover" type="Node" parent="Player" node_paths=PackedStringArray("master")]
 script = ExtResource("1_vinv6")
 master = NodePath("..")
-speed = 5.0
+speed = 6.0
 minDist = 10.0
 frameByFrame = true
+initFrameDur = 0.05
+emitSignal = true
 
 [node name="Biome-Holder" type="Node2D" parent="."]
 y_sort_enabled = true
@@ -288,6 +290,7 @@ target = NodePath("../Illumination-Spawner")
 startVisible = false
 
 [node name="Audio" type="Node" parent="."]
+process_mode = 4
 
 [node name="Desert-Wind" type="AudioStreamPlayer" parent="Audio"]
 stream = ExtResource("12_py2jo")

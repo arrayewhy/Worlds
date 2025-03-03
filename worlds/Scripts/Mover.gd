@@ -1,17 +1,17 @@
 extends Node;
 
+# Components
 @export var master:Node2D;
-
+# Variables
 @export var speed:float = 2;
 @export var minDist:float = 0.01;
-
-@export var frameByFrame:bool;
-var initFrameDur:float = 0.1;
-var frameTimer:float;
-
-var targPos:Vector2;
+var destination:Vector2;
 var lowestDist:float = 0.0;
 var currPos:Vector2;
+# Variables: Frame by Frame
+@export var frameByFrame:bool;
+@export var initFrameDur:float = 0.1;
+var frameTimer:float;
 
 @export var emitSignal:bool;
 signal Done;
@@ -21,10 +21,10 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	
-	var dist = currPos.distance_to(targPos);
+	var dist = currPos.distance_to(destination);
 	
 	if dist > lowestDist || dist < minDist:
-		master.position = targPos;
+		master.position = destination;
 		set_process(false);
 		if emitSignal:
 			Done.emit();
@@ -33,7 +33,7 @@ func _process(delta: float) -> void:
 	
 	lowestDist = dist;
 		
-	var change = (targPos - master.position) * speed * delta;
+	var change = (destination - master.position) * speed * delta;
 	
 	# We determine the actual intended position before deciding to 
 	# assign it to the target or not.
@@ -52,10 +52,11 @@ func StartMove(pos) -> void:
 	
 	var dist = master.position.distance_to(pos);
 	
+	# If the target is already close to the destination, skip moving entirely.
 	if dist < minDist:
 		return;
 		
-	targPos = pos;
+	destination = pos;
 	lowestDist = dist;
 	
 	currPos = master.position;

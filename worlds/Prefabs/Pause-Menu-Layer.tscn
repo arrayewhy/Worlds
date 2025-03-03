@@ -1,18 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://wsjv8gfe61ee"]
+[gd_scene load_steps=4 format=3 uid="uid://wsjv8gfe61ee"]
 
 [ext_resource type="Script" path="res://Scripts/UI/Pause-Menu.gd" id="1_ai6ah"]
 [ext_resource type="Theme" uid="uid://dj0864pi7lxvd" path="res://Misc/Button-Theme.tres" id="2_tftrc"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_8ipoq"]
 size = Vector2(1264, 256)
-
-[sub_resource type="GDScript" id="GDScript_mikr2"]
-script/source = "extends Button;
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_pressed():
-		print(\"Click\");
-"
 
 [node name="Pauseh-Menu-Layer" type="CanvasLayer"]
 script = ExtResource("1_ai6ah")
@@ -39,7 +31,6 @@ theme = ExtResource("2_tftrc")
 text = "QUIT"
 icon = SubResource("PlaceholderTexture2D_8ipoq")
 icon_alignment = 1
-script = SubResource("GDScript_mikr2")
 
 [node name="Curtain" type="ColorRect" parent="."]
 anchors_preset = 15

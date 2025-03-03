@@ -124,8 +124,11 @@ func Do_PlayerMove_BiomeSpawn_InterractionSpawn(inputDir:Vector2i, moveCam:bool 
 	World.Advance_Time();
 	
 	# Movement Interval
-	await get_tree().create_timer(movementInterval).timeout;
+	await mover.Done;
 	moving = false;
+	#await get_tree().create_timer(movementInterval).timeout;
+	#moving = false;
+	
 	
 	World.Roll_Dice();
 
