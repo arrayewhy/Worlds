@@ -10,6 +10,7 @@ func _ready() -> void:
 # Functions ----------------------------------------------------------------------------------------------------
 
 func Toggle_Pause(user:String) -> void:
+	InGameDebugger.Say(str("Paused by: ", user));
 	_paused = !_paused;
 	if _paused:
 		ShowCurtain();

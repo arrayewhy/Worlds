@@ -1,14 +1,10 @@
 UPCOMING ----------------------------------------------------------------------------------------------------
 
 HIGH PRIORITY:
-	- Use player's distance from center to determine biases.
 	- Entering Forests and Towns opens a Zoom View, slowing Overworld Movement
 	- World Template / World Edge through Sprite Pixel Info
 	
 LOW PRIORITY:
-	- Properly implement random Interaction Spawning:
-		Sometimes we want to explicitly set an Interaction as NULL. So, instead of spawning randomly 
-		when passed a NULL interaction, consider something like an explicit RANDOM interaction type.
 	- House in the Woods
 	- Cavern connects to town through tunnel
 	- Make biomes with empties around darker.
@@ -22,7 +18,7 @@ SPECULATIVE:
 	- Inventory
 	- Riding the Fish
 	- Slow Random Biome Reveal phenomenon that does its own thing
-	- PRETTY WATER DEPTHS
+	- Use player's distance from center to determine biases.
 	
 	- Time of Day & Search Range
 	
@@ -32,6 +28,7 @@ SPECULATIVE:
 	- Biome Mouse Hover
 	- Fade Biomes
 	- Merge signals SpawnBiomesAroundPlayer & SpawnBiomes in World.gd
+	- PRETTY WATER DEPTHS
 
 BUGS ----------------------------------------------------------------------------------------------------
 
@@ -50,6 +47,12 @@ LOW PRIORITY:
 		SOLUTION:
 			- Only connect Active Interactions to World.TimeTick, and 
 			disconnect them when NOT active (InteractionMaster.Type.NULL).
+
+FEEDBACK ----------------------------------------------------------------------------------------------------
+
+OBSERVATIONS:
+	- Lesley<3: Wanted to click on the biomes
+	- Sherry: "How do I play? This is too hard!"
 
 STORY ----------------------------------------------------------------------------------------------------
 

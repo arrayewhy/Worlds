@@ -84,7 +84,11 @@ func NeighbourBias(neighbourBiome:Biome_Master.Type) -> Array[Biome_Master.Type]
 # [ 3 / 3 ] Functions ----------------------------------------------------------------------------------------------------
 
 static func Predefined_Location(dir:Vector2i, gPos:Vector2i) -> Biome_Master.Predefined:
-	if gPos.y <= -80 and dir.y < 0:
-		InGameDebugger.Say("Predefined Location: Cavern");
-		return Biome_Master.Predefined.Cavern;
+	
+	if dir.y < 0:
+
+		if gPos.y <= -80:
+			InGameDebugger.Say("Predefined Location: Cavern");
+			return Biome_Master.Predefined.Cavern;
+
 	return Biome_Master.Predefined.NULL;

@@ -3,9 +3,9 @@ extends Node2D;
 @onready var biomeSpawner = $"Biome-Spawner";
 
 @onready var mover:Node = $Mover;
-@onready var playerSpr:Sprite2D = $Sprite2D;
+@onready var playerSpr:Sprite2D = $"Player-Sprite";
 
-@export var hover:Node;
+#@export var hover:Node;
 
 @export var microView:CanvasLayer;
 @export var camMover:Node;
@@ -14,6 +14,8 @@ const initGridPos := Vector2i(0,0);
 const movementInterval:float = 0.5;
 
 var currGridPos:Vector2i;
+var revealerGPos := Vector2i.ZERO;
+var revealerDelay:float = 2;
 
 var moving:bool;
 var insideInteraction:bool;
@@ -26,16 +28,20 @@ func _ready() -> void:
 	currGridPos = initGridPos;
 	World.SpawnBiomes_Around(currGridPos, 2);
 
+#func _process(delta: float) -> void:
+	#
+	#if revealerDelay > 0:
+		#revealerDelay -= delta;
+		#return;
+	#revealerDelay = 2;
+	#
+	## Move and Spawn Repeater
+	#RandomReveal();
+
 func _unhandled_key_input(event: InputEvent) -> void:
 	
 	if event.is_action_pressed("Cancel"):
 		PauseMenu.Toggle_Pause(name);
-	
-	# Move and Spawn Repeater
-	if event.is_action_pressed("One"):
-		hover.set_process(false);
-		RandomReveal(5000);
-		return;
 	
 	if moving:
 		return;
@@ -58,10 +64,10 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		##moving = false;
 		#return;
 	
-	# Interaction Fade
-	
 	var nextGPos:Vector2i = currGridPos + inputDir;
-		
+
+	# Interaction Fade
+
 	var nextInteraction = Interaction_Master.Get_InteractionType(nextGPos);
 	
 	if nextInteraction == Interaction_Master.Type.Forest:
@@ -93,19 +99,20 @@ func Get_DirectionInput(event:InputEvent) -> Vector2i:
 
 func Do_PlayerMove_BiomeSpawn_InterractionSpawn(inputDir:Vector2i, moveCam:bool = true) -> void:
 	
-	# Blocked by Water
-	#if Biome_Master.Get_BiomeType(nextGPos) == Biome_Master.Type.Water:
-		#var surroundingBiomes:Array = Biome_Master.Surrounding_Biomes(nextGPos, 1);
-		#if !surroundingBiomes.has(Biome_Master.Type.Earth) and !surroundingBiomes.has(Biome_Master.Type.Grass):
-			#return;
-	
 	moving = true;
 	
 	#var prevGridPos = currGridPos;
 	# Update Current Grid Position
 	currGridPos += inputDir;
 	
-	var predefinedLocation:Biome_Master.Predefined = biomeSpawner.Predefined_Location(inputDir, currGridPos);
+	if Biome_Master.Get_BiomeType(currGridPos) == Biome_Master.Type.Water:
+		if !playerSpr.Is_Swim():
+			playerSpr.ChangeTo_Swim();
+	else:
+		if !playerSpr.Is_Normal():
+			playerSpr.ChangeTo_Normal();
+	
+	#var predefinedLocation:Biome_Master.Predefined = biomeSpawner.Predefined_Location(inputDir, currGridPos);
 	
 	# Spawn Biomes around new position
 	World.SpawnBiomesAround_Player(currGridPos);
@@ -119,41 +126,31 @@ func Do_PlayerMove_BiomeSpawn_InterractionSpawn(inputDir:Vector2i, moveCam:bool 
 	if moveCam:
 		camMover.StartMove(targPos);
 		
-	# Prevent Interactions from Updating as soon as they Spawn by advancing time in the next frame.
+	## Prevent Interactions from Updating as soon as they Spawn by advancing time in the next frame.
 	await get_tree().process_frame;
 	World.Advance_Time();
-	
-	# Movement Interval
+	#
+	## Movement Interval
 	await mover.Done;
 	moving = false;
 	#await get_tree().create_timer(movementInterval).timeout;
 	#moving = false;
 	
-	
 	World.Roll_Dice();
 
 # Functions: Debug ----------------------------------------------------------------------------------------------------
 
-func RandomReveal(repetitions:int = 1000) -> void:
+func RandomReveal() -> void:
 	
-	var inputDir:Vector2i;
+	var dir:Vector2i = Get_RandDirection();
+
+	dir = Get_RandDirection();
+	revealerGPos += dir;
+	# Spawn Biomes around new position
+	World.SpawnBiomes_Around(revealerGPos, 1, 0);
 	
-	var gPos:Vector2i = currGridPos
-	
-	for i in repetitions:
-		
-		inputDir = Get_RandDirection();
-		gPos += inputDir;
-		# Spawn Biomes around new position
-		World.SpawnBiomes_AroundPlayer(gPos, gPos);
-		
-		await get_tree().process_frame;
-		World.Advance_Time();
-		
-		await get_tree().create_timer(1).timeout;
-		
-	hover.set_process(true);
-	InGameDebugger.Say(World.DiscoveredBiomes().size());
+	await get_tree().process_frame;
+	World.Advance_Time();
 
 func Get_RandDirection() -> Vector2i:
 	match randi_range(0, 3):

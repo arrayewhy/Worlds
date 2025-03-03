@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://dpw5ih7gg3btv"]
+[gd_scene load_steps=26 format=3 uid="uid://dpw5ih7gg3btv"]
 
 [ext_resource type="Script" path="res://Scripts/Main-Camera.gd" id="1_e4dtk"]
 [ext_resource type="Texture2D" uid="uid://dk06eplgkeoi2" path="res://Sprites/Clack_Map_SpriteSheet_2048.png" id="1_ntyhy"]
@@ -15,6 +15,32 @@
 [ext_resource type="AudioStream" uid="uid://cgv7itiiugmiq" path="res://Audio/SFX/Forest_634315__klankbeeld__border-forestfarmfield-727am-nl-eu-220515_0345.wav" id="13_wbwr2"]
 [ext_resource type="PackedScene" uid="uid://cf233120e3l52" path="res://Prefabs/Dice.tscn" id="14_1cw2s"]
 [ext_resource type="Image" uid="uid://bvafusrsjjlrn" path="res://Sprites/World-Templates/WT-Circle64.png" id="15_y08cy"]
+
+[sub_resource type="GDScript" id="GDScript_lhawh"]
+resource_name = "Player-Sprite"
+script/source = "extends Sprite2D;
+
+enum SpriteState { NULL, Normal, Swim };
+var _currState:SpriteState = SpriteState.Normal;
+
+func ChangeTo_Normal() -> void:
+	_currState = SpriteState.Normal;
+	Change_SpriteCoord(Vector2i(0, 1536));
+	
+func ChangeTo_Swim() -> void:
+	_currState = SpriteState.Swim;
+	Change_SpriteCoord(Vector2i(0, 768));
+
+func Change_SpriteCoord(coords:Vector2i) -> void:
+	self.region_rect.position.x = coords.x;
+	self.region_rect.position.y = coords.y;
+
+func Is_Normal() -> bool:
+	return _currState == SpriteState.Normal;
+	
+func Is_Swim() -> bool:
+	return _currState == SpriteState.Swim;
+"
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_bu5ns"]
 size = Vector2(1920, 48)
@@ -51,45 +77,6 @@ func _ready() -> void:
 func On_TimeTick() -> void:
 	position.x += 128;
 	self.energy -= 0.001;
-"
-
-[sub_resource type="GDScript" id="GDScript_acxdq"]
-resource_name = "Hover"
-script/source = "extends Node2D;
-
-var moving:Dictionary = {};
-
-var detectionRange:float = 128;
-var offset:float = -48;
-
-func _process(_delta: float) -> void:
-	
-	var mousePos:Vector2 = get_global_mouse_position();
-	
-	for i in World.discoveredBiomes:
-		
-		# If mouse is near biome object
-		var worldPos:Vector2 = i * float(World.cellSize);
-		if worldPos.distance_to(mousePos) < detectionRange:
-			
-			# If it has already been offset, skip it.
-			if moving.has(i):
-				continue;
-			
-			# 1. Get the biome's object
-			var biomeObj:Object = World.discoveredBiomes.get(i)[0];
-			# 2. Record its position
-			moving[i] = biomeObj.position;
-			# 3. Offset its Y
-			biomeObj.position.y += offset;
-			return;
-			
-		# If mouse is NOT near biome object, and it was offset
-		if moving.has(i):
-			# Reset its position
-			World.discoveredBiomes.get(i)[0].position = moving[i];
-			# Remove its record
-			moving.erase(i);
 "
 
 [sub_resource type="GDScript" id="GDScript_1rs1b"]
@@ -200,6 +187,45 @@ func On_EnterInteraction(state:bool) -> void:
 	set_process(true);
 "
 
+[sub_resource type="GDScript" id="GDScript_acxdq"]
+resource_name = "Hover"
+script/source = "extends Node2D;
+
+var hoverTargs:Dictionary = {};
+
+var detectionRange:float = 128;
+var offset:float = -48;
+
+func _process(_delta: float) -> void:
+	
+	var mousePos:Vector2 = get_global_mouse_position();
+	
+	for i in World.DiscoveredBiomes():
+		
+		# If mouse is near biome object
+		var worldPos:Vector2 = i * float(World.CellSize());
+		if worldPos.distance_to(mousePos) < detectionRange:
+			
+			# If it has already been offset, skip it.
+			if hoverTargs.has(i):
+				continue;
+			
+			# 1. Get the biome's object
+			var biomeObj:Object = World.DiscoveredBiomes().get(i)[0];
+			# 2. Record its position
+			hoverTargs[i] = biomeObj.position;
+			# 3. Offset its Y
+			biomeObj.position.y += offset;
+			return;
+			
+		# If mouse is NOT near biome object, and it was offset
+		if hoverTargs.has(i):
+			# Reset its position
+			World.DiscoveredBiomes().get(i)[0].position = hoverTargs[i];
+			# Remove its record
+			hoverTargs.erase(i);
+"
+
 [node name="World" type="Node2D"]
 top_level = true
 
@@ -215,17 +241,17 @@ speed = 0.5
 [node name="Cam-Zoom" type="Node" parent="Camera2D"]
 script = ExtResource("3_xox30")
 
-[node name="Player" type="Node2D" parent="." node_paths=PackedStringArray("hover", "microView", "camMover")]
+[node name="Player" type="Node2D" parent="." node_paths=PackedStringArray("microView", "camMover")]
 z_index = 100
 script = ExtResource("2_54uhw")
-hover = NodePath("../Misc/Hover")
 microView = NodePath("../Misc/MicroView")
 camMover = NodePath("../Camera2D/Mover")
 
-[node name="Sprite2D" type="Sprite2D" parent="Player"]
+[node name="Player-Sprite" type="Sprite2D" parent="Player"]
 texture = ExtResource("1_ntyhy")
 region_enabled = true
 region_rect = Rect2(0, 1536, 256, 256)
+script = SubResource("GDScript_lhawh")
 
 [node name="Biome-Spawner" type="Node" parent="Player" node_paths=PackedStringArray("biomeHolder")]
 script = ExtResource("5_nwltf")
@@ -359,16 +385,6 @@ texture = ExtResource("1_ntyhy")
 region_enabled = true
 region_rect = Rect2(0, 0, 256, 256)
 
-[node name="Sun" type="PointLight2D" parent="."]
-visible = false
-scale = Vector2(256, 256)
-texture = SubResource("GradientTexture2D_o4abh")
-texture_scale = 8.0
-
-[node name="CanvasModulate" type="CanvasModulate" parent="Sun"]
-scale = Vector2(0.00390625, 0.00390625)
-color = Color(0, 0, 0, 1)
-
 [node name="Misc" type="Node2D" parent="."]
 process_mode = 4
 visible = false
@@ -379,9 +395,6 @@ visible = false
 scale = Vector2(4096, 4096)
 texture = SubResource("GradientTexture2D_o4abh")
 script = SubResource("GDScript_8l2ys")
-
-[node name="Hover" type="Node2D" parent="Misc"]
-script = SubResource("GDScript_acxdq")
 
 [node name="World-Template" type="Node" parent="Misc" node_paths=PackedStringArray("biomeHolder")]
 script = SubResource("GDScript_1rs1b")
@@ -407,3 +420,6 @@ script = SubResource("GDScript_s5h60")
 
 [node name="Dice" parent="Misc" instance=ExtResource("14_1cw2s")]
 position = Vector2(0, 0)
+
+[node name="Hover" type="Node2D" parent="Misc"]
+script = SubResource("GDScript_acxdq")

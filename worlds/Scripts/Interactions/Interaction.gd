@@ -60,10 +60,10 @@ func Try_Spawn(biomeType:Biome_Master.Type, interType:Interaction_Master.Type) -
 				AudioMaster.PlaySFX_DogBark(global_position);
 				return;
 				
-		Interaction_Master.Type.Forest:
-			if biomeType == Biome_Master.Type.Grass:
-				Spawn(interType);
-				return;
+		#Interaction_Master.Type.Forest:
+			#if biomeType == Biome_Master.Type.Grass:
+				#Spawn(interType);
+				#return;
 			
 		Interaction_Master.Type.Fish:
 			if biomeType == Biome_Master.Type.Water or World.Win_ImprobableRoll():

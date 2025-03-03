@@ -39,29 +39,30 @@ func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type) -> void:
 		_:
 			InGameDebugger.Warn("Failed to Initialise Biome: No type specified.");
 			
-	#Check_Surroundings();
+	Check_Surroundings();
 		
 func Check_Surroundings() -> void:
 	if GridPos_Utils.Empties_Around(gridPos, 1, true).size() == 0:
 		
 		# Retain Water Full Opacity
-		if type == Biome_Master.Type.Water:
-			MultiFader.FadeTo_Alpha(biomeSprite, 1, biomeSprite.modulate.a, 1);
+		#if type == Biome_Master.Type.Water:
+			#MultiFader.FadeTo_Alpha(biomeSprite, 1, biomeSprite.modulate.a, 1);
 		
 		return;
 
 	#if type != Biome_Master.Type.Water:
 		#return;
 	
-	World.TimeTick.connect(On_TimeTick);
+	if !World.TimeTick.is_connected(On_TimeTick):
+		World.TimeTick.connect(On_TimeTick);
 		
 func On_TimeTick() -> void:
 	
-	#var dist:float = gridPos.distance_to(World.PlayerGridPos());
+	var dist:float = gridPos.distance_to(World.PlayerGridPos());
 	
-	#if dist >= 3:
+	if dist >= 3:
 		#biomeSprite.modulate.a = 0.5; # PRETTY WATER DEPTHS (Refer to Notes)
-		#return;
+		return;
 		
 	#biomeSprite.modulate.a = 1; # PRETTY WATER DEPTHS (Refer to Notes)
 	
