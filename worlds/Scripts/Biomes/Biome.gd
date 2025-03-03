@@ -44,6 +44,7 @@ func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type) -> void:
 func Check_Surroundings() -> void:
 	if GridPos_Utils.Empties_Around(gridPos, 1, true).size() == 0:
 		
+		# Retain Water Full Opacity
 		if type == Biome_Master.Type.Water:
 			MultiFader.FadeTo_Alpha(biomeSprite, 1, biomeSprite.modulate.a, 1);
 		
@@ -56,7 +57,7 @@ func Check_Surroundings() -> void:
 		
 func On_TimeTick() -> void:
 	
-	var dist:float = gridPos.distance_to(World.PlayerGridPos());
+	#var dist:float = gridPos.distance_to(World.PlayerGridPos());
 	
 	#if dist >= 3:
 		#biomeSprite.modulate.a = 0.5; # PRETTY WATER DEPTHS (Refer to Notes)
@@ -68,7 +69,7 @@ func On_TimeTick() -> void:
 		return;
 
 	# Make Y-Sort put the newly spawned biome behind the existing biome
-	var newBiomeOffset := Vector2(0, -10);
+	#var newBiomeOffset := Vector2(0, -10);
 
 	var surroundingBiomes:Array[Biome_Master.Type] = Biome_Master.Surrounding_Biomes(gridPos, 1, true);
 	var waters:int = surroundingBiomes.count(Biome_Master.Type.Water);

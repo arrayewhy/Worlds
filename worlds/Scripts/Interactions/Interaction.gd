@@ -1,7 +1,6 @@
 extends Node2D;
 
 # Components
-#var fader:Node;
 var sprite:Sprite2D;
 var updater:Node;
 # Variables
@@ -50,6 +49,11 @@ func Try_Spawn(biomeType:Biome_Master.Type, interType:Interaction_Master.Type) -
 
 	match interType:
 			
+		Interaction_Master.Type.Grass:
+			if biomeType == Biome_Master.Type.Grass:
+				Spawn(interType);
+				return;
+			
 		Interaction_Master.Type.Dog:
 			if biomeType != Biome_Master.Type.Water or World.Win_ImprobableRoll():
 				Spawn(interType, true);
@@ -57,8 +61,8 @@ func Try_Spawn(biomeType:Biome_Master.Type, interType:Interaction_Master.Type) -
 				return;
 				
 		Interaction_Master.Type.Forest:
-			#if biomeType == Biome_Master.Type.Grass:
-				#Spawn(interType);
+			if biomeType == Biome_Master.Type.Grass:
+				Spawn(interType);
 				return;
 			
 		Interaction_Master.Type.Fish:
@@ -125,6 +129,9 @@ func Appear(speed:float = 2) -> void:
 	
 func Update_Sprite(interType:Interaction_Master.Type) -> void:
 	match interType:
+		Interaction_Master.Type.Grass:
+			InGameDebugger.Say("Spawn Grass")
+			sprite.region_rect.position = Vector2i(768, 1792);
 		Interaction_Master.Type.Dog:
 			sprite.region_rect.position = Vector2i(0, 2048);
 		Interaction_Master.Type.Forest:

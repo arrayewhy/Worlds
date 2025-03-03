@@ -45,7 +45,7 @@ func SpawnRandomBiomes_Influenced(currGPos:Vector2i, spawnRange:int, influenceRa
 	# Add random biome to ensure there is always a chance to spawn a different biome region.
 	influences.append(Biome_Master.RandomBiomeType_Core());
 	#influences.append_array(World.WorldBiases());
-	print(influences);
+	#print(influences);
 	
 	for point in spawnPoints:
 		
@@ -60,8 +60,8 @@ func SpawnRandomBiomes_Influenced(currGPos:Vector2i, spawnRange:int, influenceRa
 				Biome_Master.SpawnBiome(point, neighbourBias.pick_random(), biomeHolder, Interaction_Master.Type.NULL);
 				break;
 
-func On_UpdateBiases(moveDir:Vector2i) -> void:
-	pass;
+#func On_UpdateBiases(moveDir:Vector2i) -> void:
+	#pass;
 
 func NeighbourBias(neighbourBiome:Biome_Master.Type) -> Array[Biome_Master.Type]:
 	
@@ -80,3 +80,11 @@ func NeighbourBias(neighbourBiome:Biome_Master.Type) -> Array[Biome_Master.Type]
 	if bias == []:
 		InGameDebugger.Warn("No neighbour biases found.");
 	return bias;
+
+# [ 3 / 3 ] Functions ----------------------------------------------------------------------------------------------------
+
+static func Predefined_Location(dir:Vector2i, gPos:Vector2i) -> Biome_Master.Predefined:
+	if gPos.y <= -80 and dir.y < 0:
+		InGameDebugger.Say("Predefined Location: Cavern");
+		return Biome_Master.Predefined.Cavern;
+	return Biome_Master.Predefined.NULL;

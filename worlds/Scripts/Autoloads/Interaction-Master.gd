@@ -1,19 +1,20 @@
 class_name Interaction_Master extends Node;
 
-enum Type {NULL, Dog, Forest, Fish, Boat};
+enum Type {NULL, Grass, Dog, Forest, Fish, Boat};
 
 const maxChance:int = 10000;
 const improbChance:int = 100000;
 
+const initChance_Grass:int = 5000
 const initChance_Dog:int = -500;
-const initChance_Forest:int = 10000;
+const initChance_Forest:int = 5000;
 const initChance_Fish:int = 500;
 const initChance_Boat:int = -1000;
 
 # Functions ----------------------------------------------------------------------------------------------------
 
 static func LandInteractions() -> Array[Type]:
-	return [Type.Dog, Type.Forest];
+	return [Type.Grass, Type.Forest, Type.Dog];
 
 static func WaterInteractions() -> Array[Type]:
 	return [Type.Fish, Type.Boat];
@@ -39,6 +40,8 @@ static func Increase_Chance(type:Interaction_Master.Type, rate:int = 1, interCha
 
 static func Reset_Chance(type:Interaction_Master.Type, interChances:Dictionary = World.InteractionChances()) -> void:
 	match type:
+		Interaction_Master.Type.Grass:
+			interChances[type] = initChance_Grass;
 		Interaction_Master.Type.Dog:
 			interChances[type] = initChance_Dog;
 		Interaction_Master.Type.Forest:

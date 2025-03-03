@@ -7,7 +7,7 @@ var worldSize:int = 1;
 var _playerGridPos:Vector2i;
 # Variables: Biomes
 var _discoveredBiomes = {}; # Grid Position : [Biome Object, Biome Type]
-var _currBiases:Dictionary;
+#var _currBiases:Dictionary;
 const _maxInfluence:int = 10;
 # Variables: Interaction
 var _interChances:Dictionary; # Interaction_Master.Type : int

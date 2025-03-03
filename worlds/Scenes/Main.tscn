@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://dpw5ih7gg3btv"]
+[gd_scene load_steps=25 format=3 uid="uid://dpw5ih7gg3btv"]
 
 [ext_resource type="Script" path="res://Scripts/Main-Camera.gd" id="1_e4dtk"]
 [ext_resource type="Texture2D" uid="uid://dk06eplgkeoi2" path="res://Sprites/Clack_Map_SpriteSheet_2048.png" id="1_ntyhy"]
@@ -21,6 +21,14 @@ size = Vector2(1920, 48)
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_dwwpb"]
 size = Vector2(48, 1080)
+
+[sub_resource type="GDScript" id="GDScript_wj4f3"]
+resource_name = "Visual Reference"
+script/source = "extends Node2D;
+
+func _ready() -> void:
+	hide();
+"
 
 [sub_resource type="Gradient" id="Gradient_236ax"]
 colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
@@ -292,6 +300,7 @@ autoplay = true
 
 [node name="Visual-Reference" type="Node2D" parent="."]
 process_mode = 4
+script = SubResource("GDScript_wj4f3")
 
 [node name="Sprite2D" type="Sprite2D" parent="Visual-Reference"]
 position = Vector2(-256, -256)
@@ -346,12 +355,14 @@ texture = ExtResource("1_ntyhy")
 region_enabled = true
 region_rect = Rect2(0, 0, 256, 256)
 
-[node name="PointLight2D2" type="PointLight2D" parent="."]
+[node name="Sun" type="PointLight2D" parent="."]
+visible = false
 scale = Vector2(256, 256)
 texture = SubResource("GradientTexture2D_o4abh")
-texture_scale = 2.0
+texture_scale = 8.0
 
-[node name="CanvasModulate" type="CanvasModulate" parent="."]
+[node name="CanvasModulate" type="CanvasModulate" parent="Sun"]
+scale = Vector2(0.00390625, 0.00390625)
 color = Color(0, 0, 0, 1)
 
 [node name="Misc" type="Node2D" parent="."]

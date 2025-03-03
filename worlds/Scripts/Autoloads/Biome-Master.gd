@@ -2,6 +2,7 @@ class_name Biome_Master extends Node;
 
 enum Type {NULL, Grass, Water, Earth};
 #enum Type {NULL, Earth, Grass, Water, Stone};
+enum Predefined {NULL, Cavern};
 
 const biomePrefab:PackedScene = preload("res://Prefabs/Biome.tscn");
 

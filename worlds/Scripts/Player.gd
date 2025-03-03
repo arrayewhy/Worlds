@@ -1,6 +1,6 @@
 extends Node2D;
 
-#@onready var biomeSpawner = $"Biome-Spawner";
+@onready var biomeSpawner = $"Biome-Spawner";
 
 @onready var mover:Node = $Mover;
 @onready var playerSpr:Sprite2D = $Sprite2D;
@@ -101,6 +101,8 @@ func Do_PlayerMove_BiomeSpawn_InterractionSpawn(inputDir:Vector2i, moveCam:bool 
 	#var prevGridPos = currGridPos;
 	# Update Current Grid Position
 	currGridPos += inputDir;
+	
+	var predefinedLocation:Biome_Master.Predefined = biomeSpawner.Predefined_Location(inputDir, currGridPos);
 	
 	# Spawn Biomes around new position
 	World.SpawnBiomesAround_Player(currGridPos);
