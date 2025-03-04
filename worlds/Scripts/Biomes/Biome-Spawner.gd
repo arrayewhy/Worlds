@@ -36,7 +36,7 @@ func SpawnRandomBiomes_Influenced(currGPos:Vector2i, spawnRange:int, influenceRa
 	# Get Surrounding Biomes with Grid Positions used to compare with each Spawn Point and get
 	# its Adjacent Biome Type, which will determine the Influences used in selecting the
 	# Type of the newly Spawned Biome.
-	var biomes_WithGPos:Array[Array] = Biome_Master.Surrounding_Biomes_WithGPos(currGPos, influenceRange);
+	var biomes_WithGPos:Array[Array] = Biome_Master.Surrounding_Biomes_WithGPos(currGPos, influenceRange, false);
 	
 	var influences:Array[Biome_Master.Type] = [];
 	for b in biomes_WithGPos:

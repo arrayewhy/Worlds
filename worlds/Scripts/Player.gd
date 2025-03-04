@@ -1,9 +1,9 @@
 extends Node2D;
 
-@onready var biomeSpawner = $"Biome-Spawner";
-
 @onready var mover:Node = $Mover;
 @onready var playerSpr:Sprite2D = $"Player-Sprite";
+@onready var biomeSpawner:Node = $"Biome-Spawner";
+@onready var worldTemplate:Node = $"World-Template";
 
 #@export var hover:Node;
 
@@ -22,13 +22,12 @@ var insideInteraction:bool;
 
 var timeSkips:int;
 
-signal EnterInteraction(state);
-
 var count:int = 0;
 
 func _ready() -> void:
 	currGridPos = initGridPos;
-	World.SpawnBiomes_Around(currGridPos, 2);
+	#World.SpawnBiomes_Around(currGridPos, 2);
+	worldTemplate.SpawnBiomes_FromImage();
 
 #func _process(delta: float) -> void:
 	#
@@ -92,16 +91,18 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		if !insideInteraction:
 			MultiFader.FadeTo_Trans(playerSpr);
 			insideInteraction = true;
-			EnterInteraction.emit(true);
 		#timeSkips = 1;
 	elif nextInteraction != Interaction_Master.Type.Forest:
 		if insideInteraction:
 			MultiFader.FadeTo_Opaque(playerSpr);
 			insideInteraction = false;
-			EnterInteraction.emit(false);
-		
+	
+	# LEFTOFF
+	# Cannot walk onto DARKNESS
+	if Biome_Master.Get_BiomeType(nextGPos) == Biome_Master.Type.DARKNESS:
+		return;
+	
 	# Move and Spawn
-		
 	Do_PlayerMove_BiomeSpawn_InterractionSpawn(inputDir);
 	
 func Get_DirectionInput(event:InputEvent) -> Vector2i:

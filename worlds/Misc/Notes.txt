@@ -33,13 +33,13 @@ SPECULATIVE:
 BUGS ----------------------------------------------------------------------------------------------------
 
 HIGH PRIORITY:
-	- Biome Melding Queue Free Issue:
-		Sometimes, we try to free a biome object when it is still fading, crashing the Multi-Fader
+	- In-land water sometimes causes Multi-Fade crash? Same as previous issue?
 	
 LOW PRIORITY:
 	- Interactions on Initial Biomes aren't visible
 
 >>> FIXED:
+
 	- 1 Signal Emit, Multiple Function Calls:
 		Interaction-Updater function (On_WorldTick) connected to World.TimeTick fires between
 		1~3 times every time World.TimeTick is emitted.
@@ -47,6 +47,12 @@ LOW PRIORITY:
 		SOLUTION:
 			- Only connect Active Interactions to World.TimeTick, and 
 			disconnect them when NOT active (InteractionMaster.Type.NULL).
+
+	- Biome Melding Queue Free Issue:
+		Sometimes, we try to free a biome object when it is still fading, crashing the Multi-Fader
+
+		SOLUTION:
+			- Handle the fading with a local tween, and set queue_free as the callback.
 
 FEEDBACK ----------------------------------------------------------------------------------------------------
 
@@ -61,4 +67,5 @@ SPECULATIVE:
 
 KEYS ----------------------------------------------------------------------------------------------------
 
+# LEFTOFF - Where we left off from last session
 # HOTFIX - Temporary fixes

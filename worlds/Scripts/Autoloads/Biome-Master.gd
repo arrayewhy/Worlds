@@ -1,7 +1,6 @@
 class_name Biome_Master extends Node;
 
-enum Type {NULL, Grass, Water, Earth};
-#enum Type {NULL, Earth, Grass, Water, Stone};
+enum Type {NULL, DARKNESS, Grass, Water, Earth, Stone};
 enum Predefined {NULL, Cavern};
 
 const biomePrefab:PackedScene = preload("res://Prefabs/Biome.tscn");
@@ -11,16 +10,17 @@ static func RandomBiomeType_Core() -> int:
 	# 1. Return an Int instead of a Type since this is faster.
 	# If this doesn't suffice, do a Match and return the appropriate Type as a String.
 	
-	# 2. We treat Grass, and Water as core biomes.
+	# 2. We treat Grass, Earth, and Water as core biomes.
 	
-	return randi_range(1, 2);
+	return randi_range(2, 4);
 	
 static func RandomBiomeType_Land() -> int:
 	# Return an Int instead of a Type since this is faster.
 	# If this doesn't suffice, do a Match and return the appropriate Type as a String.
 	var types = Type.keys();
 	types.erase(Type.keys()[Type.Water]);
-	return randi_range(1, types.size() - 1);
+	print(types);
+	return randi_range(2, types.size() - 2);
 
 # Functions ----------------------------------------------------------------------------------------------------
 
@@ -46,27 +46,33 @@ static func Get_BiomeType(gPos:Vector2i, discBiomes:Dictionary = World.Discovere
 	InGameDebugger.Warn(str("Biome NOT found: ", gPos));
 	return Biome_Master.Type.NULL;
 
-static func Surrounding_Biomes(gPos:Vector2i, reach:int, removeCent:bool) -> Array[Biome_Master.Type]:
+static func Surrounding_Biomes(gPos:Vector2i, reach:int, removeCent:bool, includeDark:bool) -> Array[Biome_Master.Type]:
 	var surrounding_GPos:Array[Vector2i] = GridPos_Utils.GridPositions_Around(gPos, reach, removeCent);
 	# Remove Empty Positions in case we are at the World Edge
 	surrounding_GPos = GridPos_Utils.Remove_Empty(surrounding_GPos);
 	
 	var biomesAround:Array[Biome_Master.Type]; # Array[Biome Type]
 	
-	for p in surrounding_GPos:
-		biomesAround.append(Biome_Master.Get_BiomeType(p));
+	for gp in surrounding_GPos:
+		var currType:Biome_Master.Type = Biome_Master.Get_BiomeType(gp);
+		if !includeDark and currType == Biome_Master.Type.DARKNESS:
+			continue;
+		biomesAround.append(currType);
 	
 	return biomesAround;
 
-static func Surrounding_Biomes_WithGPos(gPos:Vector2i, reach:int) -> Array[Array]:
+static func Surrounding_Biomes_WithGPos(gPos:Vector2i, reach:int, includeDark:bool) -> Array[Array]:
 	var surrounding_GPos:Array[Vector2i] = GridPos_Utils.GridPositions_Around(gPos, reach);
 	# Remove Empty Positions in case we are at the World Edge
 	surrounding_GPos = GridPos_Utils.Remove_Empty(surrounding_GPos);
 	
 	var biomesAround:Array[Array]; # Array[Grid Pos, Biome Type]
 	
-	for p in surrounding_GPos:
-		biomesAround.append([p, Biome_Master.Get_BiomeType(p)]);
+	for gp in surrounding_GPos:
+		var currType:Biome_Master.Type = Biome_Master.Get_BiomeType(gp);
+		if !includeDark and currType == Biome_Master.Type.DARKNESS:
+			continue;
+		biomesAround.append([gp, currType]);
 	
 	return biomesAround;
 

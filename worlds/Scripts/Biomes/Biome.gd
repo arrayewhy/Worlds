@@ -32,21 +32,39 @@ func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type) -> void:
 			MultiFader.FadeTo_Opaque(biomeSprite, 1, true);
 		Biome_Master.Type.Water:
 			Prep_Water();
+			#MultiFader.FadeTo_Opaque(biomeSprite, 1, true);
 			MultiFader.FadeTo_Alpha(biomeSprite, .2, 0, .25);
-		#Biome_Master.Type.Stone:
-			#Prep_Stone();
-			#MultiFader.FadeTo_Opaque(biomeSprite, 2, true);
+		Biome_Master.Type.Stone:
+			Prep_Stone();
+			MultiFader.FadeTo_Opaque(biomeSprite, 2, true);
+		Biome_Master.Type.DARKNESS:
+			Prep_DARKNESS();
+			MultiFader.FadeTo_Opaque(biomeSprite, 1, true);
 		_:
 			InGameDebugger.Warn("Failed to Initialise Biome: No type specified.");
 			
-	Check_Surroundings();
+	#Check_Surroundings();
 		
 func Check_Surroundings() -> void:
+
 	if GridPos_Utils.Empties_Around(gridPos, 1, true).size() == 0:
+		
+		var surroundingBiomes:Array[Biome_Master.Type] = Biome_Master.Surrounding_Biomes(gridPos, 1, true, false);
+		var waters:int = surroundingBiomes.count(Biome_Master.Type.Water);
 		
 		# Retain Water Full Opacity
 		if type == Biome_Master.Type.Water:
-			MultiFader.FadeTo_Alpha(biomeSprite, 1, biomeSprite.modulate.a, 0.8);
+			var targDepth:float = 1 - (waters * .1);
+			MultiFader.FadeTo_Alpha(biomeSprite, targDepth, biomeSprite.modulate.a, targDepth);
+			#MultiFader.FadeTo_Alpha(biomeSprite, 1, biomeSprite.modulate.a, 0.8);
+		else:
+			if waters < 8:
+				if waters > 6:
+					var tween:Tween = create_tween();
+					tween.tween_property(biomeSprite, "modulate", Color(1, 1, 1, .65), 4);
+			else:
+				var tween:Tween = create_tween();
+				tween.tween_property(biomeSprite, "modulate", Color(1, 1, 1, .4), 4);
 		
 		return;
 
@@ -63,8 +81,6 @@ func On_TimeTick() -> void:
 	#if dist >= 3:
 		#biomeSprite.modulate.a = 0.5; # PRETTY WATER DEPTHS (Refer to Notes)
 		#return;
-		
-	#biomeSprite.modulate.a = 1; # PRETTY WATER DEPTHS (Refer to Notes)
 	
 	if GridPos_Utils.Empties_Around(gridPos, 1, true).size() > 0:
 		return;
@@ -72,7 +88,7 @@ func On_TimeTick() -> void:
 	# Make Y-Sort put the newly spawned biome behind the existing biome
 	#var newBiomeOffset := Vector2(0, -10);
 
-	var surroundingBiomes:Array[Biome_Master.Type] = Biome_Master.Surrounding_Biomes(gridPos, 1, true);
+	var surroundingBiomes:Array[Biome_Master.Type] = Biome_Master.Surrounding_Biomes(gridPos, 1, true, false);
 	var waters:int = surroundingBiomes.count(Biome_Master.Type.Water);
 
 	match type:
@@ -102,9 +118,6 @@ func On_TimeTick() -> void:
 			else:
 				var tween:Tween = create_tween();
 				tween.tween_property(biomeSprite, "modulate", Color(1, 1, 1, .4), 4);
-			#Biome_Master.SpawnBiome(gridPos, Biome_Master.Type.Water, get_parent(), Interaction_Master.Type.NULL, newBiomeOffset);
-			#interaction.Disable();
-			#FadeAndDelete(biomeSprite);
 	
 	World.TimeTick.disconnect(On_TimeTick);
 
@@ -129,10 +142,14 @@ func Prep_Grass() -> void:
 func Prep_Water() -> void:
 	type = Biome_Master.Type.Water;
 	biomeSprite.region_rect.position = Vector2i(0, 0);
-
-#func Prep_Stone() -> void:
-	#type = Biome_Master.Type.Stone;
-	#biomeSprite.region_rect.position = Vector2i(512, 0);
+	
+func Prep_Stone() -> void:
+	type = Biome_Master.Type.Stone;
+	biomeSprite.region_rect.position = Vector2i(512, 0);
+	
+func Prep_DARKNESS() -> void:
+	type = Biome_Master.Type.DARKNESS;
+	biomeSprite.region_rect.position = Vector2i(1792, 0);
 
 # Functions: Interactions ----------------------------------------------------------------------------------------------------
 
