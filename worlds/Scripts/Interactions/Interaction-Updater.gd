@@ -2,6 +2,7 @@ extends Node;
 
 func On_WorldTick() -> void:
 	
+	# 50% Chance
 	if !Interaction_Master.Pass_ProbabilityCheck(Interaction_Master.Get_MaxChance()/2):
 		return;
 	

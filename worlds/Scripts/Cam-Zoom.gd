@@ -9,7 +9,6 @@ const zoomLimit:int = 1;
 func _ready() -> void:
 	cam = get_parent();
 	initZoom = cam.zoom;
-	get_parent().Zoom.connect(Zoom);
 
 func Zoom() -> void:
 	var worldSize:int = World.Get_WorldSize();

@@ -3,14 +3,15 @@ extends Node2D;
 @onready var mover:Node = $Mover;
 @onready var playerSpr:Sprite2D = $"Player-Sprite";
 @onready var biomeSpawner:Node = $"Biome-Spawner";
-@onready var worldTemplate:Node = $"World-Template";
+@onready var worldTemplates:Node = $"World-Templates";
 
 #@export var hover:Node;
 
 @export var microView:CanvasLayer;
+@export var cam:Camera2D;
 @export var camMover:Node;
 
-const initGridPos := Vector2i(0,0);
+const initGridPos := Vector2i(1, 13);
 const movementInterval:float = 0.5;
 
 var currGridPos:Vector2i;
@@ -22,8 +23,10 @@ var timeSkips:int;
 
 func _ready() -> void:
 	currGridPos = initGridPos;
+	self.position = currGridPos * World.CellSize();
+	cam.position = self.position;
 	#World.SpawnBiomes_Around(currGridPos, 2);
-	worldTemplate.SpawnBiomes_FromImage();
+	worldTemplates.SpawnBiomes_FromImage(0);
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	

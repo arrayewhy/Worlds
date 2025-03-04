@@ -1,6 +1,5 @@
 [gd_scene load_steps=24 format=3 uid="uid://dpw5ih7gg3btv"]
 
-[ext_resource type="Script" path="res://Scripts/Main-Camera.gd" id="1_e4dtk"]
 [ext_resource type="Texture2D" uid="uid://dk06eplgkeoi2" path="res://Sprites/Clack_Map_SpriteSheet_2048.png" id="1_ntyhy"]
 [ext_resource type="Script" path="res://Scripts/Mover.gd" id="1_vinv6"]
 [ext_resource type="Script" path="res://Scripts/Player.gd" id="2_54uhw"]
@@ -10,12 +9,13 @@
 [ext_resource type="Script" path="res://Scripts/UI/Illuminations-Handler.gd" id="6_ljcja"]
 [ext_resource type="Image" uid="uid://b3sydyghnrqb7" path="res://Sprites/World-Templates/WT_Birth.png" id="7_fcw8p"]
 [ext_resource type="Script" path="res://Scripts/UI/Illumination-Spawner.gd" id="7_rmeg4"]
+[ext_resource type="Script" path="res://Scripts/World-Templates.gd" id="7_t1ont"]
 [ext_resource type="Script" path="res://Scripts/Fader.gd" id="8_u5mxs"]
 [ext_resource type="Script" path="res://Scripts/UI/Black-Bars.gd" id="8_umww4"]
 [ext_resource type="AudioStream" uid="uid://sos25qvtf0mq" path="res://Audio/SFX/Desert-Wind_611257__newlocknew__windsynth-3winter3osc.wav" id="12_py2jo"]
 [ext_resource type="AudioStream" uid="uid://cgv7itiiugmiq" path="res://Audio/SFX/Forest_634315__klankbeeld__border-forestfarmfield-727am-nl-eu-220515_0345.wav" id="13_wbwr2"]
 [ext_resource type="PackedScene" uid="uid://cf233120e3l52" path="res://Prefabs/Dice.tscn" id="14_1cw2s"]
-[ext_resource type="Script" path="res://Scripts/Image-Data-Handler.gd" id="15_4vccs"]
+[ext_resource type="Image" uid="uid://bvafusrsjjlrn" path="res://Sprites/World-Templates/WT-Circle64.png" id="15_y08cy"]
 
 [sub_resource type="GDScript" id="GDScript_lhawh"]
 resource_name = "Player-Sprite"
@@ -43,67 +43,51 @@ func Is_Swim() -> bool:
 	return _currState == SpriteState.Swim;
 "
 
-[sub_resource type="GDScript" id="GDScript_1rs1b"]
-resource_name = "World-Template"
-script/source = "extends Node
-
-@onready var imgDataHandler:Node = $\"Image-Data-Handler\";
-
-@export var worldTemplate:Image;
-@export var biomeHolder:Node;
-
-#func _ready() -> void:
-	#SpawnBiomes_FromImage();
-
-func SpawnBiomes_FromImage() -> void:
-	
-	var colArray:Array[Color] = imgDataHandler.ImageToColArray(worldTemplate);
-	var currGPos:Vector2i = Vector2i(0, 0);
-	
-	var offset:Vector2i = (Vector2i(worldTemplate.get_width(), worldTemplate.get_height()) - Vector2i(1, 1)) / 2;
-	
-	for i in colArray.size():
-		match colArray[i]:
-			
-			Color(150, 250, 50, 255): # Grass
-				Biome_Master.SpawnBiome(currGPos - offset, Biome_Master.Type.Grass, biomeHolder, \\
-				Interaction_Master.Type.NULL);
-				
-			Color(150, 150, 150, 255): # Stone
-				Biome_Master.SpawnBiome(currGPos - offset, Biome_Master.Type.Stone, biomeHolder, \\
-				Interaction_Master.Type.NULL);
-			
-			Color(0, 0, 0, 255): # DARKNESS
-				Biome_Master.SpawnBiome(currGPos - offset, Biome_Master.Type.DARKNESS, biomeHolder, \\
-				Interaction_Master.Type.NULL);
-			
-			Color(255, 0, 255, 255): # Random
-				Biome_Master.SpawnBiome(currGPos - offset, Biome_Master.RandomBiomeType_Core(), biomeHolder, \\
-				Interaction_Master.Type.NULL);
-			_:
-				pass;
-				
-		if currGPos.x == worldTemplate.get_width() - 1:
-			currGPos.x = 0;
-			currGPos.y += 1;
-			continue;
-		currGPos.x += 1;
-		
-	#print(colArray.size());
-"
-
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_bu5ns"]
-size = Vector2(1920, 48)
-
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_dwwpb"]
-size = Vector2(48, 1080)
-
 [sub_resource type="GDScript" id="GDScript_wj4f3"]
 resource_name = "Visual Reference"
 script/source = "extends Node2D;
 
 func _ready() -> void:
 	hide();
+"
+
+[sub_resource type="GDScript" id="GDScript_acxdq"]
+resource_name = "Hover"
+script/source = "extends Node2D;
+
+var hoverTargs:Dictionary = {};
+
+var detectionRange:float = 128;
+var offset:float = -48;
+
+func _process(_delta: float) -> void:
+	
+	var mousePos:Vector2 = get_global_mouse_position();
+	
+	for i in World.DiscoveredBiomes():
+		
+		# If mouse is near biome object
+		var worldPos:Vector2 = i * float(World.CellSize());
+		if worldPos.distance_to(mousePos) < detectionRange:
+			
+			# If it has already been offset, skip it.
+			if hoverTargs.has(i):
+				continue;
+			
+			# 1. Get the biome's object
+			var biomeObj:Object = World.DiscoveredBiomes().get(i)[0];
+			# 2. Record its position
+			hoverTargs[i] = biomeObj.position;
+			# 3. Offset its Y
+			biomeObj.position.y += offset;
+			return;
+			
+		# If mouse is NOT near biome object, and it was offset
+		if hoverTargs.has(i):
+			# Reset its position
+			World.DiscoveredBiomes().get(i)[0].position = hoverTargs[i];
+			# Remove its record
+			hoverTargs.erase(i);
 "
 
 [sub_resource type="GDScript" id="GDScript_s5h60"]
@@ -147,43 +131,29 @@ func On_EnterInteraction(state:bool) -> void:
 	set_process(true);
 "
 
-[sub_resource type="GDScript" id="GDScript_acxdq"]
-resource_name = "Hover"
-script/source = "extends Node2D;
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_bu5ns"]
+size = Vector2(1920, 48)
 
-var hoverTargs:Dictionary = {};
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_dwwpb"]
+size = Vector2(48, 1080)
 
-var detectionRange:float = 128;
-var offset:float = -48;
+[sub_resource type="GDScript" id="GDScript_cp1f4"]
+resource_name = "Num-Inputs"
+script/source = "extends Node
 
-func _process(_delta: float) -> void:
+@export var camZoom:Node;
+
+func _unhandled_key_input(event: InputEvent) -> void:
 	
-	var mousePos:Vector2 = get_global_mouse_position();
+	#if event.is_action_pressed(\"One\"):
 	
-	for i in World.DiscoveredBiomes():
-		
-		# If mouse is near biome object
-		var worldPos:Vector2 = i * float(World.CellSize());
-		if worldPos.distance_to(mousePos) < detectionRange:
-			
-			# If it has already been offset, skip it.
-			if hoverTargs.has(i):
-				continue;
-			
-			# 1. Get the biome's object
-			var biomeObj:Object = World.DiscoveredBiomes().get(i)[0];
-			# 2. Record its position
-			hoverTargs[i] = biomeObj.position;
-			# 3. Offset its Y
-			biomeObj.position.y += offset;
-			return;
-			
-		# If mouse is NOT near biome object, and it was offset
-		if hoverTargs.has(i):
-			# Reset its position
-			World.DiscoveredBiomes().get(i)[0].position = hoverTargs[i];
-			# Remove its record
-			hoverTargs.erase(i);
+	if event.is_action_pressed(\"Two\"):
+		camZoom.Zoom();
+
+	#if event.is_action_pressed(\"Three\"):
+
+	if event.is_action_pressed(\"Zero\"):
+		InGameDebugger.Say(World.PlayerGridPos());
 "
 
 [node name="World" type="Node2D"]
@@ -191,7 +161,6 @@ top_level = true
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(0.125, 0.125)
-script = ExtResource("1_e4dtk")
 
 [node name="Mover" type="Node" parent="Camera2D" node_paths=PackedStringArray("master")]
 script = ExtResource("1_vinv6")
@@ -201,10 +170,11 @@ speed = 0.5
 [node name="Cam-Zoom" type="Node" parent="Camera2D"]
 script = ExtResource("3_xox30")
 
-[node name="Player" type="Node2D" parent="." node_paths=PackedStringArray("microView", "camMover")]
+[node name="Player" type="Node2D" parent="." node_paths=PackedStringArray("microView", "cam", "camMover")]
 z_index = 100
 script = ExtResource("2_54uhw")
-microView = NodePath("../MicroView")
+microView = NodePath("../Misc/MicroView")
+cam = NodePath("../Camera2D")
 camMover = NodePath("../Camera2D/Mover")
 
 [node name="Player-Sprite" type="Sprite2D" parent="Player"]
@@ -225,63 +195,14 @@ minDist = 1.0
 frameByFrame = true
 emitSignal = true
 
-[node name="World-Template" type="Node" parent="Player" node_paths=PackedStringArray("biomeHolder")]
-script = SubResource("GDScript_1rs1b")
-worldTemplate = ExtResource("7_fcw8p")
+[node name="World-Templates" type="Node" parent="Player" node_paths=PackedStringArray("biomeHolder")]
+script = ExtResource("7_t1ont")
+images = Array[Image]([ExtResource("7_fcw8p"), ExtResource("15_y08cy")])
 biomeHolder = NodePath("../../Biome-Holder")
-
-[node name="Image-Data-Handler" type="Node" parent="Player/World-Template"]
-script = ExtResource("15_4vccs")
 
 [node name="Biome-Holder" type="Node2D" parent="."]
 y_sort_enabled = true
 metadata/_edit_lock_ = true
-
-[node name="Illuminations-Layer" type="CanvasLayer" parent="."]
-process_mode = 4
-visible = false
-script = ExtResource("6_ljcja")
-
-[node name="Illumination-Spawner" type="Node2D" parent="Illuminations-Layer"]
-z_index = 1
-script = ExtResource("7_rmeg4")
-illum = ExtResource("6_2cew8")
-
-[node name="Black-Bars" type="Node2D" parent="Illuminations-Layer"]
-script = ExtResource("8_umww4")
-
-[node name="Top" type="Sprite2D" parent="Illuminations-Layer/Black-Bars"]
-modulate = Color(0, 0, 0, 1)
-position = Vector2(960, 0)
-texture = SubResource("PlaceholderTexture2D_bu5ns")
-offset = Vector2(0, 24)
-metadata/_edit_lock_ = true
-
-[node name="Bottom" type="Sprite2D" parent="Illuminations-Layer/Black-Bars"]
-modulate = Color(0, 0, 0, 1)
-position = Vector2(960, 1080)
-texture = SubResource("PlaceholderTexture2D_bu5ns")
-offset = Vector2(0, -24)
-metadata/_edit_lock_ = true
-
-[node name="Left" type="Sprite2D" parent="Illuminations-Layer/Black-Bars"]
-modulate = Color(0, 0, 0, 1)
-position = Vector2(0, 540)
-texture = SubResource("PlaceholderTexture2D_dwwpb")
-offset = Vector2(24, 0)
-metadata/_edit_lock_ = true
-
-[node name="Right" type="Sprite2D" parent="Illuminations-Layer/Black-Bars"]
-modulate = Color(0, 0, 0, 1)
-position = Vector2(1920, 540)
-texture = SubResource("PlaceholderTexture2D_dwwpb")
-offset = Vector2(-24, 0)
-metadata/_edit_lock_ = true
-
-[node name="Illumination-Fader" type="Node" parent="Illuminations-Layer" node_paths=PackedStringArray("target")]
-script = ExtResource("8_u5mxs")
-target = NodePath("../Illumination-Spawner")
-startVisible = false
 
 [node name="Audio" type="Node" parent="."]
 process_mode = 4
@@ -359,10 +280,20 @@ texture = ExtResource("1_ntyhy")
 region_enabled = true
 region_rect = Rect2(0, 0, 256, 256)
 
-[node name="MicroView" type="CanvasLayer" parent="."]
+[node name="Misc" type="Node2D" parent="."]
+process_mode = 4
 visible = false
 
-[node name="ColorRect" type="ColorRect" parent="MicroView" node_paths=PackedStringArray("player")]
+[node name="Dice" parent="Misc" instance=ExtResource("14_1cw2s")]
+position = Vector2(0, 0)
+
+[node name="Hover" type="Node2D" parent="Misc"]
+script = SubResource("GDScript_acxdq")
+
+[node name="MicroView" type="CanvasLayer" parent="Misc"]
+visible = false
+
+[node name="ColorRect" type="ColorRect" parent="Misc/MicroView" node_paths=PackedStringArray("player")]
 z_index = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -375,14 +306,54 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(1, 0, 1, 1)
 script = SubResource("GDScript_s5h60")
-player = NodePath("../../Player")
+player = NodePath("../../../Player")
 
-[node name="Misc" type="Node2D" parent="."]
+[node name="Illuminations-Layer" type="CanvasLayer" parent="Misc"]
 process_mode = 4
 visible = false
+script = ExtResource("6_ljcja")
 
-[node name="Dice" parent="Misc" instance=ExtResource("14_1cw2s")]
-position = Vector2(0, 0)
+[node name="Illumination-Spawner" type="Node2D" parent="Misc/Illuminations-Layer"]
+z_index = 1
+script = ExtResource("7_rmeg4")
+illum = ExtResource("6_2cew8")
 
-[node name="Hover" type="Node2D" parent="Misc"]
-script = SubResource("GDScript_acxdq")
+[node name="Black-Bars" type="Node2D" parent="Misc/Illuminations-Layer"]
+script = ExtResource("8_umww4")
+
+[node name="Top" type="Sprite2D" parent="Misc/Illuminations-Layer/Black-Bars"]
+modulate = Color(0, 0, 0, 1)
+position = Vector2(960, 0)
+texture = SubResource("PlaceholderTexture2D_bu5ns")
+offset = Vector2(0, 24)
+metadata/_edit_lock_ = true
+
+[node name="Bottom" type="Sprite2D" parent="Misc/Illuminations-Layer/Black-Bars"]
+modulate = Color(0, 0, 0, 1)
+position = Vector2(960, 1080)
+texture = SubResource("PlaceholderTexture2D_bu5ns")
+offset = Vector2(0, -24)
+metadata/_edit_lock_ = true
+
+[node name="Left" type="Sprite2D" parent="Misc/Illuminations-Layer/Black-Bars"]
+modulate = Color(0, 0, 0, 1)
+position = Vector2(0, 540)
+texture = SubResource("PlaceholderTexture2D_dwwpb")
+offset = Vector2(24, 0)
+metadata/_edit_lock_ = true
+
+[node name="Right" type="Sprite2D" parent="Misc/Illuminations-Layer/Black-Bars"]
+modulate = Color(0, 0, 0, 1)
+position = Vector2(1920, 540)
+texture = SubResource("PlaceholderTexture2D_dwwpb")
+offset = Vector2(-24, 0)
+metadata/_edit_lock_ = true
+
+[node name="Illumination-Fader" type="Node" parent="Misc/Illuminations-Layer" node_paths=PackedStringArray("target")]
+script = ExtResource("8_u5mxs")
+target = NodePath("../Illumination-Spawner")
+startVisible = false
+
+[node name="Num-Inputs" type="Node" parent="." node_paths=PackedStringArray("camZoom")]
+script = SubResource("GDScript_cp1f4")
+camZoom = NodePath("../Camera2D/Cam-Zoom")
