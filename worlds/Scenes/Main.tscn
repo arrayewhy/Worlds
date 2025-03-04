@@ -139,9 +139,31 @@ size = Vector2(48, 1080)
 
 [sub_resource type="GDScript" id="GDScript_cp1f4"]
 resource_name = "Num-Inputs"
-script/source = "extends Node
+script/source = "extends Node2D;
 
+# Two
 @export var camZoom:Node;
+# Three
+const lightPrefab:PackedScene = preload(\"res://Prefabs/Cavern-Light.tscn\");
+@export var lightHolder:Node;
+
+func _unhandled_input(event: InputEvent) -> void:
+	
+	# Three
+	
+	if event.is_action_pressed(\"Left-Click\"):
+	
+		for light in lightHolder.get_children():
+			#if light.global_position.distance_to(World.PlayerGridPos() * World.CellSize()) <= 1:
+			if light.global_position.distance_to(get_global_mouse_position()) <= 256:
+				light.queue_free();
+				return;
+			
+		var newLight:PointLight2D = lightPrefab.instantiate();
+		lightHolder.add_child(newLight);
+		#newLight.position = World.PlayerGridPos() * World.CellSize();
+		newLight.position = get_global_mouse_position();
+		return;
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	
@@ -150,7 +172,19 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if event.is_action_pressed(\"Two\"):
 		camZoom.Zoom();
 
-	#if event.is_action_pressed(\"Three\"):
+	if event.is_action_pressed(\"Three\"):
+		
+		for light in lightHolder.get_children():
+			if light.global_position.distance_to(World.PlayerGridPos() * World.CellSize()) <= 1:
+			#if light.global_position.distance_to(get_global_mouse_position()) <= 256:
+				light.queue_free();
+				return;
+		
+		var newLight:PointLight2D = lightPrefab.instantiate();
+		lightHolder.add_child(newLight);
+		newLight.position = World.PlayerGridPos() * World.CellSize();
+		#newLight.position = get_global_mouse_position();
+		return;
 
 	if event.is_action_pressed(\"Zero\"):
 		InGameDebugger.Say(World.PlayerGridPos());
@@ -354,6 +388,17 @@ script = ExtResource("8_u5mxs")
 target = NodePath("../Illumination-Spawner")
 startVisible = false
 
-[node name="Num-Inputs" type="Node" parent="." node_paths=PackedStringArray("camZoom")]
+[node name="Number-Input-Handler" type="Node2D" parent="." node_paths=PackedStringArray("camZoom", "lightHolder")]
 script = SubResource("GDScript_cp1f4")
 camZoom = NodePath("../Camera2D/Cam-Zoom")
+lightHolder = NodePath("../Lighting/Caverns/Lights")
+metadata/_edit_lock_ = true
+
+[node name="Lighting" type="Node" parent="."]
+
+[node name="Caverns" type="Node" parent="Lighting"]
+
+[node name="CanvasModulate" type="CanvasModulate" parent="Lighting/Caverns"]
+color = Color(0, 0, 0, 1)
+
+[node name="Lights" type="Node" parent="Lighting/Caverns"]

@@ -21,12 +21,23 @@ var insideInteraction:bool;
 
 var timeSkips:int;
 
+# Signals
+signal PlayerSpawned;
+
+# Functions [ 1 / 5 ] ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
 func _ready() -> void:
+	
 	currGridPos = initGridPos;
+	World.Set_PlayerGridPos(currGridPos);
+	
 	self.position = currGridPos * World.CellSize();
 	cam.position = self.position;
+	
 	#World.SpawnBiomes_Around(currGridPos, 2);
 	worldTemplates.SpawnBiomes_FromImage(0);
+	
+	PlayerSpawned.emit();
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	
@@ -56,7 +67,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	
 	MovePlayer_Then_Spawn_Biomes_And_Interactions(inputDir);
 
-# Functions [ 1 / 4 ] ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+# Functions [ 2 / 5 ] ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 func MovePlayer_Then_Spawn_Biomes_And_Interactions(inputDir:Vector2i, moveCam:bool = true) -> void:
 	
@@ -99,7 +110,7 @@ func MovePlayer_Then_Spawn_Biomes_And_Interactions(inputDir:Vector2i, moveCam:bo
 	
 	World.Roll_Dice();
 
-# Functions [ 2 / 4 ]: Debug ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+# Functions [ 3 / 5 ]: Debug ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 func RandomReveal(revealerGPos:Vector2i) -> void:
 	
@@ -123,7 +134,7 @@ func FadeIntoInteraction(gPos:Vector2i) -> void:
 		MultiFader.FadeTo_Opaque(playerSpr);
 		insideInteraction = false;
 
-# Functions [ 3 / 4 ] ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+# Functions [ 4 / 5 ] ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 func Get_DirectionInput(event:InputEvent) -> Vector2i:
 	if event.is_action("Up"):
@@ -136,7 +147,7 @@ func Get_DirectionInput(event:InputEvent) -> Vector2i:
 		return Vector2i.RIGHT;
 	return Vector2i.ZERO;
 
-# Functions [ 4 / 4 ] ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+# Functions [ 5 / 5 ] ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 func SpawnBiomes_ExpandingCircle(count:int) -> void:
 	var targs:Array[Vector2i] = GridPos_Utils.GridPositions_Around(currGridPos, 5 + count, true);

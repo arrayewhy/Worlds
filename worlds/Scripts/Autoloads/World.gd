@@ -113,3 +113,6 @@ func DiscoveredBiomes() -> Dictionary:
 
 func PlayerGridPos() -> Vector2i:
 	return _playerGridPos;
+
+func Set_PlayerGridPos(gPos:Vector2i) -> void:
+	_playerGridPos = gPos;
