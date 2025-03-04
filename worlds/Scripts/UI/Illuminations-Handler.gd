@@ -5,19 +5,21 @@ extends CanvasLayer;
 
 var showing:bool;
 
-func _ready() -> void:
-	self.hide();
+#func _ready() -> void:
+	#self.hide();
+#
+#func _process(_delta: float) -> void:
+	#if Input.is_action_just_pressed("Enter"):
+		#Toggle();
 
-func _process(_delta: float) -> void:
-	if Input.is_action_just_pressed("Enter"):
-		if !showing:
-			showing = true;
-			Show_Illums();
-			return;
-		else:
-			showing = false;
-			Hide_Illums();
-		
+func Toggle() -> void:
+	if !showing:
+		showing = true;
+		Show_Illums();
+		return;
+	showing = false;
+	Hide_Illums();
+
 func Show_Illums() -> void:
 	if !visible:
 		show();

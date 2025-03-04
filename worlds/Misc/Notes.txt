@@ -1,6 +1,8 @@
-UPCOMING ----------------------------------------------------------------------------------------------------
+UPCOMING ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 HIGH PRIORITY:
+	- Change Discovered Biomes [Grid Position : (Object), Biome Type] -> Recorded Biomes [Grid Position : Biome Type, Object]
+		- Recorded Biomes can exist without a Biome Object, which can be instantiated later.
 	- Entering Forests and Towns opens a Zoom View, slowing Overworld Movement
 	- World Template / World Edge through Sprite Pixel Info
 	
@@ -30,7 +32,7 @@ SPECULATIVE:
 	- Merge signals SpawnBiomesAroundPlayer & SpawnBiomes in World.gd
 	- PRETTY WATER DEPTHS
 
-BUGS ----------------------------------------------------------------------------------------------------
+BUGS ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 HIGH PRIORITY:
 	- In-land water sometimes causes Multi-Fade crash? Same as previous issue?
@@ -54,18 +56,18 @@ LOW PRIORITY:
 		SOLUTION:
 			- Handle the fading with a local tween, and set queue_free as the callback.
 
-FEEDBACK ----------------------------------------------------------------------------------------------------
+FEEDBACK ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 OBSERVATIONS:
 	- Lesley<3: Wanted to click on the biomes
 	- Sherry: "How do I play? This is too hard!"
 
-STORY ----------------------------------------------------------------------------------------------------
+STORY ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 SPECULATIVE:
 	- Forced to cross channel between 2 river mouths (war at one mouth, danger at the other)
 
-KEYS ----------------------------------------------------------------------------------------------------
+KEYS ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 # LEFTOFF - Where we left off from last session
 # HOTFIX - Temporary fixes

@@ -5,7 +5,6 @@ const _cellSize:int = 256;
 # Variables: World
 var worldSize:int = 1;
 var _playerGridPos:Vector2i;
-var _paused:bool;
 # Variables: Biomes
 var _discoveredBiomes = {}; # Grid Position : [Biome Object, Biome Type]
 #var _currBiases:Dictionary;
@@ -25,7 +24,7 @@ func _ready() -> void:
 func Roll_Dice() -> void:
 	RollDice.emit();
 
-# Functions: Signals ----------------------------------------------------------------------------------------------------
+# Functions: Signals ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 func SpawnBiomesAround_Player(currGPos:Vector2i, spawnRange:int = 2, influenceRange:int = 1) -> void:
 	_playerGridPos = currGPos;
@@ -37,7 +36,7 @@ func SpawnBiomes_Around(gPos:Vector2i, spawnRange:int = 1, influenceRange:int = 
 func Advance_Time() -> void:
 	TimeTick.emit();
 
-# Functions: World Size ----------------------------------------------------------------------------------------------------
+# Functions: World Size ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 func CellSize() -> int:
 	return _cellSize;
@@ -52,17 +51,17 @@ func IncreaseWorldSize() -> void:
 	if _discoveredBiomes.size() % 1000 == 0:
 		Increase_WorldSize();
 
-# Functions: Interactions ----------------------------------------------------------------------------------------------------
+# Functions: Interactions ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 func InteractionChances() -> Dictionary:
 	return _interChances;
 
-# Functions: Biomes ----------------------------------------------------------------------------------------------------
+# Functions: Biomes ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 func DiscoveredBiomes() -> Dictionary:
 	return _discoveredBiomes;
 
-# Functions: Biome Bias ----------------------------------------------------------------------------------------------------
+# Functions: Biome Bias ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 #func UpdateBiases_AccordingTo_DistFromCenter(moveDir:Vector2i) -> void:
 	#match moveDir.y:
@@ -110,7 +109,7 @@ func DiscoveredBiomes() -> Dictionary:
 		#
 	#return biases;
 
-# Functions: Player ----------------------------------------------------------------------------------------------------
+# Functions: Player ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 func PlayerGridPos() -> Vector2i:
 	return _playerGridPos;

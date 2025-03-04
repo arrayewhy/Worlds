@@ -7,9 +7,9 @@ var _paused:bool;
 func _ready() -> void:
 	HideCurtain();
 
-# Functions ----------------------------------------------------------------------------------------------------
+# Functions ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
-func Toggle_Pause(user:String) -> void:
+func Toggle_Paused(user:String) -> void:
 	InGameDebugger.Say(str("Paused by: ", user));
 	_paused = !_paused;
 	if _paused:
@@ -21,7 +21,7 @@ func Toggle_Pause(user:String) -> void:
 func Is_Paused() -> bool:
 	return _paused;
 
-# Functions ----------------------------------------------------------------------------------------------------
+# Functions ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 func ShowCurtain() -> void:
 	curtain.color.a = 0.5;

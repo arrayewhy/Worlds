@@ -126,7 +126,7 @@ func FadeAndDelete(spr:Sprite2D) -> void:
 	tween.tween_property(spr, "modulate", Color.TRANSPARENT, 4);
 	tween.tween_callback(queue_free);
 
-# Functions: Biome Type ----------------------------------------------------------------------------------------------------
+# Functions: Biome Type ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 func Get_BiomeType() -> Biome_Master.Type:
 	return type;
@@ -151,7 +151,7 @@ func Prep_DARKNESS() -> void:
 	type = Biome_Master.Type.DARKNESS;
 	biomeSprite.region_rect.position = Vector2i(1792, 0);
 
-# Functions: Interactions ----------------------------------------------------------------------------------------------------
+# Functions: Interactions ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 func Initialise_Interaction(biomeType:Biome_Master.Type, interType:Interaction_Master.Type = Interaction_Master.Type.NULL) -> void:
 	if !interaction:
@@ -167,7 +167,7 @@ func Get_Interaction() -> Interaction_Master.Type:
 func Is_Interaction_Disabled() -> bool:
 	return interaction.Is_Disabled();
 
-# Functions: Grid Position ----------------------------------------------------------------------------------------------------
+# Functions: Grid Position ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 func Get_GridPosition() -> Vector2i:
 	return gridPos;

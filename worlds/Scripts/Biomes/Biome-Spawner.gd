@@ -8,7 +8,7 @@ extends Node;
 func _ready() -> void:
 	World.SpawnBiomesAround.connect(On_SpawnBiomesAround);
 
-# [ 1 / 3 ] Functions: Signal Handling ----------------------------------------------------------------------------------------------------
+# [ 1 / 3 ] Functions: Signal Handling ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 func On_SpawnBiomesAround(gPos:Vector2i, spawnRange:int, influenceRange:int):
 	if influenceRange == 0:
@@ -16,7 +16,7 @@ func On_SpawnBiomesAround(gPos:Vector2i, spawnRange:int, influenceRange:int):
 		return;
 	SpawnRandomBiomes_Influenced(gPos, spawnRange, influenceRange);
 
-# [ 2 / 3 ] Functions: Biome Spawning ----------------------------------------------------------------------------------------------------
+# [ 2 / 3 ] Functions: Biome Spawning ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 func SpawnRandomBiome(gPos:Vector2i, interType:Interaction_Master.Type = Interaction_Master.Type.NULL) -> void:
 	Biome_Master.SpawnBiome(gPos, Biome_Master.RandomBiomeType_Core(), biomeHolder, interType);
@@ -81,7 +81,7 @@ func NeighbourBias(neighbourBiome:Biome_Master.Type) -> Array[Biome_Master.Type]
 		InGameDebugger.Warn("No neighbour biases found.");
 	return bias;
 
-# [ 3 / 3 ] Functions ----------------------------------------------------------------------------------------------------
+# [ 3 / 3 ] Functions ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 static func Predefined_Location(dir:Vector2i, gPos:Vector2i) -> Biome_Master.Predefined:
 	

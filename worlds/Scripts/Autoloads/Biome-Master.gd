@@ -22,7 +22,7 @@ static func RandomBiomeType_Land() -> int:
 	print(types);
 	return randi_range(2, types.size() - 2);
 
-# Functions ----------------------------------------------------------------------------------------------------
+# Functions ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 static func Record_Biome(gPos:Vector2i, biome:Object, type:Biome_Master.Type, discBiomes:Dictionary = World.DiscoveredBiomes()) -> void:
 	discBiomes[gPos] = [biome, type];

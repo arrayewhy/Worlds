@@ -74,7 +74,7 @@ func Start_Alpha(spr:Sprite2D, spd:float, targAlpha:float) -> void:
 	if !is_processing():
 		set_process(true);
 
-# Functions ----------------------------------------------------------------------------------------------------
+# Functions ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 func FadeTo_Trans(spr:Sprite2D, spd:float = 2, startFromOpaque:bool = false) -> void:
 	if startFromOpaque:

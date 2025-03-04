@@ -54,8 +54,21 @@ static func Are_GridPosNeighbours(gPos:Vector2i, neighbourGPos:Vector2i, diagona
 		return true;
 		
 	return false;
+	
+static func Get_RandDirection() -> Vector2i:
+	match randi_range(0, 3):
+		0:
+			return Vector2i.UP;
+		1:
+			return Vector2i.DOWN;
+		2:
+			return Vector2i.LEFT;
+		3:
+			return Vector2i.RIGHT;
+		_:
+			return Vector2i.ZERO;
 
-# Functions: Removers ----------------------------------------------------------------------------------------------------
+# Functions: Removers ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 static func Remove_Occupied(gPosArray:Array[Vector2i]) -> Array[Vector2i]:
 	var empties:Array[Vector2i] = [];

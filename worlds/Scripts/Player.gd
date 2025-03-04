@@ -14,48 +14,21 @@ const initGridPos := Vector2i(0,0);
 const movementInterval:float = 0.5;
 
 var currGridPos:Vector2i;
-var revealerGPos := Vector2i.ZERO;
-var revealerDelay:float = 2;
 
 var moving:bool;
 var insideInteraction:bool;
 
 var timeSkips:int;
 
-var count:int = 0;
-
 func _ready() -> void:
 	currGridPos = initGridPos;
 	#World.SpawnBiomes_Around(currGridPos, 2);
 	worldTemplate.SpawnBiomes_FromImage();
 
-#func _process(delta: float) -> void:
-	#
-	#if revealerDelay > 0:
-		#revealerDelay -= delta;
-		#return;
-	#revealerDelay = 2;
-	#
-	## Move and Spawn Repeater
-	#RandomReveal();
-
 func _unhandled_key_input(event: InputEvent) -> void:
 	
-	if event.is_action_pressed("Enter"):
-		var targs:Array[Vector2i] = GridPos_Utils.GridPositions_Around(currGridPos, 5 + count, true);
-		targs = GridPos_Utils.Remove_Occupied(targs);
-		
-		for gp in targs:
-			if gp.distance_to(currGridPos) > 4 + count:
-				continue;
-			#Biome_Master.SpawnBiome(gp, Biome_Master.RandomBiomeType_Core(), biomeSpawner.biomeHolder, Interaction_Master.Type.NULL);
-			biomeSpawner.SpawnRandomBiomes_Influenced(gp, 1, 2);
-		
-		count += 1;
-		
-	
 	if event.is_action_pressed("Cancel"):
-		PauseMenu.Toggle_Pause(name);
+		PauseMenu.Toggle_Paused(name);
 	
 	if PauseMenu.Is_Paused():
 		return;
@@ -70,53 +43,19 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	
 	#World.UpdateBiases_AccordingTo_DistFromCenter(inputDir);
 	
-	# Time Skip from spending more time moving through forests
-	
-	#if timeSkips > 0:
-		#InGameDebugger.Say("Time Skip");
-		#timeSkips -= 1;
-		#World.Advance_Time();
-		##moving = true;
-		##await get_tree().create_timer(movementInterval).timeout;
-		##moving = false;
-		#return;
-	
 	var nextGPos:Vector2i = currGridPos + inputDir;
 
-	# Interaction Fade
-
-	var nextInteraction = Interaction_Master.Get_InteractionType(nextGPos);
+	FadeIntoInteraction(nextGPos);
 	
-	if nextInteraction == Interaction_Master.Type.Forest:
-		if !insideInteraction:
-			MultiFader.FadeTo_Trans(playerSpr);
-			insideInteraction = true;
-		#timeSkips = 1;
-	elif nextInteraction != Interaction_Master.Type.Forest:
-		if insideInteraction:
-			MultiFader.FadeTo_Opaque(playerSpr);
-			insideInteraction = false;
-	
-	# LEFTOFF
 	# Cannot walk onto DARKNESS
 	if Biome_Master.Get_BiomeType(nextGPos) == Biome_Master.Type.DARKNESS:
 		return;
 	
-	# Move and Spawn
-	Do_PlayerMove_BiomeSpawn_InterractionSpawn(inputDir);
-	
-func Get_DirectionInput(event:InputEvent) -> Vector2i:
-	if event.is_action("Up"):
-		return Vector2i.UP;
-	if event.is_action("Down"):
-		return Vector2i.DOWN;
-	if event.is_action("Left"):
-		return Vector2i.LEFT;
-	if event.is_action("Right"):
-		return Vector2i.RIGHT;
-	return Vector2i.ZERO;
+	MovePlayer_Then_Spawn_Biomes_And_Interactions(inputDir);
 
-func Do_PlayerMove_BiomeSpawn_InterractionSpawn(inputDir:Vector2i, moveCam:bool = true) -> void:
+# Functions [ 1 / 4 ] ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+func MovePlayer_Then_Spawn_Biomes_And_Interactions(inputDir:Vector2i, moveCam:bool = true) -> void:
 	
 	moving = true;
 	
@@ -157,13 +96,12 @@ func Do_PlayerMove_BiomeSpawn_InterractionSpawn(inputDir:Vector2i, moveCam:bool 
 	
 	World.Roll_Dice();
 
-# Functions: Debug ----------------------------------------------------------------------------------------------------
+# Functions [ 2 / 4 ]: Debug ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
-func RandomReveal() -> void:
+func RandomReveal(revealerGPos:Vector2i) -> void:
 	
-	var dir:Vector2i = Get_RandDirection();
-
-	dir = Get_RandDirection();
+	var dir:Vector2i = GridPos_Utils.Get_RandDirection();
+	
 	revealerGPos += dir;
 	# Spawn Biomes around new position
 	World.SpawnBiomes_Around(revealerGPos, 1, 0);
@@ -171,15 +109,38 @@ func RandomReveal() -> void:
 	await get_tree().process_frame;
 	World.Advance_Time();
 
-func Get_RandDirection() -> Vector2i:
-	match randi_range(0, 3):
-			0:
-				return Vector2i.UP;
-			1:
-				return Vector2i.DOWN;
-			2:
-				return Vector2i.LEFT;
-			3:
-				return Vector2i.RIGHT;
-			_:
-				return Vector2i.ZERO;
+func FadeIntoInteraction(gPos:Vector2i) -> void:
+	var nextInteraction = Interaction_Master.Get_InteractionType(gPos);
+	if nextInteraction == Interaction_Master.Type.Forest:
+		if !insideInteraction:
+			MultiFader.FadeTo_Trans(playerSpr);
+			insideInteraction = true;
+		return;
+	if insideInteraction:
+		MultiFader.FadeTo_Opaque(playerSpr);
+		insideInteraction = false;
+
+# Functions [ 3 / 4 ] ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+func Get_DirectionInput(event:InputEvent) -> Vector2i:
+	if event.is_action("Up"):
+		return Vector2i.UP;
+	if event.is_action("Down"):
+		return Vector2i.DOWN;
+	if event.is_action("Left"):
+		return Vector2i.LEFT;
+	if event.is_action("Right"):
+		return Vector2i.RIGHT;
+	return Vector2i.ZERO;
+
+# Functions [ 4 / 4 ] ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+func SpawnBiomes_ExpandingCircle(count:int) -> void:
+	var targs:Array[Vector2i] = GridPos_Utils.GridPositions_Around(currGridPos, 5 + count, true);
+	targs = GridPos_Utils.Remove_Occupied(targs);
+	
+	for gp in targs:
+		if gp.distance_to(currGridPos) > 4 + count:
+			continue;
+		biomeSpawner.SpawnRandomBiomes_Influenced(gp, 1, 2);
+	count += 1;
