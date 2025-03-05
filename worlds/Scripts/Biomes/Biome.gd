@@ -9,6 +9,8 @@ var gridPos:Vector2i;
 const rotRandLimit:float = .05;
 const posRandLimit:float = 8;
 
+var _fading:bool;
+
 func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type) -> void:
 	
 	gridPos = gPos;
@@ -26,61 +28,59 @@ func Initialise(gPos:Vector2i, biomeType:Biome_Master.Type) -> void:
 	match biomeType:
 		Biome_Master.Type.Earth:
 			Prep_Earth();
-			MultiFader.FadeTo_Opaque(biomeSprite, 1, true);
 		Biome_Master.Type.Grass:
 			Prep_Grass();
-			MultiFader.FadeTo_Opaque(biomeSprite, 1, true);
 		Biome_Master.Type.Water:
 			Prep_Water();
-			#MultiFader.FadeTo_Opaque(biomeSprite, 1, true);
-			MultiFader.FadeTo_Alpha(biomeSprite, .2, 0, .25);
 		Biome_Master.Type.Stone:
 			Prep_Stone();
-			MultiFader.FadeTo_Opaque(biomeSprite, 2, true);
 		Biome_Master.Type.DARKNESS:
 			Prep_DARKNESS();
-			MultiFader.FadeTo_Opaque(biomeSprite, 1, true);
 		_:
 			InGameDebugger.Warn("Failed to Initialise Biome: No type specified.");
 			
-	#Check_Surroundings();
+	Fade_Alpha(biomeSprite, 1, 1, 0);
 		
 func Check_Surroundings() -> void:
 
+	var surroundingBiomes:Array[Biome_Master.Type] = Biome_Master.Surrounding_Biomes(gridPos, 1, true, false);
+	var waters:int = surroundingBiomes.count(Biome_Master.Type.Water);
+	var targDepth:float = 1 - (waters * .1);
+
+	# If surrounding biomes are full
 	if GridPos_Utils.Empties_Around(gridPos, 1, true).size() == 0:
 		
-		var surroundingBiomes:Array[Biome_Master.Type] = Biome_Master.Surrounding_Biomes(gridPos, 1, true, false);
-		var waters:int = surroundingBiomes.count(Biome_Master.Type.Water);
-		
-		# Retain Water Full Opacity
+		# Water Biome
 		if type == Biome_Master.Type.Water:
-			var targDepth:float = 1 - (waters * .1);
-			MultiFader.FadeTo_Alpha(biomeSprite, targDepth, biomeSprite.modulate.a, targDepth);
-			#MultiFader.FadeTo_Alpha(biomeSprite, 1, biomeSprite.modulate.a, 0.8);
+			Fade_Alpha(biomeSprite, targDepth, waters, 0);
+		
+		# Land Biomes
 		else:
-			if waters < 8:
-				if waters > 6:
-					var tween:Tween = create_tween();
-					tween.tween_property(biomeSprite, "modulate", Color(1, 1, 1, .65), 4);
+			if waters == 7:
+					Fade_Alpha(biomeSprite, .65, 4, 1);
 			else:
-				var tween:Tween = create_tween();
-				tween.tween_property(biomeSprite, "modulate", Color(1, 1, 1, .4), 4);
+				Fade_Alpha(biomeSprite, .4, 4, 1);
 		
 		return;
-
-	#if type != Biome_Master.Type.Water:
-		#return;
 	
+	# If there are Empties around:
+	# Both Land and Water should be darker, deterministically
+	if type == Biome_Master.Type.Water:
+		Fade_Alpha(biomeSprite, .25, 4, 0);
+	else:
+		Fade_Alpha(biomeSprite, .75, 1, 0);
+	
+	# Begin to check for new nearby biomes on Time Tick
 	if !World.TimeTick.is_connected(On_TimeTick):
 		World.TimeTick.connect(On_TimeTick);
 		
 func On_TimeTick() -> void:
 	
-	#var dist:float = gridPos.distance_to(World.PlayerGridPos());
+	var dist:float = gridPos.distance_to(World.PlayerGridPos());
 	
-	#if dist >= 3:
+	if dist >= 3:
 		#biomeSprite.modulate.a = 0.5; # PRETTY WATER DEPTHS (Refer to Notes)
-		#return;
+		return;
 	
 	if GridPos_Utils.Empties_Around(gridPos, 1, true).size() > 0:
 		return;
@@ -100,31 +100,40 @@ func On_TimeTick() -> void:
 				Biome_Master.SpawnBiome(gridPos, Biome_Master.RandomBiomeType_Land(), get_parent(), \
 				Interaction_Master.Type.NULL, Vector2(0, -10));
 				interaction.Disable();
-				FadeAndDelete(biomeSprite);
+				FadeOut_And_Delete(biomeSprite);
 				
-			else:
-			
-				# PRETTY WATER DEPTHS (Refer to Notes)
-				
+			else: # If there is water nearby
+				# CULPRIT: Fade Issue
 				var targDepth:float = 1 - (waters * .1);
-				MultiFader.FadeTo_Alpha(biomeSprite, targDepth, biomeSprite.modulate.a, targDepth);
+				#Fade_Alpha(biomeSprite, targDepth, waters, biomeSprite.modulate.a);
 
 		_: # Landed biomes stranded in Water
 			
-			if waters < 8:
-				if waters > 6:
-					var tween:Tween = create_tween();
-					tween.tween_property(biomeSprite, "modulate", Color(1, 1, 1, .65), 4);
+			var targDepth:float = 1 - (waters * .1);
+			
+			if waters >= 7:
+				Fade_Alpha(biomeSprite, targDepth, 4, biomeSprite.modulate.a);
 			else:
-				var tween:Tween = create_tween();
-				tween.tween_property(biomeSprite, "modulate", Color(1, 1, 1, .4), 4);
+				Fade_Alpha(biomeSprite, targDepth, 4, 1);
 	
 	World.TimeTick.disconnect(On_TimeTick);
 
-func FadeAndDelete(spr:Sprite2D) -> void:
+func FadeOut_And_Delete(spr:Sprite2D) -> void:
 	var tween:Tween = create_tween();
 	tween.tween_property(spr, "modulate", Color.TRANSPARENT, 4);
 	tween.tween_callback(queue_free);
+
+func Fade_Alpha(spr:Sprite2D, targAlpha:float, dur:float, startAlpha:float) -> void:
+	if _fading:
+		print_debug("Attempting to interrupt fade.")
+	_fading = true;
+	spr.modulate.a = startAlpha;
+	var tween:Tween = create_tween();
+	tween.tween_property(spr, "modulate", Color(1, 1, 1, targAlpha), dur);
+	tween.tween_callback(SetFading_False);
+
+func SetFading_False() -> void:
+	_fading = false
 
 # Functions: Biome Type ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 

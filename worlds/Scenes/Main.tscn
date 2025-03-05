@@ -152,18 +152,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	# Three
 	
 	if event.is_action_pressed(\"Left-Click\"):
-	
-		for light in lightHolder.get_children():
-			#if light.global_position.distance_to(World.PlayerGridPos() * World.CellSize()) <= 1:
-			if light.global_position.distance_to(get_global_mouse_position()) <= 256:
-				light.queue_free();
-				return;
-			
-		var newLight:PointLight2D = lightPrefab.instantiate();
-		lightHolder.add_child(newLight);
-		#newLight.position = World.PlayerGridPos() * World.CellSize();
-		newLight.position = get_global_mouse_position();
-		return;
+		SpawnLight_AtPlayerPos(true);
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	
@@ -173,21 +162,31 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		camZoom.Zoom();
 
 	if event.is_action_pressed(\"Three\"):
-		
-		for light in lightHolder.get_children():
-			if light.global_position.distance_to(World.PlayerGridPos() * World.CellSize()) <= 1:
-			#if light.global_position.distance_to(get_global_mouse_position()) <= 256:
-				light.queue_free();
-				return;
-		
-		var newLight:PointLight2D = lightPrefab.instantiate();
-		lightHolder.add_child(newLight);
-		newLight.position = World.PlayerGridPos() * World.CellSize();
-		#newLight.position = get_global_mouse_position();
-		return;
+		SpawnLight_AtPlayerPos(false);
 
 	if event.is_action_pressed(\"Zero\"):
 		InGameDebugger.Say(World.PlayerGridPos());
+
+func SpawnLight_AtPlayerPos(withMouseInstead:bool) -> void:
+	for light in lightHolder.get_children():
+		
+		if withMouseInstead:
+			if light.global_position.distance_to(get_global_mouse_position()) <= 256:
+				light.queue_free();
+				return;
+				
+		if light.global_position.distance_to(World.PlayerGridPos() * World.CellSize()) <= 1:
+			light.queue_free();
+			return;
+	
+	var newLight:PointLight2D = lightPrefab.instantiate();
+	lightHolder.add_child(newLight);
+	
+	if withMouseInstead:
+		newLight.position = get_global_mouse_position();
+		return;
+		
+	newLight.position = World.PlayerGridPos() * World.CellSize();
 "
 
 [node name="World" type="Node2D"]
@@ -229,10 +228,11 @@ minDist = 1.0
 frameByFrame = true
 emitSignal = true
 
-[node name="World-Templates" type="Node" parent="Player" node_paths=PackedStringArray("biomeHolder")]
+[node name="World-Templates" type="Node" parent="Player" node_paths=PackedStringArray("biomeHolder", "player")]
 script = ExtResource("7_t1ont")
 images = Array[Image]([ExtResource("7_fcw8p"), ExtResource("15_y08cy")])
 biomeHolder = NodePath("../../Biome-Holder")
+player = NodePath("..")
 
 [node name="Biome-Holder" type="Node2D" parent="."]
 y_sort_enabled = true
@@ -399,6 +399,7 @@ metadata/_edit_lock_ = true
 [node name="Caverns" type="Node" parent="Lighting"]
 
 [node name="CanvasModulate" type="CanvasModulate" parent="Lighting/Caverns"]
+visible = false
 color = Color(0, 0, 0, 1)
 
 [node name="Lights" type="Node" parent="Lighting/Caverns"]

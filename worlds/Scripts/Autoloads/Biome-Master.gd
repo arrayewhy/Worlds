@@ -93,5 +93,6 @@ interType:Interaction_Master.Type, posOffset:Vector2 = Vector2.ZERO) -> void:
 	
 	World.IncreaseWorldSize();
 
-	await holder.get_tree().process_frame
-	newBiome.Check_Surroundings();
+	# We do this check through the holder because neither Biome.gd nor Biome-Master can access the Scene Tree.
+	#await holder.get_tree().process_frame
+	#newBiome.Check_Surroundings();

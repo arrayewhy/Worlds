@@ -2,12 +2,9 @@ extends Node
 
 @export var images:Array[Image];
 @export var biomeHolder:Node;
+@export var player:Node2D;
 
 var _templates:Array[Array]; # Array[Array[Color]]
-
-func _ready() -> void:
-	for img in images:
-		_templates.push_back(ImageToColArray(img));
 
 func SpawnBiomes_FromImage(indx:int) -> void:
 	
@@ -52,6 +49,10 @@ func SpawnBiomes_FromImage(indx:int) -> void:
 		currGPos.x += 1;
 		
 	#print(colArray.size());
+
+func Init_Templates() -> void:
+	for img in images:
+		_templates.push_back(ImageToColArray(img));
 
 func ImageToColArray(img:Image) -> Array[Color]:
 	
