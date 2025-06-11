@@ -34,8 +34,8 @@ func _ready() -> void:
 	self.position = currGridPos * World.CellSize();
 	cam.position = self.position;
 	
-	#World.SpawnBiomes_Around(currGridPos, 2);
-	worldTemplates.SpawnBiomes_FromImage(0);
+	World.SpawnBiomes_Around(currGridPos, 2);
+	#worldTemplates.SpawnBiomes_FromImage(0);
 	
 	PlayerSpawned.emit();
 
