@@ -11,7 +11,8 @@ extends Node2D;
 @export var cam:Camera2D;
 @export var camMover:Node;
 
-const initGridPos := Vector2i(1, 13);
+#const initGridPos := Vector2i(1, 13);
+const initGridPos := Vector2i(0, 0);
 const movementInterval:float = 0.5;
 
 var currGridPos:Vector2i;
@@ -33,7 +34,7 @@ func _ready() -> void:
 	
 	if worldTemplates:
 		worldTemplates.Init_Templates();
-		worldTemplates.SpawnBiomes_FromImage(0);
+		worldTemplates.SpawnBiomes_FromImage(1);
 		return;
 		
 	World.SpawnBiomes_Around(currGridPos, 2);

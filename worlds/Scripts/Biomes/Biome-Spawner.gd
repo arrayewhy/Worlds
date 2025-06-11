@@ -26,6 +26,11 @@ func SpawnRandomAround(gPos:Vector2i, spawnRange:int) -> void:
 	for e in surroundingEmpties:
 		SpawnRandomBiome(e);
 
+func SpawnBiomeTypeAround(gPos:Vector2i, type:Biome_Master.Type, spawnRange:int) -> void:
+	var surroundingEmpties = GridPos_Utils.Empties_Around(gPos, spawnRange, false);
+	for e in surroundingEmpties:
+		Biome_Master.SpawnBiome(e, type, biomeHolder, Interaction_Master.Type.NULL);
+
 func SpawnRandomBiomes_Influenced(currGPos:Vector2i, spawnRange:int, influenceRange:int) -> void:
 	
 	var spawnPoints:Array[Vector2i] = GridPos_Utils.Empties_Around(currGPos, spawnRange, false);

@@ -23,6 +23,8 @@ SPECULATIVE:
 	- Use player's distance from center to determine biases.
 	
 	- Time of Day & Search Range
+	- Dog companion helps you explore land
+	- Lone water biome could lead to underground cavern
 	
 >>> DONE:
 	- Spawn: Trees

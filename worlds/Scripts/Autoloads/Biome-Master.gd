@@ -19,7 +19,7 @@ static func RandomBiomeType_Land() -> int:
 	# If this doesn't suffice, do a Match and return the appropriate Type as a String.
 	var types = Type.keys();
 	types.erase(Type.keys()[Type.Water]);
-	print(types);
+	#print(types);
 	return randi_range(2, types.size() - 2);
 
 # Functions ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||

@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://85frqv53edom"]
+
+[ext_resource type="Script" path="res://Scripts/Star.gd" id="1_nxcte"]
+[ext_resource type="Texture2D" uid="uid://dk06eplgkeoi2" path="res://Sprites/Clack_Map_SpriteSheet_2048.png" id="1_omh3g"]
+
+[node name="Star" type="Node2D"]
+script = ExtResource("1_nxcte")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+z_index = 100
+texture = ExtResource("1_omh3g")
+region_enabled = true
+region_rect = Rect2(2304, 2048, 256, 256)

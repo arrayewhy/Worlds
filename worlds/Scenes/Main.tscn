@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://dpw5ih7gg3btv"]
+[gd_scene load_steps=25 format=3 uid="uid://dpw5ih7gg3btv"]
 
 [ext_resource type="Texture2D" uid="uid://dk06eplgkeoi2" path="res://Sprites/Clack_Map_SpriteSheet_2048.png" id="1_ntyhy"]
 [ext_resource type="Script" path="res://Scripts/Mover.gd" id="1_vinv6"]
@@ -14,7 +14,6 @@
 [ext_resource type="Script" path="res://Scripts/UI/Black-Bars.gd" id="8_umww4"]
 [ext_resource type="AudioStream" uid="uid://sos25qvtf0mq" path="res://Audio/SFX/Desert-Wind_611257__newlocknew__windsynth-3winter3osc.wav" id="12_py2jo"]
 [ext_resource type="AudioStream" uid="uid://cgv7itiiugmiq" path="res://Audio/SFX/Forest_634315__klankbeeld__border-forestfarmfield-727am-nl-eu-220515_0345.wav" id="13_wbwr2"]
-[ext_resource type="PackedScene" uid="uid://cf233120e3l52" path="res://Prefabs/Dice.tscn" id="14_1cw2s"]
 [ext_resource type="Image" uid="uid://bvafusrsjjlrn" path="res://Sprites/World-Templates/WT-Circle64.png" id="15_y08cy"]
 
 [sub_resource type="GDScript" id="GDScript_lhawh"]
@@ -189,6 +188,41 @@ func SpawnLight_AtPlayerPos(withMouseInstead:bool) -> void:
 	newLight.position = World.PlayerGridPos() * World.CellSize();
 "
 
+[sub_resource type="GDScript" id="GDScript_55vie"]
+resource_name = "Star-Spawn"
+script/source = "extends Node
+
+const _starPrefab:PackedScene = preload(\"res://Prefabs/Star.tscn\");
+
+func _ready() -> void:
+	_Spawn_Star();
+	
+func _Spawn_Star() -> void:
+	var spawnGPos := Vector2(0, 20);
+	spawnGPos = spawnGPos.rotated(randf_range(0, 360));
+	
+	var star:Object = _starPrefab.instantiate();
+	add_child(star);
+	star.position = spawnGPos * World.CellSize();
+"
+
+[sub_resource type="GDScript" id="GDScript_e0cr8"]
+resource_name = "Preset-Spawner"
+script/source = "extends Node
+
+@export var _biomeHolder:Node;
+@export var _biomeSpawner:Node;
+
+func _ready() -> void:
+	await get_tree().process_frame;
+	_Spawn();
+
+func _Spawn() -> void:
+	var targGPos := Vector2i(-10, 10);
+	Biome_Master.SpawnBiome(targGPos, Biome_Master.Type.Grass, _biomeHolder, Interaction_Master.Type.Dog, Vector2.ZERO);
+	_biomeSpawner.SpawnBiomeTypeAround(targGPos, Biome_Master.Type.Grass, 5);
+"
+
 [node name="World" type="Node2D"]
 top_level = true
 
@@ -239,7 +273,6 @@ y_sort_enabled = true
 metadata/_edit_lock_ = true
 
 [node name="Audio" type="Node" parent="."]
-process_mode = 4
 
 [node name="Desert-Wind" type="AudioStreamPlayer" parent="Audio"]
 stream = ExtResource("12_py2jo")
@@ -317,9 +350,6 @@ region_rect = Rect2(0, 0, 256, 256)
 [node name="Misc" type="Node2D" parent="."]
 process_mode = 4
 visible = false
-
-[node name="Dice" parent="Misc" instance=ExtResource("14_1cw2s")]
-position = Vector2(0, 0)
 
 [node name="Hover" type="Node2D" parent="Misc"]
 script = SubResource("GDScript_acxdq")
@@ -403,3 +433,11 @@ visible = false
 color = Color(0, 0, 0, 1)
 
 [node name="Lights" type="Node" parent="Lighting/Caverns"]
+
+[node name="Star-Spawn" type="Node" parent="."]
+script = SubResource("GDScript_55vie")
+
+[node name="Preset-Spawner" type="Node" parent="." node_paths=PackedStringArray("_biomeHolder", "_biomeSpawner")]
+script = SubResource("GDScript_e0cr8")
+_biomeHolder = NodePath("../Biome-Holder")
+_biomeSpawner = NodePath("../Player/Biome-Spawner")
