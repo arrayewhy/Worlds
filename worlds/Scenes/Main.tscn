@@ -411,5 +411,5 @@ color = Color(0, 0, 0, 1)
 
 [node name="Sun" type="PointLight2D" parent="Lighting/Lights"]
 position = Vector2(512, 512)
-scale = Vector2(400, 400)
+scale = Vector2(1000, 1000)
 texture = SubResource("GradientTexture2D_7v4ub")
