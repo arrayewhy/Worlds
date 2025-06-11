@@ -3,16 +3,15 @@ extends Node2D;
 @onready var mover:Node = $Mover;
 @onready var playerSpr:Sprite2D = $"Player-Sprite";
 @onready var biomeSpawner:Node = $"Biome-Spawner";
+@onready var worldTemplates:Node = $"World-Templates";
 
 #@export var hover:Node;
 
-@export var worldTemplates:Node;
 @export var microView:CanvasLayer;
 @export var cam:Camera2D;
 @export var camMover:Node;
 
-#const initGridPos := Vector2i(1, 13);
-const initGridPos := Vector2i(0, 0);
+const initGridPos := Vector2i(1, 13);
 const movementInterval:float = 0.5;
 
 var currGridPos:Vector2i;
@@ -21,6 +20,9 @@ var moving:bool;
 var insideInteraction:bool;
 
 var timeSkips:int;
+
+# Signals
+signal PlayerSpawned;
 
 # Functions [ 1 / 5 ] ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
@@ -32,12 +34,10 @@ func _ready() -> void:
 	self.position = currGridPos * World.CellSize();
 	cam.position = self.position;
 	
-	if worldTemplates:
-		worldTemplates.Init_Templates();
-		worldTemplates.SpawnBiomes_FromImage(1);
-		return;
-		
 	World.SpawnBiomes_Around(currGridPos, 2);
+	#worldTemplates.SpawnBiomes_FromImage(0);
+	
+	PlayerSpawned.emit();
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	
