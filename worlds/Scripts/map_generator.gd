@@ -1,6 +1,6 @@
 extends Node2D
 
-const spriteSheet:Texture2D = preload("res://Sprites/Clack_Map_SpriteSheet_2048.png");
+const _spriteSheet:Texture2D = preload("res://Sprites/Clack_Map_SpriteSheet_2048.png");
 const _glyphs:Texture2D = preload("res://Sprites/Glyphs.png");
 const _lighthouseLamp:PackedScene = preload("res://Prefabs/lighthouse_lamp.tscn");
 
@@ -8,16 +8,12 @@ const _cellSize:int = 16;
 const _sprRegSize:float = 256;
 
 @export var _noiseTex:TextureRect;
-@onready var _cursor:Sprite2D = $Containers/Cursor;
 
+# Containers
 @onready var _cells:Node2D = $Containers/Cells;
-
 @onready var _show_on_zoom:Node2D = $Containers/show_on_zoom;
 @onready var _hide_on_zoom:Node2D = $Containers/hide_on_zoom;
 @onready var _always_show:Node2D = $Containers/always_show;
-#@onready var _trees:Node2D = $"Containers/objects/Trees";
-#@onready var _houses:Node2D = $"Containers/objects/houses";
-
 @onready var _treasures:CanvasLayer = $Treasures;
 
 
@@ -52,7 +48,7 @@ func _ready() -> void:
 	for d in noiseData:
 		
 		# Create Sprite
-		var cellSpr:Sprite2D = _NewSprite(0, 0, spriteSheet);
+		var cellSpr:Sprite2D = _NewSprite(0, 0, _spriteSheet);
 		_cells.add_child(cellSpr);
 		
 		var object:Sprite2D = null;
@@ -69,7 +65,7 @@ func _ready() -> void:
 			
 			# House
 			if randi_range(0, 1000) > 999:
-				object = _NewSprite(6, 7, spriteSheet);
+				object = _NewSprite(6, 7, _spriteSheet);
 				_hide_on_zoom.add_child(object);
 				#_houses.add_child(object);
 				isHouse = true;
@@ -80,7 +76,7 @@ func _ready() -> void:
 				_show_on_zoom.add_child(object);
 			# Peak
 			elif randi_range(0, 1000) > 200:
-				object = _NewSprite(3, 6, spriteSheet);
+				object = _NewSprite(3, 6, _spriteSheet);
 				_always_show.add_child(object);
 				object.scale *= randf_range(1, 1.5);
 			# Hills
@@ -97,20 +93,20 @@ func _ready() -> void:
 			
 			# Tree
 			if randi_range(0, 1000) > 600:
-				object = _NewSprite(7, 6, spriteSheet);
+				object = _NewSprite(7, 6, _spriteSheet);
 				_hide_on_zoom.add_child(object);
 				#_trees.add_child(object);
 				isTree = true;
 			# House
 			elif randi_range(0, 1000) > 980:
-				object = _NewSprite(6, 7, spriteSheet);
+				object = _NewSprite(6, 7, _spriteSheet);
 				_hide_on_zoom.add_child(object);
 				#_houses.add_child(object);
 				isHouse = true;
 				#object.modulate.a = 0.75;
 			# Hills
 			elif randi_range(0, 1000) > 900:
-				object = _NewSprite(3, 8, spriteSheet);
+				object = _NewSprite(3, 8, _spriteSheet);
 				_show_on_zoom.add_child(object);
 			# Tent
 			elif randi_range(0, 1000) > 995:
@@ -159,7 +155,7 @@ func _ready() -> void:
 			
 			# Small Fish
 			if randi_range(0, 1000) > 960:
-				object = _NewSprite(0, 7, spriteSheet);
+				object = _NewSprite(0, 7, _spriteSheet);
 				_show_on_zoom.add_child(object);
 			# Jetty
 			if randi_range(0, 1000) > 995:
@@ -173,7 +169,7 @@ func _ready() -> void:
 			
 			# Big Fish
 			if randi_range(0, 1000) > 990:
-				object = _NewSprite(1, 7, spriteSheet);
+				object = _NewSprite(1, 7, _spriteSheet);
 				_show_on_zoom.add_child(object);
 			
 			cellSpr.modulate.a = alphaThresh * 2;
@@ -187,7 +183,7 @@ func _ready() -> void:
 			
 			# Treasure
 			if randf_range(0, 1000) > 997:
-				object = _NewSprite(9, 8, spriteSheet);
+				object = _NewSprite(9, 8, _spriteSheet);
 				var flicker:Treasure_Flicker = Treasure_Flicker.new();
 				flicker.Set_CellSize(_cellSize);
 				object.add_child(flicker);
@@ -218,7 +214,7 @@ func _ready() -> void:
 				object.rotation += randf_range(-.125, .125);
 				
 			if isTree:
-				var tree:Sprite2D = _NewSprite(8, 6, spriteSheet);
+				var tree:Sprite2D = _NewSprite(8, 6, _spriteSheet);
 				tree.offset.y -= _cellSize * 4;
 				_show_on_zoom.add_child(tree);
 				tree.position.x = currX * _cellSize + randf_range(-.4, .4);
@@ -227,7 +223,7 @@ func _ready() -> void:
 				#tree.rotation += randf_range(-.125, .125);
 				
 			if isHouse:
-				var house:Sprite2D = _NewSprite(randi_range(2, 4), 14, spriteSheet);
+				var house:Sprite2D = _NewSprite(randi_range(2, 4), 14, _spriteSheet);
 				_show_on_zoom.add_child(house);
 				#house.region_rect.size *= 2;
 				house.position.x = currX * _cellSize;
@@ -237,9 +233,10 @@ func _ready() -> void:
 				house.rotation += randf_range(-.125, .125);
 				
 			if isLighthouse:
-				var lighthouse:Sprite2D = _NewSprite(6, 12, spriteSheet, Vector2(256, 256 * 3));
+				var lighthouse:Sprite2D = _NewSprite(6, 12, _spriteSheet);
 				#lighthouse.centered = false;
-				#var lighthouse:Sprite2D = _NewSprite(4, 14, spriteSheet, Vector2(1, 1));
+				#var lighthouse:Sprite2D = _NewSprite(4, 14, _spriteSheet, Vector2(1, 1));
+				lighthouse.region_rect.size = Vector2(256, 256 * 3);
 				lighthouse.offset.y -= _sprRegSize + _sprRegSize / 2;
 				_show_on_zoom.add_child(lighthouse);
 				lighthouse.position.x = currX * _cellSize;
@@ -260,7 +257,7 @@ func _ready() -> void:
 # Functions ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
-func _NewSprite(regPosX:float, regPosY:float, tex:Texture2D, regSize:Vector2 = Vector2.ZERO) -> Sprite2D:
+func _NewSprite(regPosX:float, regPosY:float, tex:Texture2D) -> Sprite2D:
 	
 	var spr:Sprite2D = Sprite2D.new();
 	
@@ -270,11 +267,8 @@ func _NewSprite(regPosX:float, regPosY:float, tex:Texture2D, regSize:Vector2 = V
 	
 	# Region Size
 	
-	if regSize != Vector2.ZERO:
-		spr.region_rect.size = regSize;
-	else:
-		spr.region_rect.size = Vector2(_sprRegSize, _sprRegSize);
-		
+	spr.region_rect.size = Vector2(_sprRegSize, _sprRegSize);
+	
 	spr.scale /= _cellSize;
 	
 	# Region Position
@@ -285,52 +279,52 @@ func _NewSprite(regPosX:float, regPosY:float, tex:Texture2D, regSize:Vector2 = V
 	return spr;
 
 
-func _Cells_From_Noise(noiseData:Array) -> Array[String]:
-	
-	var cells:Array[String] = [];
-	
-	# Set World Parameters
-	var mapWidth:float = sqrt(noiseData.size());
-	
-	var levels:float = 5.0;
-	var noiseRange:float = 255;
-	var threshold:float = noiseRange / levels;
-	
-	var top:float = 4.25;
-	var higher:float = 3.1;
-	var high:float = 3.05;
-	var upperMid:float = 3;
-	var mid:float = 2.75;
-	var low:float = 2.25;
-	var bottom:float = 1.25;
-	
-	for d in noiseData:
-		# Top
-		if d >= threshold * top:
-			cells.append("Mountain");
-		# Higher
-		elif d >= threshold * higher && d < threshold * top:
-			cells.append("Green");
-		# High: Green Edges
-		elif d >= threshold * high && d < threshold * higher:
-			cells.append("Green Edges");
-		# UpperMid: Coast
-		elif d >= threshold * upperMid && d < threshold * high:
-			cells.append("Coast");
-		# Mid
-		elif d >= threshold * mid && d < threshold * upperMid:
-			cells.append("Shallows");
-		# Low
-		elif d >= threshold * low && d < threshold * mid:
-			cells.append("Deep");
-		# Bottom
-		elif d >= threshold * bottom && d < threshold * low:
-			cells.append("Sea");
-		# Black
-		elif d < threshold * bottom:
-			cells.append("Abyss");
-		
-	return(cells);
+#func _Cells_From_Noise(noiseData:Array) -> Array[String]:
+	#
+	#var cells:Array[String] = [];
+	#
+	## Set World Parameters
+	#var mapWidth:float = sqrt(noiseData.size());
+	#
+	#var levels:float = 5.0;
+	#var noiseRange:float = 255;
+	#var threshold:float = noiseRange / levels;
+	#
+	#var top:float = 4.25;
+	#var higher:float = 3.1;
+	#var high:float = 3.05;
+	#var upperMid:float = 3;
+	#var mid:float = 2.75;
+	#var low:float = 2.25;
+	#var bottom:float = 1.25;
+	#
+	#for d in noiseData:
+		## Top
+		#if d >= threshold * top:
+			#cells.append("Mountain");
+		## Higher
+		#elif d >= threshold * higher && d < threshold * top:
+			#cells.append("Green");
+		## High: Green Edges
+		#elif d >= threshold * high && d < threshold * higher:
+			#cells.append("Green Edges");
+		## UpperMid: Coast
+		#elif d >= threshold * upperMid && d < threshold * high:
+			#cells.append("Coast");
+		## Mid
+		#elif d >= threshold * mid && d < threshold * upperMid:
+			#cells.append("Shallows");
+		## Low
+		#elif d >= threshold * low && d < threshold * mid:
+			#cells.append("Deep");
+		## Bottom
+		#elif d >= threshold * bottom && d < threshold * low:
+			#cells.append("Sea");
+		## Black
+		#elif d < threshold * bottom:
+			#cells.append("Abyss");
+		#
+	#return(cells);
 
 
 # Functions: Get Set ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||

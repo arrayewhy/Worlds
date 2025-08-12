@@ -22,7 +22,11 @@ func _process(delta: float) -> void:
 	
 	_updateTime = _time + 0.2;
 	
-	var val:float = ((sin(_time) + 1) / 2) + .125;
+	var sinVal:float = sin(_time);
+	# Clamp between 0 and 1
+	sinVal = (sinVal + 1) / 2;
+	
+	var val:float = sinVal + .125;
 	_treasure.modulate.a = val;
 	_treasure.scale = Vector2(val, val) / _cellSize;
 

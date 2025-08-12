@@ -63,13 +63,14 @@ func _ready() -> void:
 	_worldCenter = Vector2.ONE * (_texWidth / 2) * _cellSize;
 	
 	self.position = _worldCenter;
-	_Set(_dayDur);
+	#_Set(_dayDur);
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event.is_action_pressed(\"Cancel\"):
-		_posTween.stop();
-		_energyTween.stop();
+		if _posTween != null:
+			_posTween.stop();
+			_energyTween.stop();
 		if _rising:
 			self.position.x = _worldCenter.x;
 			_Set(_nightDur);
