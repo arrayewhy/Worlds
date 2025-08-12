@@ -1,10 +1,10 @@
 [gd_scene load_steps=6 format=3 uid="uid://dp8o013p58rw7"]
 
-[ext_resource type="Script" path="res://Scripts/Biomes/Biome.gd" id="1_mcdx6"]
+[ext_resource type="Script" uid="uid://6lsyyy4g573" path="res://Scripts/Biomes/Biome.gd" id="1_mcdx6"]
 [ext_resource type="Texture2D" uid="uid://dk06eplgkeoi2" path="res://Sprites/Clack_Map_SpriteSheet_2048.png" id="2_tsunu"]
-[ext_resource type="Script" path="res://Scripts/Interactions/Interaction.gd" id="3_1dk8w"]
-[ext_resource type="Script" path="res://Scripts/Fader.gd" id="5_0yswc"]
-[ext_resource type="Script" path="res://Scripts/Interactions/Interaction-Updater.gd" id="5_tenxf"]
+[ext_resource type="Script" uid="uid://d1k8wv6jci7t7" path="res://Scripts/Interactions/Interaction.gd" id="3_1dk8w"]
+[ext_resource type="Script" uid="uid://dmsv3tnmvi8tm" path="res://Scripts/Fader.gd" id="5_0yswc"]
+[ext_resource type="Script" uid="uid://badhj57hcuarr" path="res://Scripts/Interactions/Interaction-Updater.gd" id="5_tenxf"]
 
 [node name="Biome" type="Node2D"]
 script = ExtResource("1_mcdx6")

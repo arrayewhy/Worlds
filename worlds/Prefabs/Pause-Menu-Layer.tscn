@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://wsjv8gfe61ee"]
 
-[ext_resource type="Script" path="res://Scripts/UI/Pause-Menu.gd" id="1_ai6ah"]
+[ext_resource type="Script" uid="uid://dh8uacxua8mrb" path="res://Scripts/UI/Pause-Menu.gd" id="1_ai6ah"]
 [ext_resource type="Theme" uid="uid://dj0864pi7lxvd" path="res://Misc/Button-Theme.tres" id="2_tftrc"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_8ipoq"]
