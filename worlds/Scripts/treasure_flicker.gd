@@ -2,7 +2,7 @@ class_name Treasure_Flicker extends Node
 
 @onready var _treasure:Sprite2D = get_parent();
 
-var _speed:float = 4;
+const _speed:float = 1;
 var _cellSize:float;
 
 var _time:float;
@@ -10,7 +10,7 @@ var _updateTime:float;
 
 
 func _init() -> void:
-	_speed *= randf_range(.5, 1);
+	#_speed *= randf_range(.5, 1);
 	_time = randf_range(0, 1);
 
 

@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://blljud7rsng0h"]
+
+[sub_resource type="Gradient" id="Gradient_xdr3h"]
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_a77by"]
+gradient = SubResource("Gradient_xdr3h")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.8, 0.2)
+
+[node name="lighthouse_lamp" type="PointLight2D"]
+scale = Vector2(64, 64)
+color = Color(1, 0.984314, 0.901961, 1)
+energy = 0.25
+texture = SubResource("GradientTexture2D_a77by")
