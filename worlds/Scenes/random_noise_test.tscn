@@ -55,7 +55,7 @@ var _energyTween:Tween;
 
 func _ready() -> void:
 	
-	_cellSize = _mapGenerator.Get_CellSize(self.get_path());
+	_cellSize = _mapGenerator.MapGenerator_Get_CellSize(self.get_path());
 	
 	await _noiseTex.texture.changed;
 	_texWidth = sqrt(_noiseTex.get_texture().get_image().get_data().size());
@@ -224,7 +224,7 @@ func _ready() -> void:
 	
 	_cam.Zoom.connect(_Set_Zoomed);
 	
-	_cellSize = _mapGen.Get_CellSize(self.get_path());
+	_cellSize = _mapGen.MapGenerator_Get_CellSize(self.get_path());
 	self.position = floor(self.position / _cellSize) * _cellSize;
 	
 	_currPos = self.position;
@@ -237,7 +237,7 @@ func _process(delta: float) -> void:
 		
 	if Input.is_action_just_pressed(\"Enter\"):
 		#_message.position = Tools.Coord_OnGrid(self.position, _cellSize) - _messagePanelCont.size;
-		_message.Set_Position_And_Size(self.position, self.get_path());
+		_message.Message_Set_Position_And_Size(self.position, self.get_path());
 		#_message.position.y -= _cellSize / 4;
 	
 	# Move Immediately on direction key Press
@@ -370,8 +370,8 @@ func _ready() -> void:
 		#_Set_Position_And_Size();
 	
 
-func Set_Position_And_Size(pos:Vector2, callerPath:String) -> void:
-	print(\"Set_Position_And_Size() called by: \", callerPath);
+func Message_Set_Position_And_Size(pos:Vector2, callerPath:String) -> void:
+	print(\"Message_Set_Position_And_Size() called by: \", callerPath);
 	_Set_Position_And_Size(pos);
 
 
@@ -400,12 +400,6 @@ outline_color = Color(0, 0, 0, 1)
 
 [node name="RandomNoiseTest" type="Node2D" node_paths=PackedStringArray("_noiseTex")]
 script = ExtResource("1_0um4f")
-_highest = 220.0
-_higher = 200.0
-_high = 170.0
-_mid = 160.0
-_low = 140.0
-_lower = 110.0
 _noiseTex = NodePath("Noise/Control/TextureRect")
 
 [node name="Noise" type="CanvasLayer" parent="."]
@@ -433,6 +427,7 @@ stretch_mode = 5
 position = Vector2(1024, 1024)
 scale = Vector2(32, 32)
 color = Color(1, 0.983333, 0.9, 1)
+energy = 0.9
 texture = SubResource("GradientTexture2D_hf1hu")
 script = SubResource("GDScript_cl1kf")
 _mapGenerator = NodePath("..")
@@ -476,7 +471,7 @@ color = Color(0, 0, 0, 1)
 
 [node name="Containers" type="Node2D" parent="."]
 
-[node name="Cells" type="Node2D" parent="Containers"]
+[node name="Terrain" type="Node2D" parent="Containers"]
 z_index = -1
 
 [node name="hide_on_zoom" type="Node2D" parent="Containers"]

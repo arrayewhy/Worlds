@@ -23,7 +23,7 @@ signal Zoom(on:bool, camTargPos:Vector2);
 
 func _ready() -> void:
 	
-	_cellSize = _mapGenerator.Get_CellSize(self.get_path());
+	_cellSize = _mapGenerator.MapGenerator_Get_CellSize(self.get_path());
 	
 	await _noiseTex.texture.changed;
 	self.position = Vector2.ONE * _cellSize * (sqrt(_noiseTex.get_texture().get_image().get_data().size()) / 2);
