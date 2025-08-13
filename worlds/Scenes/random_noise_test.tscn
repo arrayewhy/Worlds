@@ -489,6 +489,7 @@ y_sort_enabled = true
 [node name="always_show" type="Node2D" parent="Containers"]
 
 [node name="Misc" type="Node2D" parent="."]
+visible = false
 
 [node name="Clouds" type="CanvasLayer" parent="Misc"]
 visible = false
