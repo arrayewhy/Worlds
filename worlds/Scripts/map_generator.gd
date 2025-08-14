@@ -66,6 +66,9 @@ var _detail_sprite_array:Array[Sprite2D]; # Details / NULL
 @onready var _cont_alwaysShow:Node2D = $Containers/always_show;
 @onready var _cont_treasures:CanvasLayer = $Treasures;
 
+@export_group("#DEBUG")
+@export var _debug:bool;
+
 
 # Functions: Built-in ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
@@ -102,11 +105,9 @@ func _Generate_Map(newSeed:int) -> void:
 	
 	# Create Sprite2Ds
 	_terrain_sprite_array = _TerrainSprites_From_TerrainData(terrainData);
-	#print(_terrain_sprite_array.size());
 	_marking_sprite_array = _MarkingSprites_From_MarkingData(markingData);
-	#print(_marking_sprite_array.size());
 	_detail_sprite_array = _DetailSprites_From_MarkingData(markingData);
-	#print(_detail_sprite_array.size());
+	
 
 
 func _Clear() -> void:
@@ -293,6 +294,7 @@ func _TerrainSprites_From_TerrainData(terrainData:Array[Terrain]) -> Array[Sprit
 		
 		s_array.append(spr);
 	
+	if _debug: print("_TerrainSprites_From_TerrainData, Terrain: ", s_array.size());
 	return s_array;
 
 
@@ -390,6 +392,7 @@ func _MarkingSprites_From_MarkingData(markingData:Array[Marking]) -> Array[Sprit
 			currX = 0;
 			currY += 1;
 			
+	if _debug: print("_MarkingSprites_From_MarkingData, Markings: ", s_array.size());
 	return s_array;
 
 
@@ -480,6 +483,7 @@ func _DetailSprites_From_MarkingData(markingData:Array[Marking]) -> Array[Sprite
 			currX = 0;
 			currY += 1;
 			
+	if _debug: print("_DetailSprites_From_MarkingData, Details: ", s_array.size());
 	return s_array;
 
 
@@ -497,5 +501,21 @@ func _Create_Sprite(regPosX:float, regPosY:float, tex:Texture2D) -> Sprite2D:
 
 
 func MapGenerator_Get_CellSize(callerPath:String) -> float:
-	print("MapGenerator_Get_CellSize, Called by:", callerPath);
+	if _debug: print("MapGenerator_Get_CellSize, Called by:", callerPath);
 	return _cellSize;
+
+
+func MapGenerator_Get_TerrainSprite(coord:Vector2, callerPath:String) -> Sprite2D:
+	if _debug: print("MapGenerator_Get_TerrainSprite, called by: ", callerPath);
+	var index:int = (coord.x + _mapWidth * coord.y) / _cellSize;
+	return _terrain_sprite_array[index];
+	
+func MapGenerator_Get_MarkingSprite(coord:Vector2, callerPath:String) -> Sprite2D:
+	if _debug: print("MapGenerator_Get_MarkingSprite, called by: ", callerPath);
+	var index:int = (coord.x + _mapWidth * coord.y) / _cellSize;
+	return _marking_sprite_array[index];
+
+func MapGenerator_Get_DetailSprite(coord:Vector2, callerPath:String) -> Sprite2D:
+	if _debug: print("MapGenerator_Get_DetailSprite, called by: ", callerPath);
+	var index:int = (coord.x + _mapWidth * coord.y) / _cellSize;
+	return _detail_sprite_array[index];

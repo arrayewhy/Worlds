@@ -215,12 +215,12 @@ var _modTween:Tween;
 
 func _init() -> void:
 	self.modulate.a = 0;
-	Input.mouse_mode = Input.MOUSE_MODE_HIDDEN;
+	#Input.mouse_mode = Input.MOUSE_MODE_HIDDEN;
 
 
 func _ready() -> void:
 	
-	set_process(false);
+	#set_process(false);
 	
 	_cam.Zoom.connect(_Set_Zoomed);
 	
@@ -231,6 +231,8 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	
+	_Hold();
 	
 	#if !Input.is_anything_pressed():
 		#return;
@@ -346,6 +348,93 @@ func _Set_Zoomed(on:bool, _camTargPos:Vector2) -> void:
 	tween.tween_property(self, \"modulate:a\", alpha, .5);
 	
 	set_process(on);
+
+
+var terrain:Sprite2D;
+var marking:Sprite2D;
+var detail:Sprite2D;
+var detailOffsetY:float;
+
+var holdingTween:Tween;
+
+var mouseStart:Vector2;
+var follow:bool;
+var origin:Vector2;
+
+func _Hold() -> void:
+	if terrain && !holdingTween.is_running():
+		if follow:
+			var mousePos:Vector2 = get_global_mouse_position();
+			terrain.position = mousePos;
+			if marking:
+				marking.position = mousePos;
+			if detail:
+				detail.position = mousePos;
+		else:
+			if mouseStart.distance_to(get_global_mouse_position()) > 16:
+				origin = terrain.position;
+				holdingTween.kill();
+				follow = true;
+	
+	if Input.is_action_just_pressed(\"Left-Click\"):
+		
+		if !terrain:
+			
+			mouseStart = get_global_mouse_position();
+			var coord:Vector2 = Tools.Coord_OnGrid(mouseStart, _cellSize);
+			terrain = _mapGen.MapGenerator_Get_TerrainSprite(coord, self.get_path());
+			marking = _mapGen.MapGenerator_Get_MarkingSprite(coord, self.get_path());
+			detail = _mapGen.MapGenerator_Get_DetailSprite(coord, self.get_path());
+			
+			if terrain:
+				
+				if holdingTween:
+					holdingTween.kill();
+				holdingTween = create_tween();
+				holdingTween.set_parallel(true);
+				holdingTween.tween_property(terrain, \"offset:y\", terrain.offset.y - 256/2, .0625);
+				if marking:
+					holdingTween.tween_property(marking, \"offset:y\", marking.offset.y - 256/2, .0625);
+				if detail:
+					detailOffsetY = detail.offset.y;
+					holdingTween.tween_property(detail, \"offset:y\", detail.offset.y - 256/2, .0625);
+				
+		return;
+		
+	elif Input.is_action_just_released(\"Left-Click\"):
+		
+		if terrain:
+			
+			if follow:
+				follow = false;
+				
+				terrain.position = origin;
+				if marking:
+					marking.position = origin;
+				if detail:
+					detail.position = origin;
+			
+			#mouseStart = Vector2.ZERO;
+			
+			holdingTween.stop();
+			holdingTween = create_tween();
+			holdingTween.set_parallel(true);
+			holdingTween.tween_property(terrain, \"offset:y\", 0, .0625);
+			
+			if marking:
+				holdingTween.tween_property(marking, \"offset:y\", 0, .0625);
+			if detail:
+				holdingTween.tween_property(detail, \"offset:y\", detailOffsetY, .0625);
+			
+			await holdingTween.finished;
+			terrain = null;
+			if marking:
+				marking = null;
+			if detail:
+				detailOffsetY = 0;
+				detail = null;
+			
+		return;
 "
 
 [sub_resource type="GDScript" id="GDScript_rrw6a"]
