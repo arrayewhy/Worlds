@@ -75,7 +75,7 @@ var _detail_sprite_array:Array[Sprite2D]; # Details / NULL
 @onready var _cont_showOnZoom:Node2D = $Containers/show_on_zoom;
 @onready var _cont_hideOnZoom:Node2D = $Containers/hide_on_zoom;
 @onready var _cont_alwaysShow:Node2D = $Containers/always_show;
-@export var _cont_treasures:CanvasLayer;
+@onready var _cont_treasures:CanvasLayer = $Treasures;
 
 @export_group("#DEBUG")
 @export var _debug:bool;

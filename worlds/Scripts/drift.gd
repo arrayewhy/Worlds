@@ -8,7 +8,6 @@ var _moveThresh:float = 2;
 
 func _ready() -> void:
 	_master = get_parent();
-	print(get_node("/root/map_generator"));
 
 
 func _process(delta: float) -> void:

@@ -198,7 +198,7 @@ script/source = "extends Sprite2D
 @export var _message:Node2D;
 @export var _messagePanelCont:PanelContainer;
 
-var _cellSize:float;
+#var World.CellSize:float;
 
 var _zoomed:bool;
 
@@ -224,8 +224,8 @@ func _ready() -> void:
 	
 	_cam.Zoom.connect(_Set_Zoomed);
 	
-	_cellSize = _mapGen.MapGenerator_Get_CellSize(self.get_path());
-	self.position = floor(self.position / _cellSize) * _cellSize;
+	#World.CellSize = _mapGen.MapGenerator_Get_CellSize(self.get_path());
+	self.position = floor(self.position / World.CellSize) * World.CellSize;
 	
 	_currPos = self.position;
 
@@ -238,26 +238,26 @@ func _process(delta: float) -> void:
 		#return;
 		
 	if Input.is_action_just_pressed(\"Enter\"):
-		#_message.position = Tools.Coord_OnGrid(self.position, _cellSize) - _messagePanelCont.size;
+		#_message.position = Tools.Coord_OnGrid(self.position, World.CellSize) - _messagePanelCont.size;
 		_message.Message_Set_Position_And_Size(self.position, self.get_path());
-		#_message.position.y -= _cellSize / 4;
+		#_message.position.y -= World.CellSize / 4;
 	
 	# Move Immediately on direction key Press
 	
 	if Input.is_action_just_pressed(\"Up\"):
-		self.position.y -= _cellSize;
+		self.position.y -= World.CellSize;
 		#_Fade_InOut(Vector2.UP);
 		_moveTimer = 0;
 	elif Input.is_action_just_pressed(\"Down\"):
-		self.position.y += _cellSize;
+		self.position.y += World.CellSize;
 		#_Fade_InOut(Vector2.DOWN);
 		_moveTimer = 0;
 	elif Input.is_action_just_pressed(\"Left\"):
-		self.position.x -= _cellSize;
+		self.position.x -= World.CellSize;
 		#_Fade_InOut(Vector2.LEFT);
 		_moveTimer = 0;
 	elif Input.is_action_just_pressed(\"Right\"):
-		self.position.x += _cellSize;
+		self.position.x += World.CellSize;
 		#_Fade_InOut(Vector2.RIGHT);
 		_moveTimer = 0;
 	
@@ -290,16 +290,16 @@ func _process(delta: float) -> void:
 			_moveTimer = 0;
 			match _lastDir:
 				Vector2.UP:
-					self.position.y -= _cellSize;
+					self.position.y -= World.CellSize;
 					#_Fade_InOut(Vector2.UP);
 				Vector2.DOWN:
-					self.position.y += _cellSize;
+					self.position.y += World.CellSize;
 					#_Fade_InOut(Vector2.DOWN);
 				Vector2.LEFT:
-					self.position.x -= _cellSize;
+					self.position.x -= World.CellSize;
 					#_Fade_InOut(Vector2.LEFT);
 				Vector2.RIGHT:
-					self.position.x += _cellSize;
+					self.position.x += World.CellSize;
 					#_Fade_InOut(Vector2.RIGHT);
 
 
@@ -328,7 +328,7 @@ func _Fade_InOut(dir:Vector2) -> void:
 	self.modulate.a = 0;
 	_modTween.tween_property(self, \"modulate:a\", 1, .5);
 	
-	_currPos = floor(_currPos / _cellSize) * _cellSize + dir * _cellSize;
+	_currPos = floor(_currPos / World.CellSize) * World.CellSize + dir * World.CellSize;
 	_modTween.tween_property(self, \"position\", _currPos, .5);
 
 
@@ -338,7 +338,7 @@ func _Set_Zoomed(on:bool, _camTargPos:Vector2) -> void:
 	_moveTimer = 0;
 	
 	if on:
-		self.position = floor(_camTargPos / _cellSize) * _cellSize;
+		self.position = floor(_camTargPos / World.CellSize) * World.CellSize;
 	
 	var alpha:float = on;
 	
@@ -381,7 +381,7 @@ func _Hold() -> void:
 		if !terrain:
 			
 			mouseStart = get_global_mouse_position();
-			var coord:Vector2 = Tools.Coord_OnGrid(mouseStart, _cellSize);
+			var coord:Vector2 = Tools.Coord_OnGrid(mouseStart);
 			terrain = _mapGen.MapGenerator_Get_TerrainSprite(coord, self.get_path());
 			marking = _mapGen.MapGenerator_Get_MarkingSprite(coord, self.get_path());
 			detail = _mapGen.MapGenerator_Get_DetailSprite(coord, self.get_path());
@@ -446,11 +446,9 @@ script/source = "extends Node2D
 
 const _padding:Vector2 = Vector2(128, 16);
 
-var _cellSize:float = 16;
-
 
 func _ready() -> void:
-	_panelContainer.custom_minimum_size = Vector2(_cellSize, _cellSize);
+	_panelContainer.custom_minimum_size = Vector2(World.CellSize, World.CellSize);
 	#_Set_Position_And_Size();
 
 
@@ -468,7 +466,7 @@ func _Set_Position_And_Size(pos:Vector2) -> void:
 	
 	_panelContainer.reset_size();
 
-	self.position = Tools.Coord_OnGrid(pos, _cellSize) - _panelContainer.size;
+	self.position = Tools.Coord_OnGrid(pos) - _panelContainer.size;
 
 	_panelContainer.position = _panelContainer.size / 2;
 	
