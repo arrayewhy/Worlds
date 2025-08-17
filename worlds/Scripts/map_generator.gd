@@ -28,7 +28,7 @@ enum Marking {
 	BIG_FISH,
 	JETTY,
 	TREASURE,
-	WHALE,
+	#WHALE,
 	#HOT_AIR_BALLOON,
 	OARFISH,
 	SEAGRASS,
@@ -42,7 +42,15 @@ const _spriteSheet:Texture2D = preload("res://Sprites/sparks_in_the_dark.png");
 const _glyphs:Texture2D = preload("res://Sprites/Glyphs.png");
 const _fadeInOut:Shader = preload("res://Shaders/fadeInOut.gdshader");
 const _wiggle:Shader = preload("res://Shaders/wiggle.gdshader");
-const _goodSeeds:Array[int] = [ 3184197067, 3043322721, 3879980289, 3302025460 ];
+const _goodSeeds:Array[int] = [
+	3184197067,
+	3043322721,
+	3879980289,
+	3302025460,
+	3869609850,
+	3622769036,
+	3726595959 # Three Brothers
+	];
 #const _lighthouseLamp:PackedScene = preload("res://Prefabs/lighthouse_lamp.tscn");
 
 # World
@@ -62,10 +70,15 @@ var _mapWidth:float;
 const _waterDepth:float = 4.0;
 const _alphaThresh:float = 1.0 / _waterDepth;
 
+var _terrain_data:Array[Terrain];
+var _marking_data:Array[Marking]
+
 # Sprite2D Arrays to quickly grab a Sprite2D by its Index
-var _terrain_sprite_array:Array[Sprite2D];
-var _marking_sprite_array:Array[Sprite2D]; # Markings / NULL
-var _detail_sprite_array:Array[Sprite2D]; # Details / NULL
+var _sprite_array_Terrain:Array[Sprite2D];
+var _sprite_array_Marking:Array[Sprite2D]; # Markings / NULL
+var _sprite_array_Detail:Array[Sprite2D]; # Details / NULL
+
+var _messageBottle_spawned:bool;
 
 # Noise Data
 @export var _noiseTex:TextureRect;
@@ -96,7 +109,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if event.is_action_pressed("Cancel"):
 		_Clear();
 		var newSeed:int = randi();
-		print_debug("Latest Seed: ", newSeed);
+		print("map_generator, Latest Seed: ", newSeed);
 		_Generate_Map(newSeed);
 
 
@@ -111,22 +124,23 @@ func _Generate_Map(newSeed:int) -> void:
 	
 	# Terrain & Marking Data are NOT permanent Variables
 	# because they are NOT expected to be used Elsewhere.
-	var terrainData:Array[Terrain] = _TerrainData_From_NoiseData(noiseData);
-	var markingData:Array[Marking] = _MarkingData_From_TerrainData(terrainData);
+	_terrain_data = _TerrainData_From_NoiseData(noiseData);
+	_marking_data = _MarkingData_From_TerrainData(_terrain_data);
 
 	# Final Data to Use
 	
-	terrainData = _ManipulateData_TerrainFromMarking(terrainData, markingData);
+	_terrain_data = _ManipulateData_TerrainFromMarking(_terrain_data, _marking_data);
 
 	_mapWidth = _noiseTex.get_texture().get_size().x;
 	
 	# Create Sprite2Ds
-	_terrain_sprite_array = _TerrainSprites_From_TerrainData(terrainData);
-	_marking_sprite_array = _MarkingSprites_From_MarkingData(markingData);
-	_detail_sprite_array = _DetailSprites_From_MarkingData(markingData);
+	_sprite_array_Terrain = _TerrainSprites_From_TerrainData(_terrain_data);
+	_sprite_array_Marking = _MarkingSprites_From_MarkingData(_marking_data);
+	_sprite_array_Detail = _DetailSprites_From_MarkingData(_marking_data);
 
 
 func _Clear() -> void:
+	
 	# Delete Sprite2Ds
 	for c in _cont_terrainSprites.get_children(): c.queue_free();
 	for c in _cont_showOnZoom.get_children(): c.queue_free();
@@ -134,9 +148,11 @@ func _Clear() -> void:
 	for c in _cont_alwaysShow.get_children(): c.queue_free();
 	for c in _cont_treasures.get_children(): c.queue_free();
 	# Delete Sprite2D References
-	_terrain_sprite_array = [];
-	_marking_sprite_array = [];
-	_detail_sprite_array = [];
+	_sprite_array_Terrain = [];
+	_sprite_array_Marking = [];
+	_sprite_array_Detail = [];
+	
+	_messageBottle_spawned = false;
 
 
 # Functions: Generate Data ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -254,8 +270,10 @@ func _MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> Array[Marking]
 			Terrain.DEPTHS:
 				if randi_range(0, 1000) > 980:
 					m.append(Marking.GOLD);
-				elif randi_range(0, 1000) > 595:
-					m.append(Marking.MESSAGE_BOTTLE);
+				elif randi_range(0, 1000) > 999:
+					if !_messageBottle_spawned:
+						_messageBottle_spawned = true;
+						m.append(Marking.MESSAGE_BOTTLE);
 				else:
 					m.append(Marking.Null);
 				continue;
@@ -263,8 +281,8 @@ func _MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> Array[Marking]
 			Terrain.ABYSS:
 				if randf_range(0, 1000) > 997:
 					m.append(Marking.TREASURE);
-				elif randf_range(0, 1000) > 996:
-					m.append(Marking.WHALE);
+				#elif randf_range(0, 1000) > 996:
+					#m.append(Marking.WHALE);
 				else:
 					m.append(Marking.Null);
 				continue;
@@ -388,7 +406,7 @@ func _MarkingSprites_From_MarkingData(markingData:Array[Marking]) -> Array[Sprit
 			
 			Marking.MESSAGE_BOTTLE:
 				spr = _Create_Sprite(14, 8, _glyphs);
-				_cont_showOnZoom.add_child(spr);
+				_cont_treasures.add_child(spr);
 				spr.add_child(Drift.new());
 				#spr.texture = _glyphs;
 				#spr.region_enabled = true;
@@ -425,9 +443,9 @@ func _MarkingSprites_From_MarkingData(markingData:Array[Marking]) -> Array[Sprit
 				spr.material = ShaderMaterial.new();
 				spr.material.shader = _fadeInOut;
 				
-			Marking.WHALE:
-				spr = _Create_Sprite(2, 5, _glyphs);
-				_cont_showOnZoom.add_child(spr);
+			#Marking.WHALE:
+				#spr = _Create_Sprite(2, 5, _glyphs);
+				#_cont_showOnZoom.add_child(spr);
 			
 			#Marking.HOT_AIR_BALLOON:
 				#spr = _Create_Sprite(10, 5, _spriteSheet);
@@ -535,8 +553,8 @@ func _DetailSprites_From_MarkingData(markingData:Array[Marking]) -> Array[Sprite
 				pass;
 			Marking.TREASURE:
 				pass;
-			Marking.WHALE:
-				pass;
+			#Marking.WHALE:
+				#pass;
 			Marking.SEAGRASS:
 				pass;
 			Marking.TEMPLE:
@@ -636,7 +654,7 @@ func ChangeTerrain(v2_array:Array[Vector2], terrainType:Terrain, callerPath:Stri
 
 func _ChangeTerrain(v2_array:Array[Vector2], terrainType:Terrain) -> void:
 	for v2 in v2_array:
-		var spr:Sprite2D = _terrain_sprite_array[(_mapWidth) * (v2.y / World.CellSize) + (v2.x / World.CellSize)];
+		var spr:Sprite2D = _sprite_array_Terrain[(_mapWidth) * (v2.y / World.CellSize) + (v2.x / World.CellSize)];
 		_Configure_TerrainSprite_LandAndSea(spr, terrainType);
 
 
@@ -651,16 +669,33 @@ func MapGenerator_Get_CellSize(callerPath:String) -> float:
 func MapGenerator_Get_TerrainSprite(coord:Vector2, callerPath:String) -> Sprite2D:
 	if _debug: print_debug("MapGenerator_Get_TerrainSprite, called by: ", callerPath);
 	var index:int = (coord.x + _mapWidth * coord.y) / World.CellSize;
-	return _terrain_sprite_array[index];
-
-
+	return _sprite_array_Terrain[index];
+	
 func MapGenerator_Get_MarkingSprite(coord:Vector2, callerPath:String) -> Sprite2D:
 	if _debug: print_debug("MapGenerator_Get_MarkingSprite, called by: ", callerPath);
 	var index:int = (coord.x + _mapWidth * coord.y) / World.CellSize;
-	return _marking_sprite_array[index];
-
-
+	return _sprite_array_Marking[index];
+	
 func MapGenerator_Get_DetailSprite(coord:Vector2, callerPath:String) -> Sprite2D:
 	if _debug: print_debug("MapGenerator_Get_DetailSprite, called by: ", callerPath);
 	var index:int = (coord.x + _mapWidth * coord.y) / World.CellSize;
-	return _detail_sprite_array[index];
+	return _sprite_array_Detail[index];
+
+
+func Is_Land(coord:Vector2, callerPath:String) -> bool:
+	if _debug: print_debug("Is_Land, called by: ", callerPath);
+	var index:int = (coord.x + _mapWidth * coord.y) / World.CellSize;
+	
+	match _terrain_data[index]:
+		Terrain.SHALLOWS:
+			return false;
+		Terrain.SEA:
+			return false;
+		Terrain.DEPTHS:
+			return false;
+		Terrain.ABYSS:
+			return false;
+		Terrain.SEA_GREEN:
+			return false;
+	
+	return true;
