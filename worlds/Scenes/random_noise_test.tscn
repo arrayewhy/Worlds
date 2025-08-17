@@ -192,7 +192,7 @@ image = SubResource("Image_svxh6")
 resource_name = "cursor"
 script/source = "extends Sprite2D
 
-@export var _mapGen:Node2D;
+@onready var _mapGen:Node2D = get_node(\"%map_generator\");
 
 @export var _cam:Camera2D;
 @export var _message:Node2D;
@@ -590,14 +590,13 @@ texture = ExtResource("4_5wq2m")
 region_enabled = true
 region_rect = Rect2(1536, 3072, 256, 768)
 
-[node name="Cursor" type="Sprite2D" parent="." node_paths=PackedStringArray("_mapGen", "_cam", "_message", "_messagePanelCont")]
+[node name="Cursor" type="Sprite2D" parent="." node_paths=PackedStringArray("_cam", "_message", "_messagePanelCont")]
 position = Vector2(1024, 1024)
 scale = Vector2(0.063, 0.063)
 texture = ExtResource("3_64th0")
 region_enabled = true
 region_rect = Rect2(256, 2304, 256, 256)
 script = SubResource("GDScript_nqsek")
-_mapGen = NodePath("..")
 _cam = NodePath("../Camera2D")
 _message = NodePath("../Message")
 _messagePanelCont = NodePath("../Message/PanelContainer")
@@ -639,6 +638,7 @@ label_settings = SubResource("LabelSettings_ormxn")
 vertical_alignment = 1
 
 [node name="map_generator" type="Node2D" parent="." node_paths=PackedStringArray("_noiseTex")]
+unique_name_in_owner = true
 script = ExtResource("1_0um4f")
 _noiseTex = NodePath("../Noise/Control/Noise Rect")
 

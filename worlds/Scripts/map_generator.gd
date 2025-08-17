@@ -49,7 +49,8 @@ const _goodSeeds:Array[int] = [
 	3302025460,
 	3869609850,
 	3622769036,
-	3726595959 # Three Brothers
+	3726595959, # Three Brothers
+	278936286
 	];
 #const _lighthouseLamp:PackedScene = preload("res://Prefabs/lighthouse_lamp.tscn");
 
@@ -126,10 +127,14 @@ func _Generate_Map(newSeed:int) -> void:
 	# because they are NOT expected to be used Elsewhere.
 	_terrain_data = _TerrainData_From_NoiseData(noiseData);
 	_marking_data = _MarkingData_From_TerrainData(_terrain_data);
+	
 
 	# Final Data to Use
 	
 	_terrain_data = _ManipulateData_TerrainFromMarking(_terrain_data, _marking_data);
+
+	print("Terrain Count: ", _terrain_data.size());
+	print("Marking Count: ", _marking_data.size());
 
 	_mapWidth = _noiseTex.get_texture().get_size().x;
 	
@@ -137,6 +142,9 @@ func _Generate_Map(newSeed:int) -> void:
 	_sprite_array_Terrain = _TerrainSprites_From_TerrainData(_terrain_data);
 	_sprite_array_Marking = _MarkingSprites_From_MarkingData(_marking_data);
 	_sprite_array_Detail = _DetailSprites_From_MarkingData(_marking_data);
+	print("Terrain Sprite Array: ", _sprite_array_Terrain.size());
+	print("Marking Sprite Array: ", _sprite_array_Marking.size());
+	print("Detail Sprite Array: ", _sprite_array_Detail.size());
 
 
 func _Clear() -> void:
@@ -182,10 +190,8 @@ func _TerrainData_From_NoiseData(noiseData:Array) -> Array[Terrain]:
 			t.append(Terrain.SEA);
 			continue;
 		elif d >= _depths && d < _sea:
-			
 			t.append(Terrain.DEPTHS);
 			continue;
-			
 		elif d < _depths:
 			t.append(Terrain.ABYSS)
 			continue;
@@ -274,6 +280,8 @@ func _MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> Array[Marking]
 					if !_messageBottle_spawned:
 						_messageBottle_spawned = true;
 						m.append(Marking.MESSAGE_BOTTLE);
+					else:
+						m.append(Marking.Null);
 				else:
 					m.append(Marking.Null);
 				continue;
@@ -422,7 +430,7 @@ func _MarkingSprites_From_MarkingData(markingData:Array[Marking]) -> Array[Sprit
 				_cont_showOnZoom.add_child(spr);
 				spr.material = ShaderMaterial.new();
 				spr.material.shader = _wiggle;
-				spr.material.set_shader_parameter("amplitude", randf_range(5.0, 20.0));
+				spr.material.set_shader_parameter("amplitude", randf_range(1.0, 10.0));
 				spr.material.set_shader_parameter("prog", randf_range(0.0, 10.0));
 				
 			Marking.BIG_FISH:
@@ -430,7 +438,7 @@ func _MarkingSprites_From_MarkingData(markingData:Array[Marking]) -> Array[Sprit
 				_cont_showOnZoom.add_child(spr);
 				spr.material = ShaderMaterial.new();
 				spr.material.shader = _wiggle;
-				spr.material.set_shader_parameter("amplitude", randf_range(5.0, 10.0));
+				spr.material.set_shader_parameter("amplitude", randf_range(1.0, 5.0));
 				spr.material.set_shader_parameter("prog", randf_range(0.0, 10.0));
 				
 			Marking.JETTY:
@@ -464,7 +472,7 @@ func _MarkingSprites_From_MarkingData(markingData:Array[Marking]) -> Array[Sprit
 				#spr.modulate = Color.ORANGE;
 			
 			Marking.GOLD:
-				pass;
+				s_array.append(null);
 			
 			Marking.Null:
 				s_array.append(null);
@@ -639,7 +647,7 @@ func _Configure_TerrainSprite_LandAndSea(spr:Sprite2D, terrainType:Terrain) -> v
 			spr.modulate.b -= rand;
 		Terrain.TEMPLE_RED:
 			#spr.region_rect.position.x = World.Spr_Reg_Size * 5;
-			spr.region_rect.position.x = World.Spr_Reg_Size * 10;
+			spr.region_rect.position.x = World.Spr_Reg_Size * 9;
 			
 		_:
 			print_debug("\nTerrain Data contains Invalid Data");
