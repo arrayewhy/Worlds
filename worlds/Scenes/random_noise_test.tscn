@@ -485,9 +485,7 @@ font_size = 8
 font_color = Color(0, 0, 0, 1)
 outline_color = Color(0, 0, 0, 1)
 
-[node name="RandomNoiseTest" type="Node2D" node_paths=PackedStringArray("_noiseTex")]
-script = ExtResource("1_0um4f")
-_noiseTex = NodePath("Noise/Control/TextureRect")
+[node name="RandomNoiseTest" type="Node2D"]
 
 [node name="Noise" type="CanvasLayer" parent="."]
 visible = false
@@ -500,7 +498,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TextureRect" type="TextureRect" parent="Noise/Control"]
+[node name="Noise Rect" type="TextureRect" parent="Noise/Control"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -517,23 +515,20 @@ color = Color(1, 0.983333, 0.9, 1)
 energy = 0.9
 texture = SubResource("GradientTexture2D_hf1hu")
 script = SubResource("GDScript_cl1kf")
-_mapGenerator = NodePath("..")
-_noiseTex = NodePath("../Noise/Control/TextureRect")
+_mapGenerator = NodePath("../map_generator")
+_noiseTex = NodePath("../Noise/Control/Noise Rect")
 
 [node name="Camera2D" type="Camera2D" parent="." node_paths=PackedStringArray("_mapGenerator", "_noiseTex", "_hide_on_zoom", "_show_on_zoom", "_cursor")]
 position = Vector2(1024, 1024)
 script = ExtResource("1_o4r1h")
-_mapGenerator = NodePath("..")
-_noiseTex = NodePath("../Noise/Control/TextureRect")
-_hide_on_zoom = NodePath("../Containers/hide_on_zoom")
-_show_on_zoom = NodePath("../Containers/show_on_zoom")
+_mapGenerator = NodePath("../map_generator")
+_noiseTex = NodePath("../Noise/Control/Noise Rect")
+_hide_on_zoom = NodePath("../map_generator/hide_on_zoom")
+_show_on_zoom = NodePath("../map_generator/show_on_zoom")
 _cursor = NodePath("../Cursor")
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
 color = Color(0.03, 0.0918333, 0.1, 1)
-
-[node name="Treasures" type="CanvasLayer" parent="."]
-follow_viewport_enabled = true
 
 [node name="Curtain" type="CanvasLayer" parent="."]
 visible = false
@@ -557,18 +552,7 @@ grow_vertical = 2
 color = Color(0, 0, 0, 1)
 
 [node name="Containers" type="Node2D" parent="."]
-
-[node name="Terrain" type="Node2D" parent="Containers"]
-z_index = -1
-
-[node name="hide_on_zoom" type="Node2D" parent="Containers"]
-z_index = 1
-
-[node name="show_on_zoom" type="Node2D" parent="Containers"]
-z_index = 1
-y_sort_enabled = true
-
-[node name="always_show" type="Node2D" parent="Containers"]
+visible = false
 
 [node name="Misc" type="Node2D" parent="."]
 visible = false
@@ -653,3 +637,22 @@ theme_override_fonts/font = SubResource("FontVariation_svxh6")
 text = "Fortune favours the prepared."
 label_settings = SubResource("LabelSettings_ormxn")
 vertical_alignment = 1
+
+[node name="map_generator" type="Node2D" parent="." node_paths=PackedStringArray("_noiseTex")]
+script = ExtResource("1_0um4f")
+_noiseTex = NodePath("../Noise/Control/Noise Rect")
+
+[node name="terrain" type="Node2D" parent="map_generator"]
+z_index = -1
+
+[node name="hide_on_zoom" type="Node2D" parent="map_generator"]
+z_index = 1
+
+[node name="show_on_zoom" type="Node2D" parent="map_generator"]
+z_index = 1
+y_sort_enabled = true
+
+[node name="always_show" type="Node2D" parent="map_generator"]
+
+[node name="Treasures" type="CanvasLayer" parent="map_generator"]
+follow_viewport_enabled = true

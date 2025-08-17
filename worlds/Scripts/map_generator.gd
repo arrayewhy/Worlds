@@ -71,10 +71,10 @@ var _detail_sprite_array:Array[Sprite2D]; # Details / NULL
 @export var _noiseTex:TextureRect;
 
 # Sprite2D Containers
-@onready var _cont_terrainSprites:Node2D = $Containers/Terrain;
-@onready var _cont_showOnZoom:Node2D = $Containers/show_on_zoom;
-@onready var _cont_hideOnZoom:Node2D = $Containers/hide_on_zoom;
-@onready var _cont_alwaysShow:Node2D = $Containers/always_show;
+@onready var _cont_terrainSprites:Node2D = $terrain;
+@onready var _cont_showOnZoom:Node2D = $show_on_zoom;
+@onready var _cont_hideOnZoom:Node2D = $hide_on_zoom;
+@onready var _cont_alwaysShow:Node2D = $always_show;
 @onready var _cont_treasures:CanvasLayer = $Treasures;
 
 @export_group("#DEBUG")
