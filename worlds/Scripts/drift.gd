@@ -32,7 +32,7 @@ func _process(delta: float) -> void:
 func _Move_Right() -> void:
 	
 	var hideTween:Tween = create_tween();
-	hideTween.tween_property(_master, "modulate:a", 0, 1);
+	hideTween.tween_property(_master, "modulate:a", 0, _moveThresh / 2);
 	
 	await hideTween.finished;
 	
@@ -44,4 +44,4 @@ func _Move_Right() -> void:
 		_master.modulate = Color(0, 0, 0, 0);
 	
 	var showTween:Tween = create_tween();
-	showTween.tween_property(_master, "modulate:a", 1, 1);
+	showTween.tween_property(_master, "modulate:a", 1, _moveThresh / 2);
