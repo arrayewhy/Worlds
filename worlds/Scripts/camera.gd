@@ -10,9 +10,10 @@ extends Camera2D
 
 @export var _cursor:Sprite2D;
 
-var _cellSize:float;
+const _normSpeed:float = 256;
+var _currSpeed:float = _normSpeed;
 
-var _speed:float = 256;
+var _cellSize:float;
 
 var _zoomed:bool;
 
@@ -36,21 +37,19 @@ func _process(delta: float) -> void:
 	if !_zoomed:
 	
 		if Input.is_action_pressed("Up"):
-			_targPos.y -= delta * _speed;
+			_targPos.y -= delta * _currSpeed;
 		if Input.is_action_pressed("Down"):
-			_targPos.y += delta * _speed;
+			_targPos.y += delta * _currSpeed;
 		if Input.is_action_pressed("Left"):
-			_targPos.x -= delta * _speed;
+			_targPos.x -= delta * _currSpeed;
 		if Input.is_action_pressed("Right"):
-			_targPos.x += delta * _speed;
-	
-		self.position += (_targPos - self.position) * delta * (_speed / 64);
-		
-		return;
+			_targPos.x += delta * _currSpeed;
+
+		self.position += (_targPos - self.position) * delta * (_currSpeed / 64);
 	
 	else:
 		
-		self.position += (_cursor.position - self.position) * delta * (_speed / 128);
+		self.position += (_cursor.position - self.position) * delta * (_currSpeed / 128);
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
@@ -87,7 +86,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		var zoomTween:Tween = create_tween();
 		zoomTween.set_trans(Tween.TRANS_QUINT);
 		zoomTween.set_ease(Tween.EASE_OUT);
-		zoomTween.tween_property(self, "zoom", Vector2(1.5, 1.5), 1.5);
+		zoomTween.tween_property(self, "zoom", Vector2(1, 1), 1.5);
 		#await zoomTween.finished;
 	
 	# Zoom In
@@ -124,6 +123,6 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		#await zoomTween.finished;
 		
 	if event.is_action_pressed("Shift"):
-		_speed = 256 * 2;
+		_currSpeed = _normSpeed * 2;
 	if event.is_action_released("Shift"):
-		_speed = 256;
+		_currSpeed = _normSpeed;
