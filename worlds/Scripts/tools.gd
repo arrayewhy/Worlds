@@ -9,6 +9,10 @@ static func Coord_OnGrid(v2:Vector2) -> Vector2:
 	return floor(v2 / World.CellSize) * World.CellSize;
 
 
+#static func Index_To_Coord(idx:int) -> Vector2:
+	#return Vector2(idx % );
+
+
 static func V2_Array_Around(pos:Vector2, range:int, skipCenter:bool = false) -> Array[Vector2]:
 	
 	var p:Array[Vector2] = [];

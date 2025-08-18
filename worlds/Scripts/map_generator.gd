@@ -57,7 +57,7 @@ const _goodSeeds:Array[int] = [
 # World
 #const World.CellSize:int = 16;
 #const World.Spr_Reg_Size:float = 256;
-var _mapWidth:float;
+#var _mapWidth:float;
 
 # Thresholds
 @export var _mountain:float = 230;
@@ -136,7 +136,7 @@ func _Generate_Map(newSeed:int) -> void:
 	print("Terrain Count: ", _terrain_data.size());
 	print("Marking Count: ", _marking_data.size());
 
-	_mapWidth = _noiseTex.get_texture().get_size().x;
+	World.Set_MapWidth(_noiseTex.get_texture().get_size().x, self.get_path());
 	
 	# Create Sprite2Ds
 	_sprite_array_Terrain = _TerrainSprites_From_TerrainData(_terrain_data);
@@ -145,6 +145,8 @@ func _Generate_Map(newSeed:int) -> void:
 	print("Terrain Sprite Array: ", _sprite_array_Terrain.size());
 	print("Marking Sprite Array: ", _sprite_array_Marking.size());
 	print("Detail Sprite Array: ", _sprite_array_Detail.size());
+	
+	World.Signal_Initial_MapGen_Complete(self.get_path());
 
 
 func _Clear() -> void:
@@ -324,6 +326,20 @@ func _ManipulateData_TerrainFromMarking(terrainData:Array[Terrain], markingData:
 	return t;
 
 
+func _ManipulateData_Marking(markingData:Array[Marking]) -> Array[Marking]:
+	
+	var m:Array[Marking] = markingData;
+	
+	for i in markingData.size():
+		match markingData[i]:
+			Marking.TREE:
+				#var pos:Vector2 = Tools.
+				#var p:Array[Vector2] = Tools.V2_Array_Around()
+				pass;
+				
+	return m;
+
+
 # Functions: Create Sprites ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
@@ -350,7 +366,7 @@ func _TerrainSprites_From_TerrainData(terrainData:Array[Terrain]) -> Array[Sprit
 		# Set Next sprite Position
 		
 		currX += 1;
-		if currX >= _mapWidth:
+		if currX >= World.MapWidth():
 			currX = 0;
 			currY += 1;
 		
@@ -491,7 +507,7 @@ func _MarkingSprites_From_MarkingData(markingData:Array[Marking]) -> Array[Sprit
 		# Set Next marking Position
 		
 		currX += 1;
-		if currX >= _mapWidth:
+		if currX >= World.MapWidth():
 			currX = 0;
 			currY += 1;
 			
@@ -601,7 +617,7 @@ func _DetailSprites_From_MarkingData(markingData:Array[Marking]) -> Array[Sprite
 		
 		# Set Next Detail Position
 		currX += 1;
-		if currX >= _mapWidth:
+		if currX >= World.MapWidth():
 			currX = 0;
 			currY += 1;
 			
@@ -670,7 +686,7 @@ func ChangeTerrain(v2_array:Array[Vector2], terrainType:Terrain, callerPath:Stri
 
 func _ChangeTerrain(v2_array:Array[Vector2], terrainType:Terrain) -> void:
 	for v2 in v2_array:
-		var spr:Sprite2D = _sprite_array_Terrain[(_mapWidth) * (v2.y / World.CellSize) + (v2.x / World.CellSize)];
+		var spr:Sprite2D = _sprite_array_Terrain[(World.MapWidth()) * (v2.y / World.CellSize) + (v2.x / World.CellSize)];
 		_Configure_TerrainSprite_LandAndSea(spr, terrainType);
 
 
@@ -684,23 +700,23 @@ func MapGenerator_Get_CellSize(callerPath:String) -> float:
 
 func MapGenerator_Get_TerrainSprite(coord:Vector2, callerPath:String) -> Sprite2D:
 	if _debug: print_debug("MapGenerator_Get_TerrainSprite, called by: ", callerPath);
-	var index:int = (coord.x + _mapWidth * coord.y) / World.CellSize;
+	var index:int = (coord.x + World.MapWidth() * coord.y) / World.CellSize;
 	return _sprite_array_Terrain[index];
 	
 func MapGenerator_Get_MarkingSprite(coord:Vector2, callerPath:String) -> Sprite2D:
 	if _debug: print_debug("MapGenerator_Get_MarkingSprite, called by: ", callerPath);
-	var index:int = (coord.x + _mapWidth * coord.y) / World.CellSize;
+	var index:int = (coord.x + World.MapWidth() * coord.y) / World.CellSize;
 	return _sprite_array_Marking[index];
 	
 func MapGenerator_Get_DetailSprite(coord:Vector2, callerPath:String) -> Sprite2D:
 	if _debug: print_debug("MapGenerator_Get_DetailSprite, called by: ", callerPath);
-	var index:int = (coord.x + _mapWidth * coord.y) / World.CellSize;
+	var index:int = (coord.x + World.MapWidth() * coord.y) / World.CellSize;
 	return _sprite_array_Detail[index];
 
 
 func Is_Land(coord:Vector2, callerPath:String) -> bool:
 	if _debug: print_debug("Is_Land, called by: ", callerPath);
-	var index:int = (coord.x + _mapWidth * coord.y) / World.CellSize;
+	var index:int = (coord.x + World.MapWidth() * coord.y) / World.CellSize;
 	
 	match _terrain_data[index]:
 		Terrain.SHALLOWS:
