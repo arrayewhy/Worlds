@@ -48,10 +48,10 @@ func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("Enter"):
 		
 		var pos:Vector2 = Tools.Coord_OnGrid(self.position);
-		var v2_array:Array[Vector2] = Tools.V2_Array_Around(pos, 1);
-		v2_array = [pos];
+		var v2_array:Array[Vector2] = Tools.V2_Array_Around(pos, 1, true);
+		#v2_array = [pos];
 		_mapGen.ChangeTerrain(v2_array, 10, self.get_path());
-		#print(v2_array);
+		#print(v2_array.size());
 		#_Position_Message();
 	
 	# Move Immediately on direction key Press

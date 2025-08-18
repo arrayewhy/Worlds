@@ -24,3 +24,12 @@ func Set_MapWidth(width:float, callerPath:String) -> void:
 
 func MapWidth() -> float:
 	return _mapWidth;
+
+
+#func Set_TotalUnitWidth(width:float, callerPath:String) -> void:
+	#if _debug: print_debug("Set_TotalUnitWidth, called by: ", callerPath);
+	#_totalUnitWidth = width;
+#
+#
+#func Total_Unit_Width() -> float:
+	#return _totalUnitWidth;

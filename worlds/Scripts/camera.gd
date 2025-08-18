@@ -1,10 +1,5 @@
 extends Camera2D
 
-#@export var _mapGenerator:Node2D;
-#@export var _noiseTex:TextureRect;
-
-#@export var _trees:Node2D;
-#@export var _houses:Node2D;
 @export var _hide_on_zoom:Node2D;
 @export var _show_on_zoom:Node2D;
 
@@ -12,8 +7,6 @@ extends Camera2D
 
 const _normSpeed:float = 256;
 var _currSpeed:float = _normSpeed;
-
-#var _cellSize:float;
 
 var _zoomed:bool;
 
@@ -24,20 +17,11 @@ signal Zoom(on:bool, camTargPos:Vector2);
 
 func _ready() -> void:
 	
-	#_cellSize = _mapGenerator.MapGenerator_Get_CellSize(self.get_path());
+	# Wait for Initial Map Generation
 	
-	#await _noiseTex.texture.changed;
-	#self.position = Vector2.ONE * _cellSize * (sqrt(_noiseTex.get_texture().get_image().get_data().size()) / 2);
-	
-	#await World.Initial_MapGen_Complete;
-	
-	# I think this is Good Practice so when we want to Check Connections to this Signal, we can.
+	# It is Good Practice to Connect to Signals instead of Awaiting Directly,
+	# so when we want to Check Connections to this Signal, we can.
 	World.Initial_MapGen_Complete.connect(_On_Initial_MapGen_Complete);
-	
-	#self.position = Vector2.ONE * World.CellSize * (World.MapWidth() / 2);
-	#self.position = Vector2.ONE * World.CellSize * (sqrt(_noiseTex.get_texture().get_image().get_data().size()) / 2);
-	
-	#_targPos = self.position;
 
 
 func _process(delta: float) -> void:
@@ -134,6 +118,9 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		_currSpeed = _normSpeed * 2;
 	if event.is_action_released("Shift"):
 		_currSpeed = _normSpeed;
+
+
+# Functions: Signals ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
 func _On_Initial_MapGen_Complete() -> void:
