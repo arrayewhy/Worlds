@@ -123,28 +123,28 @@ func _Generate_Map(newSeed:int) -> void:
 	await _noiseTex.texture.changed;
 	var noiseData:PackedByteArray = _noiseTex.get_texture().get_image().get_data();
 	
+	World.Set_MapWidth(_noiseTex.get_texture().get_size().x, self.get_path());
+	
 	# Terrain & Marking Data are NOT permanent Variables
 	# because they are NOT expected to be used Elsewhere.
 	_terrain_data = _TerrainData_From_NoiseData(noiseData);
 	_marking_data = _MarkingData_From_TerrainData(_terrain_data);
-	
 
 	# Final Data to Use
 	
 	_terrain_data = _ManipulateData_TerrainFromMarking(_terrain_data, _marking_data);
-
-	print("Terrain Count: ", _terrain_data.size());
-	print("Marking Count: ", _marking_data.size());
-
-	World.Set_MapWidth(_noiseTex.get_texture().get_size().x, self.get_path());
+	_marking_data = _ManipulateData_Marking(_marking_data);
+	
+	#print("Terrain Count: ", _terrain_data.size());
+	#print("Marking Count: ", _marking_data.size());
 	
 	# Create Sprite2Ds
 	_sprite_array_Terrain = _TerrainSprites_From_TerrainData(_terrain_data);
 	_sprite_array_Marking = _MarkingSprites_From_MarkingData(_marking_data);
 	_sprite_array_Detail = _DetailSprites_From_MarkingData(_marking_data);
-	print("Terrain Sprite Array: ", _sprite_array_Terrain.size());
-	print("Marking Sprite Array: ", _sprite_array_Marking.size());
-	print("Detail Sprite Array: ", _sprite_array_Detail.size());
+	#print("Terrain Sprite Array: ", _sprite_array_Terrain.size());
+	#print("Marking Sprite Array: ", _sprite_array_Marking.size());
+	#print("Detail Sprite Array: ", _sprite_array_Detail.size());
 	
 	World.Signal_Initial_MapGen_Complete(self.get_path());
 
@@ -224,7 +224,8 @@ func _MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> Array[Marking]
 			
 			Terrain.HIGHLAND:
 				if randi_range(0, 1000) > 500:
-					m.append(Marking.HILL);
+					m.append(Marking.TREE);
+					#m.append(Marking.HILL);
 				elif randi_range(0, 1000) > 200:
 					m.append(Marking.TREE);
 				#elif randi_range(0, 1000) > 995:
@@ -327,17 +328,80 @@ func _ManipulateData_TerrainFromMarking(terrainData:Array[Terrain], markingData:
 
 
 func _ManipulateData_Marking(markingData:Array[Marking]) -> Array[Marking]:
+	#var done = false;
+	var mark_array:Array[Marking] = markingData;
 	
-	var m:Array[Marking] = markingData;
+	var width:float = World.MapWidth();
 	
-	for i in markingData.size():
-		match markingData[i]:
+	#print(_terrain_data.size());
+	#print(mark_array.size());
+	
+	for i in mark_array.size():
+		
+		match mark_array[i]:
+			
 			Marking.TREE:
-				#var pos:Vector2 = Tools.
-				#var p:Array[Vector2] = Tools.V2_Array_Around()
-				pass;
 				
-	return m;
+				#var house:bool = true;
+				
+				var center:Vector2 = Tools.Index_To_Coord(i, int(width)) * World.CellSize;
+				#print("Center: ", center);
+				center = Tools.Coord_OnGrid(center);
+				var surr_coords:Array[Vector2] = Tools.V2_Array_Around(center, 1, true);
+				#print(surr_coords);
+				
+				#if !done:
+					#done = true;
+					#_terrain_data[i] = Terrain.TEMPLE_RED;
+					#for s in surr_coords:
+						#_terrain_data[Tools.Coord_To_Index(s, width)] = Terrain.Null;
+					
+					#_terrain_data[i] = Terrain.Null;
+					
+				
+				var surr_idx:Array[int] = [];
+				
+				for coord in surr_coords:
+					surr_idx.append(Tools.Coord_To_Index(coord, World.MapWidth()));
+					
+					#print(surr_idx);
+					#for idx in surr_idx:
+						#_terrain_data[idx] = Terrain.MOUNTAIN;
+
+				var surr_marks:Array[Marking] = [];
+				
+				for idx in surr_idx:
+					surr_marks.append(mark_array[idx]);
+				
+					#print(surr_marks);
+					
+				#for s in surr_coords:
+					#var markIdx:int = Tools.Coord_To_Index(s, width);
+					#surr_marks.append(mark_array[markIdx]);
+				
+				var trees:int = 0;
+				
+				for m in surr_marks:
+					if m == Marking.TREE:
+						trees += 1;
+						#house = false;
+					#else:
+						#trees += 1;
+				#if !done: 
+					#done = true;
+				#_terrain_data[i] = Terrain.Null;
+				#print(surr_marks);
+				#print(trees);
+
+				if trees >= 8:
+				#if house:
+					#if !done:
+						#done = true;
+					mark_array[i] = Marking.HOUSE;
+					#print("House!");
+					#print(trees);
+				
+	return mark_array;
 
 
 # Functions: Create Sprites ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -673,6 +737,9 @@ func _Configure_TerrainSprite_LandAndSea(spr:Sprite2D, terrainType:Terrain) -> v
 			#spr.region_rect.position.x = World.Spr_Reg_Size * 5;
 			spr.region_rect.position.x = World.Spr_Reg_Size * 9;
 			
+		Terrain.Null:
+			spr.region_rect.position.x = World.Spr_Reg_Size * 8;
+			
 		_:
 			print_debug("\nTerrain Data contains Invalid Data");
 
@@ -693,9 +760,9 @@ func _ChangeTerrain(v2_array:Array[Vector2], terrainType:Terrain) -> void:
 # Functions: Get Set ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
-func MapGenerator_Get_CellSize(callerPath:String) -> float:
-	if _debug: print_debug("MapGenerator_Get_CellSize, Called by:", callerPath);
-	return World.CellSize;
+#func MapGenerator_Get_CellSize(callerPath:String) -> float:
+	#if _debug: print_debug("MapGenerator_Get_CellSize, Called by:", callerPath);
+	#return World.CellSize;
 
 
 func MapGenerator_Get_TerrainSprite(coord:Vector2, callerPath:String) -> Sprite2D:
