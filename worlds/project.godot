@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Worlds"
-run/main_scene="res://Scenes/Main.tscn"
+run/main_scene="uid://86tq3blbo8rs"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -19,9 +19,6 @@ config/icon="res://icon.svg"
 
 World="*res://Scripts/Autoloads/World.gd"
 InGameDebugger="*res://Scripts/Debug/InGameDebugger.gd"
-AudioMaster="*res://Prefabs/Audio-Master.tscn"
-MultiFader="*res://Scripts/Autoloads/Multi-Fader.gd"
-PauseMenu="*res://Prefabs/Pause-Menu-Layer.tscn"
 
 [display]
 
