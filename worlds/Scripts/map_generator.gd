@@ -20,7 +20,7 @@ enum Marking {
 	HOUSE,
 	#TENT,
 	PEAK,
-	HILLS,
+	HILL,
 	TREE,
 	LIGHTHOUSE,
 	SHELL,
@@ -217,12 +217,12 @@ func _MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> Array[Marking]
 				#elif randi_range(0, 1000) > 990:
 					#m.append(Marking.HOT_AIR_BALLOON);
 				else:
-					m.append(Marking.HILLS);
+					m.append(Marking.HILL);
 				continue;
 			
 			Terrain.HIGHLAND:
 				if randi_range(0, 1000) > 500:
-					m.append(Marking.HILLS);
+					m.append(Marking.HILL);
 				elif randi_range(0, 1000) > 200:
 					m.append(Marking.TREE);
 				#elif randi_range(0, 1000) > 995:
@@ -387,7 +387,7 @@ func _MarkingSprites_From_MarkingData(markingData:Array[Marking]) -> Array[Sprit
 				_cont_alwaysShow.add_child(spr);
 				spr.scale *= randf_range(1, 1.5);
 				
-			Marking.HILLS:
+			Marking.HILL:
 				spr = _Create_Sprite(5, 7, _spriteSheet);
 				_cont_showOnZoom.add_child(spr);
 				#spr.modulate = Color.BLACK;
@@ -395,7 +395,8 @@ func _MarkingSprites_From_MarkingData(markingData:Array[Marking]) -> Array[Sprit
 				
 			Marking.TREE:
 				spr = _Create_Sprite(7, 6, _spriteSheet);
-				_cont_hideOnZoom.add_child(spr);
+				_cont_alwaysShow.add_child(spr);
+				#spr.modulate = Color.BLACK;
 				
 			Marking.LIGHTHOUSE:
 				spr = _Create_Sprite(0, 11, _glyphs);
@@ -520,27 +521,33 @@ func _DetailSprites_From_MarkingData(markingData:Array[Marking]) -> Array[Sprite
 				# Randomise Transform
 				spr.position.y = currY * World.CellSize - randf_range(0, World.CellSize / 1.5);
 				spr.scale *= randf_range(1, 1.125);
+				spr.scale /= 1.5;
 				spr.rotation += randf_range(-.125, .125);
 				
 			#Marking.TENT:
 				#pass;
 			Marking.PEAK:
 				pass;
-			Marking.HILLS:
+			Marking.HILL:
 				pass;
 				
 			Marking.TREE:
+				pass;
 				
-				spr = _Create_Sprite(8, 6, _spriteSheet);
-				_cont_showOnZoom.add_child(spr);
-				
-				spr.position = Vector2(currX * World.CellSize, currY * World.CellSize);
-				# Randomise Transform
-				spr.position += Vector2.ONE * randf_range(-.4, .4);
-				spr.scale += Vector2.ONE * randf_range(-.01, .02);
-				spr.offset.y -= World.CellSize * 4;
+				#spr = _Create_Sprite(8, 6, _spriteSheet);
+				#_cont_showOnZoom.add_child(spr);
+				#
+				#spr.position = Vector2(currX * World.CellSize, currY * World.CellSize);
+				## Randomise Transform
+				#spr.position += Vector2.ONE * randf_range(-.4, .4);
+				#spr.scale += Vector2.ONE * randf_range(-.01, .02);
+				#spr.offset.y -= World.CellSize * 4;
 				
 			Marking.LIGHTHOUSE:
+				
+				#spr = _Create_Sprite(14, 5, _spriteSheet);
+				#spr.region_rect.size = Vector2(World.Spr_Reg_Size, World.Spr_Reg_Size * 2);
+				#spr.offset.y -= World.Spr_Reg_Size;
 				
 				spr = _Create_Sprite(6, 12, _spriteSheet);
 				_cont_showOnZoom.add_child(spr);
@@ -550,6 +557,7 @@ func _DetailSprites_From_MarkingData(markingData:Array[Marking]) -> Array[Sprite
 				# Adjust Sprite2D
 				spr.region_rect.size = Vector2(World.Spr_Reg_Size, World.Spr_Reg_Size * 3);
 				spr.offset.y -= World.Spr_Reg_Size + World.Spr_Reg_Size / 2;
+				spr.scale /= 2;
 				
 			Marking.SHELL:
 				pass;
