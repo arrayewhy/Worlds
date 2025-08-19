@@ -15,13 +15,15 @@ var _targPos:Vector2;
 signal Zoom(on:bool, camTargPos:Vector2);
 
 
+# Functions: Built-in ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
 func _ready() -> void:
 	
 	# Wait for Initial Map Generation
-	
+	World.Initial_MapGen_Complete.connect(_On_Initial_MapGen_Complete);
 	# It is Good Practice to Connect to Signals instead of Awaiting Directly,
 	# so when we want to Check Connections to this Signal, we can.
-	World.Initial_MapGen_Complete.connect(_On_Initial_MapGen_Complete);
 
 
 func _process(delta: float) -> void:
@@ -46,24 +48,27 @@ func _process(delta: float) -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	
-	# Zoom Out
 	if event.is_action_pressed("Zoom") && _zoomed:
+		_Zoom_Out();
+	elif event.is_action_pressed("Zoom") && !_zoomed:
+		_Zoom_In();
 		
+	if event.is_action_pressed("Shift"):
+		_currSpeed = _normSpeed * 2;
+	if event.is_action_released("Shift"):
+		_currSpeed = _normSpeed;
+
+
+# Functions ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+func _Zoom_Out() -> void:
+	
 		_zoomed = false;
 		
 		_targPos = _cursor.position;
 		
 		Zoom.emit(_zoomed, _targPos);
-		
-		#var treeTween:Tween = create_tween();
-		#treeTween.set_trans(Tween.TRANS_CUBIC);
-		#treeTween.set_ease(Tween.EASE_IN_OUT);
-		#treeTween.tween_property(_trees, "modulate:a", 1.0, .5);
-		
-		#var houseTween:Tween = create_tween();
-		#houseTween.set_trans(Tween.TRANS_CUBIC);
-		#houseTween.set_ease(Tween.EASE_IN_OUT);
-		#houseTween.tween_property(_houses, "modulate:a", 1.0, .5);
 		
 		var objTween:Tween = create_tween();
 		objTween.set_trans(Tween.TRANS_CUBIC);
@@ -79,24 +84,12 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		zoomTween.set_trans(Tween.TRANS_QUINT);
 		zoomTween.set_ease(Tween.EASE_OUT);
 		zoomTween.tween_property(self, "zoom", Vector2(1, 1), 1.5);
-		#await zoomTween.finished;
+
+func _Zoom_In() -> void:
 	
-	# Zoom In
-	elif event.is_action_pressed("Zoom") && !_zoomed:
-		
 		_zoomed = true;
 		
 		Zoom.emit(_zoomed, _targPos);
-		
-		#var treeTween:Tween = create_tween();
-		#treeTween.set_trans(Tween.TRANS_QUAD);
-		#treeTween.set_ease(Tween.EASE_IN_OUT);
-		#treeTween.tween_property(_trees, "modulate:a", 0, .5);
-		
-		#var houseTween:Tween = create_tween();
-		#houseTween.set_trans(Tween.TRANS_QUAD);
-		#houseTween.set_ease(Tween.EASE_IN_OUT);
-		#houseTween.tween_property(_houses, "modulate:a", 0, .5);
 		
 		var objTween:Tween = create_tween();
 		objTween.set_trans(Tween.TRANS_CUBIC);
@@ -112,13 +105,6 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		zoomTween.set_trans(Tween.TRANS_CUBIC);
 		zoomTween.set_ease(Tween.EASE_IN_OUT);
 		zoomTween.tween_property(self, "zoom", Vector2(3.5, 3.5), 1.25);
-		#await zoomTween.finished;
-		
-	if event.is_action_pressed("Shift"):
-		_currSpeed = _normSpeed * 2;
-	if event.is_action_released("Shift"):
-		_currSpeed = _normSpeed;
-
 
 # Functions: Signals ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
@@ -126,3 +112,4 @@ func _unhandled_key_input(event: InputEvent) -> void:
 func _On_Initial_MapGen_Complete() -> void:
 	self.position = Vector2.ONE * World.CellSize * (World.MapWidth() / 2);
 	_targPos = self.position;
+	_Zoom_In();
