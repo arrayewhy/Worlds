@@ -13,6 +13,7 @@ enum Terrain {
 	# Specials
 	SEA_GREEN,
 	TEMPLE_RED,
+	DOCK,
 	}
 
 enum Marking { 
@@ -72,7 +73,7 @@ const _waterDepth:float = 4.0;
 const _alphaThresh:float = 1.0 / _waterDepth;
 
 var _terrain_data:Array[Terrain];
-var _marking_data:Array[Marking]
+var _marking_data:Array[Marking];
 
 # Sprite2D Arrays to quickly grab a Sprite2D by its Index
 var _sprite_array_Terrain:Array[Sprite2D];
@@ -89,7 +90,7 @@ var _messageBottle_spawned:bool;
 @onready var _cont_showOnZoom:Node2D = $show_on_zoom;
 @onready var _cont_hideOnZoom:Node2D = $hide_on_zoom;
 @onready var _cont_alwaysShow:Node2D = $always_show;
-@onready var _cont_treasures:CanvasLayer = $Treasures;
+@onready var _cont_treasures:CanvasLayer = $treasures;
 
 @export_group("#DEBUG")
 @export var _debug:bool;
@@ -118,7 +119,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 
 func _Generate_Map(newSeed:int) -> void:
-
+	
 	_noiseTex.texture.noise.seed = newSeed;
 	await _noiseTex.texture.changed;
 	var noiseData:PackedByteArray = _noiseTex.get_texture().get_image().get_data();
@@ -129,11 +130,11 @@ func _Generate_Map(newSeed:int) -> void:
 	# because they are NOT expected to be used Elsewhere.
 	_terrain_data = _TerrainData_From_NoiseData(noiseData);
 	_marking_data = _MarkingData_From_TerrainData(_terrain_data);
-
+	
 	# Final Data to Use
 	
-	_terrain_data = _ManipulateData_TerrainFromMarking(_terrain_data, _marking_data);
-	_marking_data = _ManipulateData_Marking(_marking_data);
+	_terrain_data = _Amend_TerrainData_Using_MarkingData(_terrain_data, _marking_data);
+	_marking_data = _Amend_MarkingData(_marking_data);
 	
 	#print("Terrain Count: ", _terrain_data.size());
 	#print("Marking Count: ", _marking_data.size());
@@ -313,7 +314,22 @@ func _MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> Array[Marking]
 	return m;
 
 
-func _ManipulateData_TerrainFromMarking(terrainData:Array[Terrain], markingData:Array[Marking]) -> Array[Terrain]:
+func _Amend_TerrainData(terrainData:Array[Terrain]) -> Array[Terrain]:
+	
+	var t_array:Array[Terrain] = terrainData;
+	
+	for t in t_array:
+		
+		match t:
+			
+			Terrain.COAST:
+				
+				pass;
+	
+	return t_array;
+
+
+func _Amend_TerrainData_Using_MarkingData(terrainData:Array[Terrain], markingData:Array[Marking]) -> Array[Terrain]:
 	
 	var t:Array[Terrain] = terrainData;
 	
@@ -327,14 +343,11 @@ func _ManipulateData_TerrainFromMarking(terrainData:Array[Terrain], markingData:
 	return t;
 
 
-func _ManipulateData_Marking(markingData:Array[Marking]) -> Array[Marking]:
-	#var done = false;
+func _Amend_MarkingData(markingData:Array[Marking]) -> Array[Marking]:
+	
 	var mark_array:Array[Marking] = markingData;
 	
 	var width:float = World.MapWidth();
-	
-	#print(_terrain_data.size());
-	#print(mark_array.size());
 	
 	for i in mark_array.size():
 		
@@ -342,64 +355,29 @@ func _ManipulateData_Marking(markingData:Array[Marking]) -> Array[Marking]:
 			
 			Marking.TREE:
 				
-				#var house:bool = true;
+				var center:Vector2 = World.Index_To_Coord(i) * World.CellSize;
 				
-				var center:Vector2 = Tools.Index_To_Coord(i, int(width)) * World.CellSize;
-				#print("Center: ", center);
-				center = Tools.Coord_OnGrid(center);
-				var surr_coords:Array[Vector2] = Tools.V2_Array_Around(center, 1, true);
-				#print(surr_coords);
-				
-				#if !done:
-					#done = true;
-					#_terrain_data[i] = Terrain.TEMPLE_RED;
-					#for s in surr_coords:
-						#_terrain_data[Tools.Coord_To_Index(s, width)] = Terrain.Null;
-					
-					#_terrain_data[i] = Terrain.Null;
-					
+				#center = World.Coord_OnGrid(center);
+				var surr_coords:Array[Vector2] = World.V2_Array_Around(center, 1, true);
 				
 				var surr_idx:Array[int] = [];
 				
 				for coord in surr_coords:
-					surr_idx.append(Tools.Coord_To_Index(coord, World.MapWidth()));
-					
-					#print(surr_idx);
-					#for idx in surr_idx:
-						#_terrain_data[idx] = Terrain.MOUNTAIN;
+					surr_idx.append(World.Coord_To_Index(coord));
 
 				var surr_marks:Array[Marking] = [];
 				
 				for idx in surr_idx:
 					surr_marks.append(mark_array[idx]);
 				
-					#print(surr_marks);
-					
-				#for s in surr_coords:
-					#var markIdx:int = Tools.Coord_To_Index(s, width);
-					#surr_marks.append(mark_array[markIdx]);
-				
 				var trees:int = 0;
 				
 				for m in surr_marks:
 					if m == Marking.TREE:
 						trees += 1;
-						#house = false;
-					#else:
-						#trees += 1;
-				#if !done: 
-					#done = true;
-				#_terrain_data[i] = Terrain.Null;
-				#print(surr_marks);
-				#print(trees);
 
 				if trees >= 8:
-				#if house:
-					#if !done:
-						#done = true;
 					mark_array[i] = Marking.HOUSE;
-					#print("House!");
-					#print(trees);
 				
 	return mark_array;
 
