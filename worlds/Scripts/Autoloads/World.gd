@@ -1,8 +1,8 @@
 extends Node;
 
-var CellSize:float = 16;
-var Spr_Reg_Size:float = 256;
-var _mapWidth:float;
+const CellSize:float = 16;
+const Spr_Reg_Size:float = 256;
+var _mapWidth:int;
 
 signal Initial_MapGen_Complete;
 
@@ -17,12 +17,12 @@ func Signal_Initial_MapGen_Complete(callerPath:String) -> void:
 # Functions: Get Set ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
-func Set_MapWidth(width:float, callerPath:String) -> void:
+func Set_MapWidth(width:int, callerPath:String) -> void:
 	if _debug: print_debug("Set_MapWidth, called by: ", callerPath);
 	_mapWidth = width;
 
 
-func MapWidth() -> float:
+func MapWidth() -> int:
 	return _mapWidth;
 
 
@@ -33,3 +33,45 @@ func MapWidth() -> float:
 #
 #func Total_Unit_Width() -> float:
 	#return _totalUnitWidth;
+
+
+func Float_OnGrid(val:float) -> float:
+	return floor(val / CellSize) * CellSize;
+
+
+func Coord_OnGrid(v2:Vector2) -> Vector2:
+	return floor(v2 / CellSize) * CellSize;
+
+
+func Index_To_Coord(idx:int) -> Vector2:
+	return Vector2(idx % int(_mapWidth), idx / _mapWidth);
+
+
+func Coord_To_Index(coord:Vector2) -> int:
+	return (_mapWidth * coord.y + coord.x) / CellSize;
+
+
+func V2_Array_Around(pos:Vector2, range:int, skipCenter:bool = false) -> Array[Vector2]:
+	
+	var p:Array[Vector2] = [];
+	
+	var length:float = range * 2 + 1;
+	
+	var start:Vector2 = pos + (-Vector2.ONE * range * CellSize);
+	#REFACTOR
+	for y in length:
+		
+		if start.y + y * CellSize < 0 || start.y + y * CellSize >= World.MapWidth() * CellSize:
+			continue;
+		
+		for x in length:
+			
+			if start.x + x * CellSize < 0 || start.x + x * CellSize >= World.MapWidth() * CellSize:
+				continue;
+			p.append(start + Vector2(x, y) * CellSize);
+	
+	if skipCenter && p.has(pos):
+		p.erase(pos);
+		#p.remove_at(length * range + range);
+	
+	return p;

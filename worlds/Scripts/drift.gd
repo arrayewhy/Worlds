@@ -36,7 +36,7 @@ func _Move_Right() -> void:
 	
 	await hideTween.finished;
 	
-	var currX = Tools.Float_OnGrid(_master.position.x);
+	var currX = World.Float_OnGrid(_master.position.x);
 	_master.position.x = currX + World.CellSize;
 	
 	if _mapGen.Is_Land(_master.position, self.get_path()):

@@ -47,8 +47,8 @@ func _process(delta: float) -> void:
 		
 	if Input.is_action_just_pressed("Enter"):
 		
-		var pos:Vector2 = Tools.Coord_OnGrid(self.position);
-		var v2_array:Array[Vector2] = Tools.V2_Array_Around(pos, 1, true);
+		var pos:Vector2 = World.Coord_OnGrid(self.position);
+		var v2_array:Array[Vector2] = World.V2_Array_Around(pos, 1, true);
 		#v2_array = [pos];
 		_mapGen.ChangeTerrain(v2_array, 10, self.get_path());
 		#print(v2_array.size());
@@ -201,7 +201,7 @@ func _Hold() -> void:
 		if !terrain:
 			
 			mouseStart = get_global_mouse_position();
-			var coord:Vector2 = Tools.Coord_OnGrid(mouseStart);
+			var coord:Vector2 = World.Coord_OnGrid(mouseStart);
 			terrain = _mapGen.MapGenerator_Get_TerrainSprite(coord, self.get_path());
 			marking = _mapGen.MapGenerator_Get_MarkingSprite(coord, self.get_path());
 			detail = _mapGen.MapGenerator_Get_DetailSprite(coord, self.get_path());
