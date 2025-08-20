@@ -5,8 +5,9 @@ var _master:Node2D;
 #REFACTOR
 @onready var _mapGen:Node2D = get_parent().get_parent().get_parent();
 
+const _moveThresh:float = 3;
+
 var _time:float;
-var _moveThresh:float = 4;
 
 
 # Functions: Built-in ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -14,6 +15,7 @@ var _moveThresh:float = 4;
 
 func _ready() -> void:
 	_master = get_parent();
+	_Move_Right();
 
 
 func _process(delta: float) -> void:

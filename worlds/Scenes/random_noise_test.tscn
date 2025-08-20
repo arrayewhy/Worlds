@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://86tq3blbo8rs"]
+[gd_scene load_steps=25 format=3 uid="uid://86tq3blbo8rs"]
 
 [ext_resource type="Script" uid="uid://ddx5i8d1mr1lo" path="res://Scripts/map_generator.gd" id="1_0um4f"]
 [ext_resource type="Script" uid="uid://bu55c8rfhtrsl" path="res://Scripts/camera.gd" id="1_o4r1h"]
@@ -7,19 +7,7 @@
 [ext_resource type="Script" uid="uid://cfisq7q1r08j0" path="res://Scripts/cursor.gd" id="4_rrw6a"]
 [ext_resource type="FontFile" uid="uid://bn56m5j1acs0j" path="res://Misc/Fonts/Georgia.ttf" id="5_n34cn"]
 [ext_resource type="Texture2D" uid="uid://da0t66iwxuyxq" path="res://Sprites/textbox_yellow.png" id="6_svxh6"]
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_g2m6q"]
-noise_type = 3
-frequency = 0.04
-fractal_weighted_strength = 0.1
-
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ue23j"]
-width = 32
-height = 32
-invert = true
-generate_mipmaps = false
-seamless_blend_skirt = 1.0
-noise = SubResource("FastNoiseLite_g2m6q")
+[ext_resource type="Script" uid="uid://cal2wnxopwt2h" path="res://Scripts/islands.gd" id="8_rydrt"]
 
 [sub_resource type="Gradient" id="Gradient_lnlyj"]
 interpolation_mode = 2
@@ -229,28 +217,20 @@ font_size = 8
 font_color = Color(0, 0, 0, 1)
 outline_color = Color(0, 0, 0, 1)
 
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_g2m6q"]
+noise_type = 3
+frequency = 0.04
+fractal_weighted_strength = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ue23j"]
+width = 128
+height = 128
+invert = true
+generate_mipmaps = false
+seamless_blend_skirt = 1.0
+noise = SubResource("FastNoiseLite_g2m6q")
+
 [node name="RandomNoiseTest" type="Node2D"]
-
-[node name="Noise" type="CanvasLayer" parent="."]
-visible = false
-
-[node name="Control" type="Control" parent="Noise"]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Noise Rect" type="TextureRect" parent="Noise/Control"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = SubResource("NoiseTexture2D_ue23j")
-stretch_mode = 5
 
 [node name="Sun" type="PointLight2D" parent="."]
 visible = false
@@ -383,7 +363,7 @@ vertical_alignment = 1
 [node name="map_generator" type="Node2D" parent="." node_paths=PackedStringArray("_noiseTex")]
 unique_name_in_owner = true
 script = ExtResource("1_0um4f")
-_noiseTex = NodePath("../Noise/Control/Noise Rect")
+_noiseTex = NodePath("Noise/Control/Noise Rect")
 
 [node name="terrain" type="Node2D" parent="map_generator"]
 z_index = -1
@@ -399,3 +379,27 @@ y_sort_enabled = true
 
 [node name="treasures" type="CanvasLayer" parent="map_generator"]
 follow_viewport_enabled = true
+
+[node name="Noise" type="CanvasLayer" parent="map_generator"]
+visible = false
+
+[node name="Control" type="Control" parent="map_generator/Noise"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Noise Rect" type="TextureRect" parent="map_generator/Noise/Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("NoiseTexture2D_ue23j")
+stretch_mode = 5
+
+[node name="islands" type="Node" parent="map_generator"]
+script = ExtResource("8_rydrt")

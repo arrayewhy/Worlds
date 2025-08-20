@@ -55,6 +55,8 @@ var _sprite_array_Detail:Array[Sprite2D]; # Details / NULL
 @onready var _cont_alwaysShow:Node2D = $always_show;
 @onready var _cont_treasures:CanvasLayer = $treasures;
 
+@onready var _islands:Node = $islands;
+
 @export_group("#DEBUG")
 @export var _debug:bool;
 
@@ -89,6 +91,8 @@ func _Generate_Map(newSeed:int) -> void:
 	
 	World.Set_MapWidth(_noiseTex.get_texture().get_size().x, self.get_path());
 	
+	# Get Map Data
+	
 	_terrain_data = Map_Data.Derive_TerrainData_From_NoiseData(
 		_mountain, _highland, _ground, _coast, _shallows, _sea, _depths, 
 		noiseData);
@@ -99,10 +103,16 @@ func _Generate_Map(newSeed:int) -> void:
 	
 	_terrain_data = Map_Data.Amend_TerrainData_Using_MarkingData(_terrain_data, _marking_data);
 	_marking_data = Map_Data.Amend_MarkingData(_marking_data);
+	# Add Docks
 	_terrain_data = Map_Data.Amend_TerrainData(_terrain_data);
 	
 	#print("Terrain Count: ", _terrain_data.size());
 	#print("Marking Count: ", _marking_data.size());
+	
+	var islands:Array[Array] = _islands.Islands_From_TerrainData(_terrain_data, true, self.get_path());
+	
+	for island in islands:
+		print("Island Size: ", island.size());
 	
 	# Create Sprite2Ds
 	_sprite_array_Terrain = _TerrainSprites_From_TerrainData(_terrain_data);

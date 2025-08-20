@@ -112,4 +112,4 @@ func _Zoom_In() -> void:
 func _On_Initial_MapGen_Complete() -> void:
 	self.position = Vector2.ONE * World.CellSize * (World.MapWidth() / 2);
 	_targPos = self.position;
-	_Zoom_In();
+	#_Zoom_In();
