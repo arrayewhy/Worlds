@@ -2,20 +2,21 @@ class_name Map_Data
 
 enum Terrain {
 	Null, # 0
+	#DEBUG
+	DEBUG_HOLE,
+	# Land
 	MOUNTAIN,
 	HIGHLAND,
 	GROUND,
 	COAST,
+	TEMPLE_BROWN,
+	DOCK,
+	# Water
 	SHALLOWS, # 5
 	SEA,
 	DEPTHS,
 	ABYSS,
-	# Specials
 	SEA_GREEN,
-	TEMPLE_BROWN,
-	DOCK,
-	#DEBUG
-	DEBUG_HOLE,
 	}
 
 enum Marking { 
@@ -246,7 +247,15 @@ static func Amend_MarkingData(markingData:Array[Marking]) -> Array[Marking]:
 
 
 static func Amend_TerrainData(terrainData:Array[Terrain]) -> Array[Terrain]:
+	var t:Array[Terrain] = terrainData;
+	t = _Amend_TerrainData_Docks(t);
+	return t;
+
+static func _Amend_TerrainData_Docks(terrainData:Array[Terrain]) -> Array[Terrain]:
+	
+	#TEMPORARY
 	var done = false;
+	
 	var t_array:Array[Terrain] = terrainData;
 	
 	for t_idx in t_array.size():
@@ -257,7 +266,8 @@ static func Amend_TerrainData(terrainData:Array[Terrain]) -> Array[Terrain]:
 			
 				if randf_range(0, 1000) < 900:
 					continue;
-					
+				
+				#TEMPORARY
 				if !done:
 					done = true;
 					
@@ -268,60 +278,102 @@ static func Amend_TerrainData(terrainData:Array[Terrain]) -> Array[Terrain]:
 					
 					var highest_waterScore:int = 0;
 					
-					var rows:int = 3;
-					var cols:int = 3;
-					var currIdx:int = 0;
+					var directions:Array[Vector2] = [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT];
 					
-					# START: Look for Suitable Dock Point
-					for row in rows:
+					for d in directions:
+
+						var check_center:Vector2i = start + World.CellSize * 5 * d;
 						
-						for col in cols:
-					
-							var dir:Vector2 = Vector2(-1 + col, -1 + row);
-					
-							# Skip Center
-							if dir == Vector2.ZERO:
-								continue;
-					
-							var extension_center:Vector2 = start + World.CellSize * 5 * dir;
-							
-							var surr_coord:Array[Vector2] = World.V2_Array_Around(extension_center, 4);
-							
-							var surr_idx:Array[int];
-							for c_idx in surr_coord.size():
-								surr_idx.append(World.Coord_To_Index(surr_coord[c_idx]));
-							
-							var waterScore:int = 0;
-							for idx in surr_idx:
+						var surr_coords:Array[Vector2] = World.V2_Array_Around(check_center, 4);
 								
-								if t_array[idx] == Terrain.SHALLOWS \
-								|| t_array[idx] == Terrain.SEA \
-								|| t_array[idx] == Terrain.DEPTHS \
-								|| t_array[idx] == Terrain.ABYSS \
-								|| t_array[idx] == Terrain.SEA_GREEN:
-									waterScore += 1;
-								else:
-									waterScore -= 1;
+						var surr_indices:Array[int];
+						for c_index in surr_coords.size():
+							surr_indices.append(World.Coord_To_Index(surr_coords[c_index]));
+						
+						var score:int = 0;
+						for index in surr_indices:
 							
-							print(waterScore);
-							
-							if waterScore > highest_waterScore && extension_center > Vector2.ZERO:
-								highest_waterScore = waterScore;
-								dockTarget = extension_center;
-								dockIdx = currIdx;
-							
-							currIdx += 1;
-					# END: Look for Suitable Dock Point
-					
-					# Check for Diagonal
-					#if dockIdx == 0 \
-					#|| dockIdx == 2 \
-					#|| dockIdx == 5 \
-					#|| dockIdx == 7:
-						#pass;
+							if t_array[index] == Terrain.SHALLOWS \
+							|| t_array[index] == Terrain.SEA \
+							|| t_array[index] == Terrain.DEPTHS \
+							|| t_array[index] == Terrain.ABYSS \
+							|| t_array[index] == Terrain.SEA_GREEN:
+								score += 1;
+							else:
+								score -= 1;
+						
+						#print(score);
+						
+						if score > highest_waterScore && check_center > Vector2i.ZERO:
+							highest_waterScore = score;
+							dockTarget = check_center;
 					
 					t_array[World.Coord_To_Index(start)] = Terrain.Null;
-					if dockTarget != -Vector2.ONE:
-						t_array[World.Coord_To_Index(dockTarget)] = Terrain.TEMPLE_BROWN;
+					
+					if highest_waterScore > 20:
+
+						if dockTarget != -Vector2.ONE:
+							t_array[World.Coord_To_Index(dockTarget)] = Terrain.TEMPLE_BROWN;
+					
+					#continue;
+					
+					
+					
+					#var rows:int = 3;
+					#var cols:int = 3;
+					#var currIdx:int = 0;
+					#
+					## START: Look for Suitable Dock Point
+					#for row in rows:
+						#
+						#for col in cols:
+							#
+							## Determinal Check Direction
+							#var dir:Vector2 = Vector2(-1 + col, -1 + row);
+					#
+							## Skip Center
+							#if dir == Vector2.ZERO:
+								#continue;
+							#
+							#var extension_center:Vector2i = start + World.CellSize * 5 * dir;
+							#
+							#var surr_coord:Array[Vector2] = World.V2_Array_Around(extension_center, 4);
+							#
+							#var surr_idx:Array[int];
+							#for c_idx in surr_coord.size():
+								#surr_idx.append(World.Coord_To_Index(surr_coord[c_idx]));
+							#
+							#var waterScore:int = 0;
+							#for idx in surr_idx:
+								#
+								#if t_array[idx] == Terrain.SHALLOWS \
+								#|| t_array[idx] == Terrain.SEA \
+								#|| t_array[idx] == Terrain.DEPTHS \
+								#|| t_array[idx] == Terrain.ABYSS \
+								#|| t_array[idx] == Terrain.SEA_GREEN:
+									#waterScore += 1;
+								#else:
+									#waterScore -= 1;
+							#
+							#print(waterScore);
+							#
+							#if waterScore > highest_waterScore && extension_center > Vector2i.ZERO:
+								#highest_waterScore = waterScore;
+								#dockTarget = extension_center;
+								#dockIdx = currIdx;
+							#
+							#currIdx += 1;
+					## END: Look for Suitable Dock Point
+					#
+					## Check for Diagonal
+					##if dockIdx == 0 \
+					##|| dockIdx == 2 \
+					##|| dockIdx == 5 \
+					##|| dockIdx == 7:
+						##pass;
+					#
+					#t_array[World.Coord_To_Index(start)] = Terrain.Null;
+					#if dockTarget != -Vector2.ONE:
+						#t_array[World.Coord_To_Index(dockTarget)] = Terrain.TEMPLE_BROWN;
 	
 	return t_array;
