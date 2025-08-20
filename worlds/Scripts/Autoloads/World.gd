@@ -44,7 +44,7 @@ func Coord_OnGrid(v2:Vector2) -> Vector2:
 
 
 func Index_To_Coord(idx:int) -> Vector2:
-	return Vector2(idx % int(_mapWidth), idx / _mapWidth);
+	return Vector2(idx % int(_mapWidth), idx / _mapWidth) * CellSize;
 
 
 func Coord_To_Index(coord:Vector2) -> int:
@@ -61,12 +61,12 @@ func V2_Array_Around(pos:Vector2, range:int, skipCenter:bool = false) -> Array[V
 	#REFACTOR
 	for y in length:
 		
-		if start.y + y * CellSize < 0 || start.y + y * CellSize >= World.MapWidth() * CellSize:
+		if start.y + y * CellSize < 0 || start.y + y * CellSize >= _mapWidth * CellSize:
 			continue;
 		
 		for x in length:
 			
-			if start.x + x * CellSize < 0 || start.x + x * CellSize >= World.MapWidth() * CellSize:
+			if start.x + x * CellSize < 0 || start.x + x * CellSize >= _mapWidth * CellSize:
 				continue;
 			p.append(start + Vector2(x, y) * CellSize);
 	
