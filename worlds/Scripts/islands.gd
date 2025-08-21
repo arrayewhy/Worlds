@@ -1,9 +1,11 @@
 extends Node
 
+var _debug:bool;
 
-func Islands_From_TerrainData(terrainData:Array[Map_Data.Terrain], convert_to_idx:bool, callerPath:String) -> Array[Array]:
+
+func Islands_From_TerrainData(terrainData:Array[Map_Data.Terrain], convert_to_idx:bool, withShallows:bool, callerPath:String) -> Array[Array]:
 	
-	#print_debug("Islands_From_TerrainData, called by: ", callerPath);
+	if _debug: print_debug("Islands_From_TerrainData, called by: ", callerPath);
 	
 	var islands:Array[Array] = [];
 	
@@ -18,42 +20,22 @@ func Islands_From_TerrainData(terrainData:Array[Map_Data.Terrain], convert_to_id
 		
 		if _Is_Land(terrainData[i]) && !checked.has(World.Index_To_Coord(i)):
 			
-			var start:Vector2 = World.Index_To_Coord(i);
-			
-			var surr_coords:Array[Vector2] = World.V2_Array_Around(start, 1, true);
-			
-			for coord in surr_coords:
-				
-				var curr_terrain:Map_Data.Terrain = terrainData[World.Coord_To_Index(coord)];
-				
-				if _Is_Land(curr_terrain) && !checked.has(coord):
-					#pendingCoords_In.append(coord);
-					pendingCoords_Out.append(coord);
-			
-			curr_island_chunks.append(start);
-			checked.append(start);
-			checked.append_array(surr_coords);
-			
-			pendingCoords_In = pendingCoords_Out;
+			pendingCoords_In.append(World.Index_To_Coord(i));
 				
 			while pendingCoords_In.size() > 0:
-				
-				pendingCoords_Out = [];
 				
 				# Loop
 				for p in pendingCoords_In:
 					
-					surr_coords = World.V2_Array_Around(p, 1, true);
+					var surr_coords:Array[Vector2] = World.V2_Array_Around(p, 1, true);
 					
 					for coord in surr_coords:
 					
 						var curr_terrain:Map_Data.Terrain = terrainData[World.Coord_To_Index(coord)];
 						
-						#print("Checked: ", checked);
-						#return islands;
-						
 						if _Is_Land(curr_terrain) && !checked.has(coord):
-							#pendingCoords_In.append(coord);
+							pendingCoords_Out.append(coord);
+						elif withShallows && !checked.has(coord) && curr_terrain == Map_Data.Terrain.SHALLOWS:
 							pendingCoords_Out.append(coord);
 					
 					curr_island_chunks.append(p);
@@ -61,6 +43,7 @@ func Islands_From_TerrainData(terrainData:Array[Map_Data.Terrain], convert_to_id
 					checked.append_array(surr_coords);
 				
 				pendingCoords_In = pendingCoords_Out;
+				pendingCoords_Out = [];
 			
 			if curr_island_chunks.size() > 0:
 				islands.push_back(curr_island_chunks);
@@ -68,12 +51,8 @@ func Islands_From_TerrainData(terrainData:Array[Map_Data.Terrain], convert_to_id
 	
 			continue;
 		
-		#print("Skip");
-		
 	if !convert_to_idx:
-		
 		return islands;
-		
 	else:
 		
 		var islands_in_idx:Array[Array];
