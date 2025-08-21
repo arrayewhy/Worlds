@@ -24,6 +24,7 @@ const _goodSeeds:Array[int] = [
 #const _lighthouseLamp:PackedScene = preload("res://Prefabs/lighthouse_lamp.tscn");
 
 # Thresholds
+@export var _sky:float = 230;
 @export var _mountain:float = 215;
 @export var _highland:float = 200;
 @export var _ground:float = 190;
@@ -94,7 +95,7 @@ func _Generate_Map(newSeed:int) -> void:
 	World.Set_MapWidth(_noiseTex.get_texture().get_size().x, self.get_path());
 	
 	# Generate Map Data
-	_terrain_data = Map_Data.Derive_TerrainData_From_NoiseData(_mountain, _highland, _ground, _coast, _shallows, _sea, _depths, noiseData);
+	_terrain_data = Map_Data.Derive_TerrainData_From_NoiseData(_sky, _mountain, _highland, _ground, _coast, _shallows, _sea, _depths, noiseData);
 	# Add Docks
 	#_terrain_data = Map_Data.Amend_TerrainData_Docks(_terrain_data);
 	_marking_data = Map_Data.Derive_MarkingData_From_TerrainData(_terrain_data);
@@ -218,7 +219,7 @@ func _MarkingSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Ar
 		
 		match m:
 		
-			Map_Data.Marking.	HOUSE:
+			Map_Data.Marking.HOUSE:
 				spr = _Create_Sprite(6, 7, _spriteSheet);
 				_cont_hideOnZoom.add_child(spr);
 				
@@ -471,34 +472,39 @@ func _Create_Sprite(regPosX:float, regPosY:float, tex:Texture2D) -> Sprite2D:
 func _Configure_TerrainSprite_LandAndSea(spr:Sprite2D, terrainType:Map_Data.Terrain) -> void:
 	
 	match terrainType:
+		Map_Data.Terrain.SKY:
+			spr.region_rect.position.x = World.Spr_Reg_Size * 2;
 		Map_Data.Terrain.MOUNTAIN:
 			#spr.region_rect.position.x = World.Spr_Reg_Size * 2;
-			spr.region_rect.position.x = World.Spr_Reg_Size * 3;
+			spr.region_rect.position.x = World.Spr_Reg_Size * 3; # Green
 			spr.modulate.v -= .2;
 		Map_Data.Terrain.HIGHLAND:
-			spr.region_rect.position.x = World.Spr_Reg_Size * 3;
+			spr.region_rect.position.x = World.Spr_Reg_Size * 3; # Green
 			#spr.modulate.r -= .25;
 			#spr.modulate.b -= .25;
 			#spr.modulate.s += 1;
 			#spr.modulate.v -= .2;
 		Map_Data.Terrain.GROUND:
-			spr.region_rect.position.x = World.Spr_Reg_Size * 4;
+			spr.region_rect.position.x = World.Spr_Reg_Size * 4; # Sand Brown
 			#spr.region_rect.position.x = World.Spr_Reg_Size * 3;
 			#spr.modulate.v -= .2;
 		Map_Data.Terrain.COAST:
 			#spr.region_rect.position.x = World.Spr_Reg_Size * 4;
-			spr.region_rect.position.x = World.Spr_Reg_Size * 4;
+			spr.region_rect.position.x = World.Spr_Reg_Size * 4; # Sand Brown
 			spr.modulate.r -= .5;
 			spr.modulate.g -= .1;
-			spr.modulate.a = _alphaThresh * 1.75;
+			spr.modulate.a = _alphaThresh * 1.5;
 		Map_Data.Terrain.SHALLOWS:
-			spr.modulate.a = _alphaThresh * 1.5 - randf_range(0, 0.03125);
-		Map_Data.Terrain.SEA:
+			spr.region_rect.position.x = World.Spr_Reg_Size * 4; # Sand Brown
+			spr.modulate.r -= .6;
+			spr.modulate.g -= .2;
 			spr.modulate.a = _alphaThresh * 1.0 - randf_range(0, 0.03125);
+		Map_Data.Terrain.SEA:
+			spr.modulate.a = _alphaThresh * .8 - randf_range(0, 0.03125);
 			#spr.modulate.a = _alphaThresh * 1.0 - randf_range(0, .125);
 			#spr.modulate.g -= .25;
 		Map_Data.Terrain.DEPTHS:
-			spr.modulate.a = _alphaThresh * .7 - randf_range(0, 0.03125);
+			spr.modulate.a = _alphaThresh * .5 - randf_range(0, 0.03125);
 		Map_Data.Terrain.ABYSS:
 			spr.modulate.a = _alphaThresh * 0;
 			
@@ -509,19 +515,19 @@ func _Configure_TerrainSprite_LandAndSea(spr:Sprite2D, terrainType:Map_Data.Terr
 			#spr.modulate.b -= rand;
 		Map_Data.Terrain.TEMPLE_BROWN:
 			#spr.region_rect.position.x = World.Spr_Reg_Size * 5;
-			spr.region_rect.position.x = World.Spr_Reg_Size * 9;
+			spr.region_rect.position.x = World.Spr_Reg_Size * 9; # Brown
 		Map_Data.Terrain.DOCK:
-			spr.region_rect.position.x = World.Spr_Reg_Size * 9;
+			spr.region_rect.position.x = World.Spr_Reg_Size * 9; # Brown
 		Map_Data.Terrain.WATER_COAST:
-			spr.region_rect.position.x = World.Spr_Reg_Size * 4;
+			spr.region_rect.position.x = World.Spr_Reg_Size * 4; # Sand Brown
 			spr.modulate.r -= .5;
 			spr.modulate.a = _alphaThresh * 1.75 - randf_range(0, .125);
 			
 		Map_Data.Terrain.DEBUG_HOLE:
-			spr.region_rect.position.x = World.Spr_Reg_Size * 10;
+			spr.region_rect.position.x = World.Spr_Reg_Size * 10; # Brown Box
 			
 		Map_Data.Terrain.Null:
-			spr.region_rect.position.x = World.Spr_Reg_Size * 8;
+			spr.region_rect.position.x = World.Spr_Reg_Size * 8; # Fucshia
 			
 		_:
 			print_debug("\nTerrain Data contains Invalid Data");
@@ -562,7 +568,8 @@ func Is_Land(coord:Vector2, callerPath:String) -> bool:
 	var index:int = World.Coord_To_Index(coord);
 	var t:Map_Data.Terrain = _terrain_data[World.Coord_To_Index(coord)];
 	
-	if t == Map_Data.Terrain.MOUNTAIN \
+	if t == Map_Data.Terrain.SKY \
+	|| t == Map_Data.Terrain.MOUNTAIN \
 	|| t == Map_Data.Terrain.HIGHLAND \
 	|| t == Map_Data.Terrain.GROUND \
 	|| t == Map_Data.Terrain.COAST \

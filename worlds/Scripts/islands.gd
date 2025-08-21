@@ -67,7 +67,8 @@ func Islands_From_TerrainData(terrainData:Array[Map_Data.Terrain], convert_to_id
 
 
 func _Is_Land(terrain:Map_Data.Terrain) -> bool:
-	if terrain == Map_Data.Terrain.MOUNTAIN \
+	if terrain == Map_Data.Terrain.SKY \
+	|| terrain == Map_Data.Terrain.MOUNTAIN \
 	|| terrain == Map_Data.Terrain.HIGHLAND \
 	|| terrain == Map_Data.Terrain.GROUND \
 	|| terrain == Map_Data.Terrain.COAST \
