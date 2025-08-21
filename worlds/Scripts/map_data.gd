@@ -2,21 +2,26 @@ class_name Map_Data
 
 enum Terrain {
 	Null, # 0
+	
 	#DEBUG
 	DEBUG_HOLE,
+	
 	# Land
-	SKY,
 	MOUNTAIN,
 	HIGHLAND,
 	GROUND,
-	COAST,
-	TEMPLE_BROWN,
-	DOCK,
+	SHORE,
 	# Water
-	SHALLOWS, # 5
-	SEA,
+	SHALLOW,
+	SSEEAA,
+	OCEAN,
 	DEPTHS,
 	ABYSS,
+	
+	# Special: Land
+	TEMPLE_BROWN,
+	DOCK,
+	# Special: Water
 	#SEA_GREEN,
 	WATER_COAST,
 	}
@@ -49,15 +54,12 @@ enum Marking {
 # Functions ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
-static func Derive_TerrainData_From_NoiseData(peak:float, mountain:float, highland:float, ground:float, coast:float, shallows:float, sea:float, depths:float, noiseData:Array) -> Array[Terrain]:
+static func Derive_TerrainData_From_NoiseData(mountain:float, highland:float, ground:float, shore:float, shallow:float, sea:float, ocean:float, depths:float, noiseData:Array) -> Array[Terrain]:
 	
 	var t:Array[Terrain];
 	
 	for d in noiseData:
-		if d >= peak:
-			t.append(Terrain.SKY);
-			continue;
-		elif d >= mountain && d < peak:
+		if d >= mountain:
 			t.append(Terrain.MOUNTAIN);
 			continue;
 		elif d >= highland && d < mountain:
@@ -66,16 +68,19 @@ static func Derive_TerrainData_From_NoiseData(peak:float, mountain:float, highla
 		elif d >= ground && d < highland:
 			t.append(Terrain.GROUND);
 			continue;
-		elif d >= coast && d < ground:
-			t.append(Terrain.COAST);
+		elif d >= shore && d < ground:
+			t.append(Terrain.SHORE);
 			continue;
-		elif d >= shallows && d < coast:
-			t.append(Terrain.SHALLOWS);
+		elif d >= shallow && d < shore:
+			t.append(Terrain.SHALLOW);
 			continue;
-		elif d >= sea && d < shallows:
-			t.append(Terrain.SEA);
+		elif d >= sea && d < shallow:
+			t.append(Terrain.SSEEAA);
 			continue;
-		elif d >= depths && d < sea:
+		elif d >= ocean && d < sea:
+			t.append(Terrain.OCEAN);
+			continue;
+		elif d >= depths && d < ocean:
 			t.append(Terrain.DEPTHS);
 			continue;
 		elif d < depths:
@@ -95,7 +100,7 @@ static func Derive_MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> A
 		
 		match t:
 			
-			Terrain.SKY: # Now MOUNTAIN
+			Terrain.MOUNTAIN:
 				if randi_range(0, 1000) > 999:
 					m.append(Marking.HOUSE);
 				#elif randi_range(0, 1000) > 995:
@@ -108,10 +113,10 @@ static func Derive_MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> A
 					m.append(Marking.HILL);
 				continue;
 			
-			Terrain.MOUNTAIN: # Now HILL
+			Terrain.HIGHLAND:
 				if randi_range(0, 1000) > 500:
-					m.append(Marking.TREE);
-					#m.append(Marking.HILL);
+					#m.append(Marking.TREE);
+					m.append(Marking.HILL);
 				elif randi_range(0, 1000) > 200:
 					m.append(Marking.TREE);
 				#elif randi_range(0, 1000) > 995:
@@ -120,7 +125,7 @@ static func Derive_MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> A
 					m.append(Marking.Null);
 				continue;
 			
-			Terrain.HIGHLAND: # Now GROUND
+			Terrain.GROUND:
 				if randi_range(0, 1000) > 600:
 					m.append(Marking.TREE);
 				elif randi_range(0, 1000) > 980:
@@ -131,7 +136,7 @@ static func Derive_MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> A
 					m.append(Marking.Null);
 				continue;
 				
-			Terrain.GROUND: # Now SHORE
+			Terrain.SHORE:
 				if randi_range(0, 1000) > 990:
 					m.append(Marking.LIGHTHOUSE);
 				elif randi_range(0, 1000) > 990:
@@ -142,11 +147,11 @@ static func Derive_MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> A
 					m.append(Marking.Null);
 				continue;
 				
-			Terrain.COAST: # Now SHALLOW
+			Terrain.SHALLOW:
 				m.append(Marking.Null);
 				continue;
 				
-			Terrain.SHALLOWS: # Now SEA
+			Terrain.SSEEAA:
 				if randi_range(0, 1000) > 960:
 					m.append(Marking.SMALL_FISH);
 				#elif randi_range(0, 1000) > 995:
@@ -155,7 +160,7 @@ static func Derive_MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> A
 					m.append(Marking.Null);
 				continue;
 				
-			Terrain.SEA: # Now OCEAN
+			Terrain.OCEAN:
 				if randi_range(0, 1000) > 900:
 					m.append(Marking.SEAGRASS);
 				elif randi_range(0, 1000) > 990:
@@ -267,7 +272,7 @@ static func Amend_TerrainData_Docks(terrainData:Array[Terrain]) -> Array[Terrain
 		
 		match t_array[t_idx]:
 			
-			Terrain.COAST:
+			Terrain.SHALLOW:
 			
 				if randf_range(0, 1000) < 990:
 					continue;
@@ -298,8 +303,8 @@ static func Amend_TerrainData_Docks(terrainData:Array[Terrain]) -> Array[Terrain
 					var score:int = 0;
 					for index in surr_indices:
 						
-						if t_array[index] == Terrain.SHALLOWS \
-						|| t_array[index] == Terrain.SEA \
+						if t_array[index] == Terrain.SSEEAA \
+						|| t_array[index] == Terrain.OCEAN \
 						|| t_array[index] == Terrain.DEPTHS \
 						|| t_array[index] == Terrain.ABYSS:
 						#|| t_array[index] == Terrain.SEA_GREEN:
