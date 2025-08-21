@@ -48,7 +48,7 @@ func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("Enter"):
 		
 		var pos:Vector2 = World.Coord_OnGrid(self.position);
-		var v2_array:Array[Vector2] = World.V2_Array_Around(pos, 1, true);
+		var v2_array:Array[Vector2] = World.V2_Array_Around(pos, 1);
 		#v2_array = [pos];
 		_mapGen.ChangeTerrain(v2_array, 10, self.get_path());
 		#print(v2_array.size());

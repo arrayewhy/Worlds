@@ -1,4 +1,4 @@
-class_name Map_Generator extends Node2D
+extends Node2D
 
 # Resources
 const _spriteSheet:Texture2D = preload("res://Sprites/sparks_in_the_dark.png");
@@ -17,17 +17,15 @@ const _goodSeeds:Array[int] = [
 	462604253, # Broken Bridge
 	1504345747, # Jurassic
 	1852288905, # The Argument
+	920171824,
+	2219318034, # Cut through the Mountains
+	2912471184,
 	];
 #const _lighthouseLamp:PackedScene = preload("res://Prefabs/lighthouse_lamp.tscn");
 
-# World
-#const World.CellSize:int = 16;
-#const World.Spr_Reg_Size:float = 256;
-#var _mapWidth:float;
-
 # Thresholds
-@export var _mountain:float = 230;
-@export var _highland:float = 210;
+@export var _mountain:float = 215;
+@export var _highland:float = 200;
 @export var _ground:float = 190;
 @export var _coast:float = 180;
 @export var _shallows:float = 160;
@@ -39,6 +37,7 @@ const _alphaThresh:float = 1.0 / _waterDepth;
 
 var _terrain_data:Array[Map_Data.Terrain];
 var _marking_data:Array[Map_Data.Marking];
+var _islands:Array[Array];
 
 # Sprite2D Arrays to quickly grab a Sprite2D by its Index
 var _sprite_array_Terrain:Array[Sprite2D];
@@ -55,7 +54,7 @@ var _sprite_array_Detail:Array[Sprite2D]; # Details / NULL
 @onready var _cont_alwaysShow:Node2D = $always_show;
 @onready var _cont_treasures:CanvasLayer = $treasures;
 
-@onready var _islands:Node = $islands;
+@onready var _islands_gen:Node = $islands;
 
 @export_group("#DEBUG")
 @export var _debug:bool;
@@ -69,12 +68,15 @@ func _ready() -> void:
 	# Make sure Zoom Objects start off Invisible
 	_cont_showOnZoom.modulate.a = 0;
 	
-	_Generate_Map(3);
+	_Generate_Map(920171824);
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
+	
 	if event.is_action_pressed("Cancel"):
+		
 		_Clear();
+		
 		var newSeed:int = randi();
 		print("map_generator, Latest Seed: ", newSeed);
 		_Generate_Map(newSeed);
@@ -91,42 +93,70 @@ func _Generate_Map(newSeed:int) -> void:
 	
 	World.Set_MapWidth(_noiseTex.get_texture().get_size().x, self.get_path());
 	
-	# Get Map Data
-	
-	_terrain_data = Map_Data.Derive_TerrainData_From_NoiseData(
-		_mountain, _highland, _ground, _coast, _shallows, _sea, _depths, 
-		noiseData);
-		
-	_marking_data = Map_Data.Derive_MarkingData_From_TerrainData(_terrain_data);
-	
-	# Final Data to Use
-	
-	_terrain_data = Map_Data.Amend_TerrainData_Using_MarkingData(_terrain_data, _marking_data);
-	_marking_data = Map_Data.Amend_MarkingData(_marking_data);
+	# Generate Map Data
+	_terrain_data = Map_Data.Derive_TerrainData_From_NoiseData(_mountain, _highland, _ground, _coast, _shallows, _sea, _depths, noiseData);
 	# Add Docks
-	_terrain_data = Map_Data.Amend_TerrainData(_terrain_data);
+	#_terrain_data = Map_Data.Amend_TerrainData_Docks(_terrain_data);
+	_marking_data = Map_Data.Derive_MarkingData_From_TerrainData(_terrain_data);
+	# Amend Map Data
+	_terrain_data = Map_Data.Amend_TerrainData_Using_MarkingData(_terrain_data, _marking_data);
+	_marking_data = Map_Data.Amend_MarkingData_Houses(_marking_data);
 	
-	#print("Terrain Count: ", _terrain_data.size());
-	#print("Marking Count: ", _marking_data.size());
+	# Derive Islands
+	#_islands = _islands_gen.Islands_From_TerrainData(_terrain_data, true, true, self.get_path());
 	
-	var islands:Array[Array] = _islands.Islands_From_TerrainData(_terrain_data, true, self.get_path());
+	#for island in _islands:
+		#for idx in island:
+			#_terrain_data[idx] = Map_Data.Terrain.DEBUG_HOLE;
 	
-	for island in islands:
-		print("Island Size: ", island.size());
+	#var second_largest:Array[int];
+	#
+	#var top:int = 0;
+	#var sub:int = 0;
+	#
+	#for island in _islands:
+		#
+		#if top == 0:
+			#top = island.size();
+			#
+		#elif island.size() > top:
+			#
+			#sub = top;
+			#second_largest = island;
+			#top = island.size();
+			#
+		#elif island.size() > sub:
+			#
+			#sub = island.size();
+			#second_largest = island;
+#
+	#for idx in second_largest:
+		#match _terrain_data[idx]:
+			#Map_Data.Terrain.MOUNTAIN:
+				#_terrain_data[idx] = Map_Data.Terrain.COAST;
+			#Map_Data.Terrain.HIGHLAND:
+				#_terrain_data[idx] = Map_Data.Terrain.WATER_COAST;
+			#Map_Data.Terrain.GROUND:
+				#_terrain_data[idx] = Map_Data.Terrain.SEA;
+			#Map_Data.Terrain.COAST:
+				#_terrain_data[idx] = Map_Data.Terrain.SEA;
+			#Map_Data.Terrain.SHALLOWS:
+				#_terrain_data[idx] = Map_Data.Terrain.DEPTHS;
 	
 	# Create Sprite2Ds
 	_sprite_array_Terrain = _TerrainSprites_From_TerrainData(_terrain_data);
 	_sprite_array_Marking = _MarkingSprites_From_MarkingData(_marking_data);
 	_sprite_array_Detail = _DetailSprites_From_MarkingData(_marking_data);
-	#print("Terrain Sprite Array: ", _sprite_array_Terrain.size());
-	#print("Marking Sprite Array: ", _sprite_array_Marking.size());
-	#print("Detail Sprite Array: ", _sprite_array_Detail.size());
+	
+	#for island in _islands:
+		#var col:Color = Color(randf_range(.25, 1), randf_range(.25, 1), 0);
+		#for idx in island:
+			#_sprite_array_Terrain[idx].modulate = col;
 	
 	World.Signal_Initial_MapGen_Complete(self.get_path());
 
 
 func _Clear() -> void:
-	
 	# Delete Sprite2Ds
 	for c in _cont_terrainSprites.get_children(): c.queue_free();
 	for c in _cont_showOnZoom.get_children(): c.queue_free();
@@ -137,8 +167,6 @@ func _Clear() -> void:
 	_sprite_array_Terrain = [];
 	_sprite_array_Marking = [];
 	_sprite_array_Detail = [];
-	
-	#_messageBottle_spawned = false;
 
 
 # Functions: Create Sprites ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -329,7 +357,7 @@ func _DetailSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Arr
 		
 		match m:
 		
-			Map_Data.Marking.	HOUSE:
+			Map_Data.Marking.HOUSE:
 				
 				spr = _Create_Sprite(randi_range(2, 4), 14, _spriteSheet);
 				_cont_showOnZoom.add_child(spr);
@@ -338,7 +366,7 @@ func _DetailSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Arr
 				# Randomise Transform
 				spr.position.y = currY * World.CellSize - randf_range(0, World.CellSize / 1.5);
 				spr.scale *= randf_range(1, 1.125);
-				spr.scale /= 1.5;
+				#spr.scale /= 1.5;
 				spr.rotation += randf_range(-.125, .125);
 				
 			#Map_Data.Marking.TENT:
@@ -444,35 +472,51 @@ func _Configure_TerrainSprite_LandAndSea(spr:Sprite2D, terrainType:Map_Data.Terr
 	
 	match terrainType:
 		Map_Data.Terrain.MOUNTAIN:
-			spr.region_rect.position.x = World.Spr_Reg_Size * 2;
+			#spr.region_rect.position.x = World.Spr_Reg_Size * 2;
+			spr.region_rect.position.x = World.Spr_Reg_Size * 3;
+			spr.modulate.v -= .2;
 		Map_Data.Terrain.HIGHLAND:
 			spr.region_rect.position.x = World.Spr_Reg_Size * 3;
 			#spr.modulate.r -= .25;
 			#spr.modulate.b -= .25;
 			#spr.modulate.s += 1;
-			spr.modulate.v -= .2;
+			#spr.modulate.v -= .2;
 		Map_Data.Terrain.GROUND:
-			spr.region_rect.position.x = World.Spr_Reg_Size * 3;
+			spr.region_rect.position.x = World.Spr_Reg_Size * 4;
+			#spr.region_rect.position.x = World.Spr_Reg_Size * 3;
 			#spr.modulate.v -= .2;
 		Map_Data.Terrain.COAST:
+			#spr.region_rect.position.x = World.Spr_Reg_Size * 4;
 			spr.region_rect.position.x = World.Spr_Reg_Size * 4;
+			spr.modulate.r -= .5;
+			spr.modulate.g -= .1;
+			spr.modulate.a = _alphaThresh * 1.75;
 		Map_Data.Terrain.SHALLOWS:
-			spr.modulate.a = _alphaThresh * 3;
+			spr.modulate.a = _alphaThresh * 1.5 - randf_range(0, 0.03125);
 		Map_Data.Terrain.SEA:
-			spr.modulate.a = _alphaThresh * 1.75 - randf_range(0, .125);
+			spr.modulate.a = _alphaThresh * 1.0 - randf_range(0, 0.03125);
+			#spr.modulate.a = _alphaThresh * 1.0 - randf_range(0, .125);
 			#spr.modulate.g -= .25;
 		Map_Data.Terrain.DEPTHS:
-			spr.modulate.a = _alphaThresh * .7 - randf_range(0, .0625);
+			spr.modulate.a = _alphaThresh * .7 - randf_range(0, 0.03125);
 		Map_Data.Terrain.ABYSS:
 			spr.modulate.a = _alphaThresh * 0;
+			
 		# Specials
-		Map_Data.Terrain.SEA_GREEN:
-			spr.modulate.a = _alphaThresh * 1.6 - randf_range(0, .125);
-			var rand:float = randf_range(.125, .25);
-			spr.modulate.b -= rand;
+		#Map_Data.Terrain.SEA_GREEN:
+			#spr.modulate.a = _alphaThresh * 1.6 - randf_range(0, .125);
+			#var rand:float = randf_range(.125, .25);
+			#spr.modulate.b -= rand;
 		Map_Data.Terrain.TEMPLE_BROWN:
 			#spr.region_rect.position.x = World.Spr_Reg_Size * 5;
 			spr.region_rect.position.x = World.Spr_Reg_Size * 9;
+		Map_Data.Terrain.DOCK:
+			spr.region_rect.position.x = World.Spr_Reg_Size * 9;
+		Map_Data.Terrain.WATER_COAST:
+			spr.region_rect.position.x = World.Spr_Reg_Size * 4;
+			spr.modulate.r -= .5;
+			spr.modulate.a = _alphaThresh * 1.75 - randf_range(0, .125);
+			
 		Map_Data.Terrain.DEBUG_HOLE:
 			spr.region_rect.position.x = World.Spr_Reg_Size * 10;
 			
@@ -492,48 +536,37 @@ func ChangeTerrain(v2_array:Array[Vector2], terrainType:Map_Data.Terrain, caller
 
 func _ChangeTerrain(v2_array:Array[Vector2], terrainType:Map_Data.Terrain) -> void:
 	for v2 in v2_array:
-		var spr:Sprite2D = _sprite_array_Terrain[(World.MapWidth()) * (v2.y / World.CellSize) + (v2.x / World.CellSize)];
+		var spr:Sprite2D = _sprite_array_Terrain[World.Coord_To_Index(v2)];
 		_Configure_TerrainSprite_LandAndSea(spr, terrainType);
 
 
 # Functions: Get Set ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
-#func MapGenerator_Get_CellSize(callerPath:String) -> float:
-	#if _debug: print_debug("MapGenerator_Get_CellSize, Called by:", callerPath);
-	#return World.CellSize;
-
-
 func MapGenerator_Get_TerrainSprite(coord:Vector2, callerPath:String) -> Sprite2D:
 	if _debug: print_debug("MapGenerator_Get_TerrainSprite, called by: ", callerPath);
-	var index:int = (coord.x + World.MapWidth() * coord.y) / World.CellSize;
-	return _sprite_array_Terrain[index];
+	return _sprite_array_Terrain[World.Coord_To_Index(coord)];
 	
 func MapGenerator_Get_MarkingSprite(coord:Vector2, callerPath:String) -> Sprite2D:
 	if _debug: print_debug("MapGenerator_Get_MarkingSprite, called by: ", callerPath);
-	var index:int = (coord.x + World.MapWidth() * coord.y) / World.CellSize;
-	return _sprite_array_Marking[index];
+	return _sprite_array_Marking[World.Coord_To_Index(coord)];
 	
 func MapGenerator_Get_DetailSprite(coord:Vector2, callerPath:String) -> Sprite2D:
 	if _debug: print_debug("MapGenerator_Get_DetailSprite, called by: ", callerPath);
-	var index:int = (coord.x + World.MapWidth() * coord.y) / World.CellSize;
-	return _sprite_array_Detail[index];
+	return _sprite_array_Detail[World.Coord_To_Index(coord)];
 
 
 func Is_Land(coord:Vector2, callerPath:String) -> bool:
 	if _debug: print_debug("Is_Land, called by: ", callerPath);
-	var index:int = (coord.x + World.MapWidth() * coord.y) / World.CellSize;
 	
-	match _terrain_data[index]:
-		Map_Data.Terrain.SHALLOWS:
-			return false;
-		Map_Data.Terrain.SEA:
-			return false;
-		Map_Data.Terrain.DEPTHS:
-			return false;
-		Map_Data.Terrain.ABYSS:
-			return false;
-		Map_Data.Terrain.SEA_GREEN:
-			return false;
+	var index:int = World.Coord_To_Index(coord);
+	var t:Map_Data.Terrain = _terrain_data[World.Coord_To_Index(coord)];
 	
-	return true;
+	if t == Map_Data.Terrain.MOUNTAIN \
+	|| t == Map_Data.Terrain.HIGHLAND \
+	|| t == Map_Data.Terrain.GROUND \
+	|| t == Map_Data.Terrain.COAST \
+	|| t == Map_Data.Terrain.TEMPLE_BROWN \
+	|| t == Map_Data.Terrain.DOCK:
+		return true;
+	return false;
