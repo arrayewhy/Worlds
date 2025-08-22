@@ -13,7 +13,7 @@ enum Terrain {
 	SHORE,
 	# Water
 	SHALLOW,
-	SSEEAA,
+	SEA,
 	OCEAN,
 	DEPTHS,
 	ABYSS,
@@ -46,6 +46,8 @@ enum Marking {
 	TEMPLE,
 	GOLD,
 	MESSAGE_BOTTLE,
+	MINI_MOUNT,
+	HOBBIT_HOUSE,
 	}
 
 #var _messageBottle_spawned:bool;
@@ -75,7 +77,7 @@ static func Derive_TerrainData_From_NoiseData(mountain:float, highland:float, gr
 			t.append(Terrain.SHALLOW);
 			continue;
 		elif d >= sea && d < shallow:
-			t.append(Terrain.SSEEAA);
+			t.append(Terrain.SEA);
 			continue;
 		elif d >= ocean && d < sea:
 			t.append(Terrain.OCEAN);
@@ -101,37 +103,46 @@ static func Derive_MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> A
 		match t:
 			
 			Terrain.MOUNTAIN:
-				if randi_range(0, 1000) > 999:
-					m.append(Marking.HOUSE);
+				#if randi_range(0, 1000) > 999:
+					#m.append(Marking.HOUSE);
 				#elif randi_range(0, 1000) > 995:
 					#m.append(Marking.TENT);
-				elif randi_range(0, 1000) > 200:
-					m.append(Marking.PEAK);
+				#if randi_range(0, 1000) > 900:
+					#m.append(Marking.PEAK);
+				#elif randi_range(0, 1000) > 200:
+					#m.append(Marking.MINI_MOUNT);
 				#elif randi_range(0, 1000) > 990:
 					#m.append(Marking.HOT_AIR_BALLOON);
-				else:
-					m.append(Marking.HILL);
+				#else:
+					#m.append(Marking.Null);
+				m.append(Marking.Null);
 				continue;
 			
 			Terrain.HIGHLAND:
-				if randi_range(0, 1000) > 500:
-					#m.append(Marking.TREE);
-					m.append(Marking.HILL);
-				elif randi_range(0, 1000) > 200:
+				#if randi_range(0, 1000) > 500:
+					#m.append(Marking.HILL);
+				if randi_range(0, 1000) > 50:
 					m.append(Marking.TREE);
 				#elif randi_range(0, 1000) > 995:
 					#m.append(Marking.TENT);
+				elif randi_range(0, 1000) > 50:
+					m.append(Marking.HILL);
+				elif randi_range(0, 1000) > 200:
+					m.append(Marking.HOBBIT_HOUSE);
+				elif randi_range(0, 1000) > 100:
+					m.append(Marking.HOUSE);
 				else:
-					m.append(Marking.Null);
+					m.append(Marking.TEMPLE);
+					#m.append(Marking.Null);
 				continue;
 			
 			Terrain.GROUND:
 				if randi_range(0, 1000) > 600:
 					m.append(Marking.TREE);
-				elif randi_range(0, 1000) > 980:
+				elif randi_range(0, 1000) > 900:
 					m.append(Marking.HOUSE);
-				elif randi_range(0, 1000) > 998:
-					m.append(Marking.TEMPLE);
+				#elif randi_range(0, 1000) > 998:
+					#m.append(Marking.TEMPLE);
 				else:
 					m.append(Marking.Null);
 				continue;
@@ -151,7 +162,7 @@ static func Derive_MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> A
 				m.append(Marking.Null);
 				continue;
 				
-			Terrain.SSEEAA:
+			Terrain.SEA:
 				if randi_range(0, 1000) > 960:
 					m.append(Marking.SMALL_FISH);
 				#elif randi_range(0, 1000) > 995:
@@ -240,14 +251,6 @@ static func Amend_MarkingData_Houses(markingData:Array[Marking]) -> Array[Markin
 				var center:Vector2 = World.Index_To_Coord(i);
 				
 				var surr_coords:Array[Vector2] = World.V2_Array_Around(center, 1, true);
-
-				#var surr_marks:Array[Marking];
-				#
-				#for coord in surr_coords:
-					#surr_marks.push_back(m_array[World.Coord_To_Index(coord)]);
-				#
-				#if surr_marks.count(Marking.HOUSE) >= 7:
-					#m_array[i] = Marking.HOUSE;
 				
 				var trees:int = 0;
 				
@@ -255,7 +258,7 @@ static func Amend_MarkingData_Houses(markingData:Array[Marking]) -> Array[Markin
 					if m_array[World.Coord_To_Index(coord)] == Marking.TREE:
 						trees += 1;
 
-				if trees >= 7:
+				if trees >= 8:
 					m_array[i] = Marking.HOUSE;
 				
 	return m_array;
@@ -303,7 +306,7 @@ static func Amend_TerrainData_Docks(terrainData:Array[Terrain]) -> Array[Terrain
 					var score:int = 0;
 					for index in surr_indices:
 						
-						if t_array[index] == Terrain.SSEEAA \
+						if t_array[index] == Terrain.SEA \
 						|| t_array[index] == Terrain.OCEAN \
 						|| t_array[index] == Terrain.DEPTHS \
 						|| t_array[index] == Terrain.ABYSS:

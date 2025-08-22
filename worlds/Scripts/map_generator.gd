@@ -20,6 +20,8 @@ const _goodSeeds:Array[int] = [
 	920171824,
 	2219318034, # Cut through the Mountains
 	2912471184,
+	1970006309, # Leviathan
+	429314510,
 	];
 #const _lighthouseLamp:PackedScene = preload("res://Prefabs/lighthouse_lamp.tscn");
 
@@ -34,11 +36,12 @@ const _goodSeeds:Array[int] = [
 @export var _depths:float = 80;
 # Water Depth Alpha
 const _waterDepth:float = 4.0;
-const _alphaThresh:float = 1.0 / _waterDepth;
+const _valueThresh:float = 1.0 / _waterDepth;
 
 var _terrain_data:Array[Map_Data.Terrain];
 var _marking_data:Array[Map_Data.Marking];
-var _islands:Array[Array];
+#var _islands:Array[Array];
+var _mountains_data:Array[Array];
 
 # Sprite2D Arrays to quickly grab a Sprite2D by its Index
 var _sprite_array_Terrain:Array[Sprite2D];
@@ -55,7 +58,7 @@ var _sprite_array_Detail:Array[Sprite2D]; # Details / NULL
 @onready var _cont_alwaysShow:Node2D = $always_show;
 @onready var _cont_treasures:CanvasLayer = $treasures;
 
-@onready var _islands_gen:Node = $islands;
+@onready var _terrain_grouper:Node = $terrain_grouper;
 
 @export_group("#DEBUG")
 @export var _debug:bool;
@@ -101,10 +104,18 @@ func _Generate_Map(newSeed:int) -> void:
 	_marking_data = Map_Data.Derive_MarkingData_From_TerrainData(_terrain_data);
 	# Amend Map Data
 	_terrain_data = Map_Data.Amend_TerrainData_Using_MarkingData(_terrain_data, _marking_data);
-	_marking_data = Map_Data.Amend_MarkingData_Houses(_marking_data);
+	#_marking_data = Map_Data.Amend_MarkingData_Houses(_marking_data);
+	
+	# Mountains
+	_mountains_data = _terrain_grouper.TerrainGroups_From_TerrainData(Map_Data.Terrain.MOUNTAIN, _terrain_data, true, self.get_path());
+	
+	#for mountain in _mountains_data:
+		#print(mountain.size());
+		#for idx in mountain:
+			#_terrain_data[idx] = Map_Data.Terrain.Null;
 	
 	# Derive Islands
-	#_islands = _islands_gen.Islands_From_TerrainData(_terrain_data, true, true, self.get_path());
+	#_islands = _terrain_grouper.Islands_From_TerrainData(_terrain_data, true, true, self.get_path());
 	
 	#for island in _islands:
 		#for idx in island:
@@ -182,16 +193,22 @@ func _TerrainSprites_From_TerrainData(terrainData:Array[Map_Data.Terrain]) -> Ar
 	
 	for t in terrainData:
 		
-		# Create Sprite
-		var spr:Sprite2D = _Create_Sprite(0, 0, _spriteSheet);
-		_cont_terrainSprites.add_child(spr);
-		_Configure_TerrainSprite_LandAndSea(spr, t);
-		
-		# Position Terrain Sprite
-		
-		spr.position = Vector2(currX * World.CellSize, currY * World.CellSize);
-		spr.position += Vector2.ONE * randf_range(-.4, .4);
-		spr.rotation += randf_range(-.0625, .0625);
+		if t == Map_Data.Terrain.ABYSS:
+			s_array.append(null);
+		else:
+			# Create Sprite
+			var spr:Sprite2D = _Create_Sprite(0, 0, _spriteSheet);
+			_cont_terrainSprites.add_child(spr);
+			
+			_Configure_TerrainSprite_LandAndSea(spr, t);
+			
+			# Position Terrain Sprite
+			
+			spr.position = Vector2(currX * World.CellSize, currY * World.CellSize);
+			spr.position += Vector2.ONE * randf_range(-.4, .4);
+			spr.rotation += randf_range(-.0625, .0625);
+			
+			s_array.append(spr);
 		
 		# Set Next sprite Position
 		
@@ -199,8 +216,6 @@ func _TerrainSprites_From_TerrainData(terrainData:Array[Map_Data.Terrain]) -> Ar
 		if currX >= World.MapWidth():
 			currX = 0;
 			currY += 1;
-		
-		s_array.append(spr);
 	
 	if _debug: print_debug("_TerrainSprites_From_TerrainData, Terrain: ", s_array.size());
 	return s_array;
@@ -220,8 +235,9 @@ func _MarkingSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Ar
 		match m:
 		
 			Map_Data.Marking.HOUSE:
-				spr = _Create_Sprite(6, 6, _spriteSheet);
-				_cont_hideOnZoom.add_child(spr);
+				#spr = _Create_Sprite(6, 6, _spriteSheet);
+				#_cont_hideOnZoom.add_child(spr);
+				s_array.append(null);
 				
 			#Map_Data.Marking.TENT:
 				#spr = _Create_Sprite(4, 9, _glyphs);
@@ -229,25 +245,37 @@ func _MarkingSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Ar
 				#spr.modulate = Color.BLACK;
 				
 			Map_Data.Marking.PEAK:
-				spr = _Create_Sprite(3, 6, _spriteSheet);
-				_cont_alwaysShow.add_child(spr);
+				spr = _Create_Sprite(9, 1, _glyphs);
+				_cont_hideOnZoom.add_child(spr);
 				spr.scale *= randf_range(1, 1.5);
+				spr.modulate = Color.BLACK;
+			
+			Map_Data.Marking.MINI_MOUNT:
+				spr = _Create_Sprite(9, 1, _glyphs);
+				_cont_showOnZoom.add_child(spr);
+				spr.modulate = Color.BLACK;
+				spr.scale *= randf_range(1, 1.75);
+				spr.scale /= 2;
 				
 			Map_Data.Marking.HILL:
-				#spr = _Create_Sprite(5, 6, _spriteSheet);
-				#_cont_showOnZoom.add_child(spr);
-				#spr.modulate = Color.BLACK;
+				spr = _Create_Sprite(5, 7, _spriteSheet);
+				_cont_alwaysShow.add_child(spr);
+				spr.modulate = Color.BLACK;
 				#spr.scale /= 1.5;
-				s_array.append(null);
+				#s_array.append(null);
 				
 			Map_Data.Marking.TREE:
 				spr = _Create_Sprite(7, 6, _spriteSheet);
 				_cont_showOnZoom.add_child(spr);
-				#spr.modulate = Color.BLACK;
+				#spr.scale.x *= randf_range(.9, 1.125);
+				spr.scale.y *= randf_range(.9, 1.125);
+				spr.rotation += randf_range(-.125, .125);
 				
 			Map_Data.Marking.LIGHTHOUSE:
+				#s_array.append(null);
 				spr = _Create_Sprite(0, 11, _glyphs);
 				_cont_hideOnZoom.add_child(spr);
+				spr.modulate = Color.BLACK;
 				# Lamp
 				#var lamp:PointLight2D = _lighthouseLamp.instantiate();
 				#lamp.position = spr.position;
@@ -322,6 +350,11 @@ func _MarkingSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Ar
 			Map_Data.Marking.GOLD:
 				s_array.append(null);
 			
+			Map_Data.Marking.HOBBIT_HOUSE:
+				spr = _Create_Sprite(5, 7, _spriteSheet);
+				_cont_hideOnZoom.add_child(spr);
+				spr.modulate = Color.BLACK;
+			
 			Map_Data.Marking.Null:
 				s_array.append(null);
 			
@@ -366,16 +399,32 @@ func _DetailSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Arr
 				
 				spr.position = Vector2(currX * World.CellSize, currY * World.CellSize);
 				# Randomise Transform
-				spr.position.y = currY * World.CellSize - randf_range(0, World.CellSize / 1.5);
+				spr.position.y = currY * World.CellSize - randf_range(0, World.CellSize / 2);
 				spr.scale *= randf_range(1, 1.125);
-				#spr.scale /= 1.5;
+				spr.scale /= 1.5;
 				spr.rotation += randf_range(-.125, .125);
 				
 			#Map_Data.Marking.TENT:
 				#pass;
 			Map_Data.Marking.PEAK:
+				spr = _Create_Sprite(3, 6, _spriteSheet);
+				_cont_showOnZoom.add_child(spr);
+				spr.position = Vector2(currX * World.CellSize, currY * World.CellSize);
+				spr.scale *= 1.5;
+				#spr.rotation += randf_range(-.125, .125);
+				
+			Map_Data.Marking.MINI_MOUNT:
 				pass;
+				
 			Map_Data.Marking.HILL:
+				#spr = _Create_Sprite(5, 7, _spriteSheet);
+				#_cont_showOnZoom.add_child(spr);
+				#spr.position = Vector2(currX * World.CellSize, currY * World.CellSize);
+				## Randomise Transform
+				##spr.position.y = currY * World.CellSize - randf_range(0, World.CellSize / 2);
+				#spr.scale *= randf_range(1, 1.125);
+				##spr.scale /= 1.5;
+				#spr.rotation += randf_range(-.125, .125);
 				pass;
 				
 			Map_Data.Marking.TREE:
@@ -396,15 +445,15 @@ func _DetailSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Arr
 				#spr.region_rect.size = Vector2(World.Spr_Reg_Size, World.Spr_Reg_Size * 2);
 				#spr.offset.y -= World.Spr_Reg_Size;
 				
-				spr = _Create_Sprite(6, 12, _spriteSheet);
+				spr = _Create_Sprite(7, 12, _spriteSheet);
 				_cont_showOnZoom.add_child(spr);
 				
 				spr.position = Vector2(currX * World.CellSize, currY * World.CellSize);
 				
 				# Adjust Sprite2D
-				spr.region_rect.size = Vector2(World.Spr_Reg_Size, World.Spr_Reg_Size * 3);
-				spr.offset.y -= World.Spr_Reg_Size + World.Spr_Reg_Size / 2;
-				spr.scale /= 2;
+				spr.region_rect.size = Vector2(World.Spr_Reg_Size, World.Spr_Reg_Size * 2);
+				spr.offset.y -= World.Spr_Reg_Size / 4 * 3;
+				#spr.scale /= 2;
 				
 			Map_Data.Marking.SHELL:
 				pass;
@@ -428,7 +477,7 @@ func _DetailSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Arr
 				spr = _Create_Sprite(2, 7, _spriteSheet);
 				_cont_showOnZoom.add_child(spr);
 				
-				spr.modulate.a = _alphaThresh * 1 + randf_range(-0.0625, .0625);
+				spr.modulate.v = _valueThresh * 1 + randf_range(-0.0625, .0625);
 				spr.position = Vector2(currX * World.CellSize, currY * World.CellSize);
 				# Randomise Transform
 				#spr.position -= Vector2.ONE * randf_range(0, World.CellSize / 1.5);
@@ -437,6 +486,12 @@ func _DetailSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Arr
 			
 			Map_Data.Marking.MESSAGE_BOTTLE:
 				pass;
+			
+			Map_Data.Marking.HOBBIT_HOUSE:
+				spr = _Create_Sprite(7, 7, _spriteSheet);
+				_cont_showOnZoom.add_child(spr);
+				spr.position = Vector2(currX * World.CellSize, currY * World.CellSize);
+				spr.modulate = Color.BLACK;
 				
 			Map_Data.Marking.Null:
 				pass;
@@ -474,44 +529,49 @@ func _Configure_TerrainSprite_LandAndSea(spr:Sprite2D, terrainType:Map_Data.Terr
 	
 	match terrainType:
 		Map_Data.Terrain.MOUNTAIN:
-			spr.region_rect.position.x = World.Spr_Reg_Size * 2;
+			spr.region_rect.position.x = World.Spr_Reg_Size * 2; # Grey
+			spr.modulate.a -= randf_range(0, 0.25);
 		Map_Data.Terrain.HIGHLAND:
 			#spr.region_rect.position.x = World.Spr_Reg_Size * 2;
 			spr.region_rect.position.x = World.Spr_Reg_Size * 3; # Green
 			spr.modulate.v -= .25;
+			spr.modulate.a -= randf_range(0, 0.125);
 		Map_Data.Terrain.GROUND:
 			spr.region_rect.position.x = World.Spr_Reg_Size * 3; # Green
+			spr.modulate.a -= randf_range(0, 0.125);
 			#spr.modulate.r -= .25;
 			#spr.modulate.b -= .25;
 			#spr.modulate.s += 1;
 			#spr.modulate.v -= .2;
 		Map_Data.Terrain.SHORE:
 			spr.region_rect.position.x = World.Spr_Reg_Size * 4; # Sand Brown
+			spr.modulate.a -= randf_range(0, 0.125);
 			#spr.region_rect.position.x = World.Spr_Reg_Size * 3;
 			#spr.modulate.v -= .2;
 		Map_Data.Terrain.SHALLOW:
-			#spr.region_rect.position.x = World.Spr_Reg_Size * 4;
-			spr.region_rect.position.x = World.Spr_Reg_Size * 4; # Sand Brown
-			spr.modulate.r -= .5;
-			spr.modulate.g -= .1;
-			spr.modulate.a = _alphaThresh * 1.5;
-		Map_Data.Terrain.SSEEAA:
-			spr.region_rect.position.x = World.Spr_Reg_Size * 4; # Sand Brown
-			spr.modulate.r -= .6;
-			spr.modulate.g -= .2;
-			spr.modulate.a = _alphaThresh * 1.0 - randf_range(0, 0.03125);
+			#spr.region_rect.position.x = World.Spr_Reg_Size * 4; # Sand Brown
+			#spr.modulate.r -= .5;
+			#spr.modulate.g -= .1;
+			#spr.modulate.v = _valueThresh * 1.5;
+			spr.modulate.v = _valueThresh * 1.6 - randf_range(0, 0.03125);
+		Map_Data.Terrain.SEA:
+			#spr.region_rect.position.x = World.Spr_Reg_Size * 4; # Sand Brown
+			#spr.modulate.r -= .6;
+			#spr.modulate.g -= .2;
+			spr.modulate.v = _valueThresh * 1.1 - randf_range(0, 0.03125);
 		Map_Data.Terrain.OCEAN:
-			spr.modulate.a = _alphaThresh * .8 - randf_range(0, 0.03125);
-			#spr.modulate.a = _alphaThresh * 1.0 - randf_range(0, .125);
+			spr.modulate.v = _valueThresh * .8 - randf_range(0, 0.03125);
+			#spr.modulate.v = _valueThresh * 1.0 - randf_range(0, .125);
 			#spr.modulate.g -= .25;
 		Map_Data.Terrain.DEPTHS:
-			spr.modulate.a = _alphaThresh * .5 - randf_range(0, 0.03125);
+			spr.modulate.v = _valueThresh * .5 - randf_range(0, 0.03125);
 		Map_Data.Terrain.ABYSS:
-			spr.modulate.a = _alphaThresh * 0;
+			#spr.modulate.v = _valueThresh * 0;
+			pass;
 			
 		# Specials
 		#Map_Data.Terrain.SEA_GREEN:
-			#spr.modulate.a = _alphaThresh * 1.6 - randf_range(0, .125);
+			#spr.modulate.v = _valueThresh * 1.6 - randf_range(0, .125);
 			#var rand:float = randf_range(.125, .25);
 			#spr.modulate.b -= rand;
 		Map_Data.Terrain.TEMPLE_BROWN:
@@ -522,7 +582,7 @@ func _Configure_TerrainSprite_LandAndSea(spr:Sprite2D, terrainType:Map_Data.Terr
 		Map_Data.Terrain.WATER_COAST:
 			spr.region_rect.position.x = World.Spr_Reg_Size * 4; # Sand Brown
 			spr.modulate.r -= .5;
-			spr.modulate.a = _alphaThresh * 1.75 - randf_range(0, .125);
+			spr.modulate.v = _valueThresh * 1.75 - randf_range(0, .125);
 			
 		Map_Data.Terrain.DEBUG_HOLE:
 			spr.region_rect.position.x = World.Spr_Reg_Size * 10; # Brown Box
