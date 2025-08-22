@@ -1,5 +1,12 @@
 UPCOMING ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
+- Icons that look like Objects but are actually buildings
+- Building interiors
+- Terrain that forms a drawing of an idol
+- Hidden pathways up mountains
+- Houses hidden in trees
+- Pulling up plants to reveal harvest "drawer"
+
 HIGH PRIORITY:
 	- Change Discovered Biomes [Grid Position : (Object), Biome Type] -> Recorded Biomes [Grid Position : Biome Type, Object]
 		- Recorded Biomes can exist without a Biome Object, which can be instantiated later.
