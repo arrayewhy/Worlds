@@ -104,7 +104,7 @@ func _Zoom_In() -> void:
 		var zoomTween:Tween = create_tween();
 		zoomTween.set_trans(Tween.TRANS_CUBIC);
 		zoomTween.set_ease(Tween.EASE_IN_OUT);
-		zoomTween.tween_property(self, "zoom", Vector2(3.5, 3.5), 1.25);
+		zoomTween.tween_property(self, "zoom", Vector2(3, 3), 1.25);
 
 # Functions: Signals ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 

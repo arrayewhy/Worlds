@@ -7,102 +7,7 @@
 [ext_resource type="Script" uid="uid://cfisq7q1r08j0" path="res://Scripts/cursor.gd" id="4_rrw6a"]
 [ext_resource type="FontFile" uid="uid://bn56m5j1acs0j" path="res://Misc/Fonts/Georgia.ttf" id="5_n34cn"]
 [ext_resource type="Texture2D" uid="uid://da0t66iwxuyxq" path="res://Sprites/textbox_yellow.png" id="6_svxh6"]
-[ext_resource type="Script" uid="uid://cal2wnxopwt2h" path="res://Scripts/islands.gd" id="8_rydrt"]
-
-[sub_resource type="Gradient" id="Gradient_lnlyj"]
-interpolation_mode = 2
-offsets = PackedFloat32Array(0.408759, 1)
-colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_hf1hu"]
-gradient = SubResource("Gradient_lnlyj")
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(0.85, 0.15)
-
-[sub_resource type="GDScript" id="GDScript_cl1kf"]
-resource_name = "sun"
-script/source = "extends PointLight2D
-
-const _dayDur:float = 60;
-const _nightDur:float = 30;
-
-var _worldCenter:Vector2;
-
-var _rising:bool = true;
-
-var _posTween:Tween;
-var _energyTween:Tween;
-
-
-func _ready() -> void:
-	# Wait for Initial Map Generation
-	World.Initial_MapGen_Complete.connect(_On_Initial_MapGen_Complete);
-
-
-#func _unhandled_key_input(event: InputEvent) -> void:
-	#if event.is_action_pressed(\"Cancel\"):
-		#if _posTween != null:
-			#_posTween.stop();
-			#_energyTween.stop();
-		#if _rising:
-			#self.position.x = _worldCenter.x;
-			#_Set(_nightDur);
-		#else:
-			#_Rise(_dayDur);
-
-
-func _Rise(duration:float) -> void:
-	
-	self.position.x = _worldCenter.x + World.MapWidth() / 2;
-	
-	_posTween = create_tween();
-	_posTween.set_trans(Tween.TRANS_CUBIC);
-	_posTween.set_ease(Tween.EASE_OUT);
-	_posTween.tween_property(self, \"position:x\", _worldCenter.x, duration);
-	
-	_rising = !_rising;
-	var energy:float = _rising;
-	
-	_energyTween = create_tween();
-	_energyTween.set_trans(Tween.TRANS_CUBIC);
-	_energyTween.set_ease(Tween.EASE_OUT);
-	_energyTween.tween_property(self, \"energy\", energy, duration);
-	
-	await _posTween.finished;
-	
-	_Set(_nightDur);
-
-
-func _Set(duration:float) -> void:
-	
-	var endX:float = _worldCenter.x - World.MapWidth() / 2;
-	
-	_posTween = create_tween();
-	_posTween.set_trans(Tween.TRANS_CUBIC);
-	_posTween.set_ease(Tween.EASE_IN);
-	_posTween.tween_property(self, \"position:x\", endX, duration);
-	
-	_rising = !_rising;
-	var energy:float = _rising;
-	
-	_energyTween = create_tween();
-	_energyTween.set_trans(Tween.TRANS_CUBIC);
-	_energyTween.set_ease(Tween.EASE_OUT);
-	_energyTween.tween_property(self, \"energy\", energy, duration);
-	
-	await _posTween.finished;
-	
-	_Rise(_dayDur);
-
-
-# Functions: Signals ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-
-
-func _On_Initial_MapGen_Complete() -> void:
-	_worldCenter = Vector2.ONE * (World.MapWidth() / 2) * World.CellSize;
-	self.position = _worldCenter;
-"
+[ext_resource type="Script" uid="uid://cal2wnxopwt2h" path="res://Scripts/terrain_grouper.gd" id="8_rydrt"]
 
 [sub_resource type="GDScript" id="GDScript_ho7ea"]
 resource_name = "curtain"
@@ -196,6 +101,9 @@ func Message_Set_Position_And_Size(pos:Vector2, callerPath:String) -> void:
 
 func _Set_Position_And_Size(pos:Vector2) -> void:
 	
+	if !visible:
+		self.show();
+	
 	_panelContainer.reset_size();
 
 	self.position = World.Coord_OnGrid(pos) - _panelContainer.size;
@@ -230,16 +138,108 @@ generate_mipmaps = false
 seamless_blend_skirt = 1.0
 noise = SubResource("FastNoiseLite_g2m6q")
 
-[node name="RandomNoiseTest" type="Node2D"]
+[sub_resource type="Gradient" id="Gradient_lnlyj"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0.408759, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
 
-[node name="Sun" type="PointLight2D" parent="."]
-visible = false
-position = Vector2(1024, 1024)
-scale = Vector2(32, 32)
-color = Color(1, 0.983333, 0.9, 1)
-energy = 0.9
-texture = SubResource("GradientTexture2D_hf1hu")
-script = SubResource("GDScript_cl1kf")
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_hf1hu"]
+gradient = SubResource("Gradient_lnlyj")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.85, 0.15)
+
+[sub_resource type="GDScript" id="GDScript_cl1kf"]
+resource_name = "sun"
+script/source = "extends PointLight2D
+
+const _dayDur:float = 60;
+const _nightDur:float = 30;
+
+var _worldCenter:Vector2;
+
+var _rising:bool = true;
+
+var _posTween:Tween;
+var _energyTween:Tween;
+
+
+func _ready() -> void:
+	# Wait for Initial Map Generation
+	World.Initial_MapGen_Complete.connect(_On_Initial_MapGen_Complete);
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if event.is_action_pressed(\"Zero\"):
+		if _posTween != null:
+			_posTween.stop();
+			_energyTween.stop();
+		if _rising:
+			#self.position.x = _worldCenter.x;
+			_Set(_nightDur);
+		else:
+			_Rise(_dayDur);
+
+
+func _Rise(duration:float) -> void:
+	
+	#self.position.x = _worldCenter.x + World.MapWidth() / 2;
+	
+	#_posTween = create_tween();
+	#_posTween.set_trans(Tween.TRANS_CUBIC);
+	#_posTween.set_ease(Tween.EASE_OUT);
+	#_posTween.tween_property(self, \"position:x\", _worldCenter.x, duration);
+	
+	_rising = !_rising;
+	var sun_energy:float = _rising;
+	
+	_energyTween = create_tween();
+	_energyTween.set_trans(Tween.TRANS_CUBIC);
+	_energyTween.set_ease(Tween.EASE_OUT);
+	_energyTween.tween_property(self, \"energy\", sun_energy, duration);
+	
+	await _energyTween.finished;
+	
+	_Set(_nightDur);
+
+
+func _Set(duration:float) -> void:
+	
+	#var endX:float = _worldCenter.x - World.MapWidth() / 2;
+	#
+	#_posTween = create_tween();
+	#_posTween.set_trans(Tween.TRANS_CUBIC);
+	#_posTween.set_ease(Tween.EASE_IN);
+	#_posTween.tween_property(self, \"position:x\", endX, duration);
+	
+	_rising = !_rising;
+	var sun_energy:float = _rising;
+	sun_energy += 0.05;
+	
+	_energyTween = create_tween();
+	_energyTween.set_trans(Tween.TRANS_CUBIC);
+	_energyTween.set_ease(Tween.EASE_OUT);
+	_energyTween.tween_property(self, \"energy\", sun_energy, duration);
+	
+	await _energyTween.finished;
+	
+	await get_tree().create_timer(_nightDur);
+	
+	_Rise(_dayDur);
+
+
+# Functions: Signals ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+func _On_Initial_MapGen_Complete() -> void:
+	_worldCenter = Vector2.ONE * (World.MapWidth() / 2) * World.CellSize;
+	self.position = _worldCenter;
+	await get_tree().create_timer(60);
+	_Set(_nightDur);
+	
+"
+
+[node name="RandomNoiseTest" type="Node2D"]
 
 [node name="Camera2D" type="Camera2D" parent="." node_paths=PackedStringArray("_hide_on_zoom", "_show_on_zoom", "_cursor")]
 position = Vector2(1024, 1024)
@@ -247,10 +247,6 @@ script = ExtResource("1_o4r1h")
 _hide_on_zoom = NodePath("../map_generator/hide_on_zoom")
 _show_on_zoom = NodePath("../map_generator/show_on_zoom")
 _cursor = NodePath("../Cursor")
-
-[node name="CanvasModulate" type="CanvasModulate" parent="."]
-visible = false
-color = Color(0.03, 0.0918333, 0.1, 1)
 
 [node name="Curtain" type="CanvasLayer" parent="."]
 visible = false
@@ -325,6 +321,7 @@ _message = NodePath("../Message")
 _messagePanelCont = NodePath("../Message/PanelContainer")
 
 [node name="Message" type="Node2D" parent="."]
+visible = false
 z_index = 1000
 z_as_relative = false
 position = Vector2(1014, 801)
@@ -401,5 +398,18 @@ grow_vertical = 2
 texture = SubResource("NoiseTexture2D_ue23j")
 stretch_mode = 5
 
-[node name="islands" type="Node" parent="map_generator"]
+[node name="terrain_grouper" type="Node" parent="map_generator"]
 script = ExtResource("8_rydrt")
+
+[node name="lighting" type="Node2D" parent="."]
+
+[node name="Sun" type="PointLight2D" parent="lighting"]
+position = Vector2(1024, 1024)
+scale = Vector2(32, 32)
+color = Color(1, 0.983333, 0.9, 1)
+energy = 0.9
+texture = SubResource("GradientTexture2D_hf1hu")
+script = SubResource("GDScript_cl1kf")
+
+[node name="CanvasModulate" type="CanvasModulate" parent="lighting"]
+color = Color(0.03, 0.0918333, 0.1, 1)
