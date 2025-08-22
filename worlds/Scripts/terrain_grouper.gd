@@ -3,7 +3,7 @@ extends Node
 var _debug:bool;
 
 
-func Islands_From_TerrainData(terrainData:Array[Map_Data.Terrain], convert_to_idx:bool, withShallow:bool, callerPath:String) -> Array[Array]:
+func Island_CoordArrays_From_TerrainData(terrainData:Array[Map_Data.Terrain], callerPath:String) -> Array[Array]:
 	
 	if _debug: print_debug("Islands_From_TerrainData, called by: ", callerPath);
 	
@@ -18,7 +18,7 @@ func Islands_From_TerrainData(terrainData:Array[Map_Data.Terrain], convert_to_id
 		
 		var curr_island_chunks:Array[Vector2];
 		
-		if _Is_Land(terrainData[i]) && !checked.has(World.Index_To_Coord(i)):
+		if World.Terrain_Is_Land(terrainData[i]) && !checked.has(World.Index_To_Coord(i)):
 			
 			pendingCoords_In.append(World.Index_To_Coord(i));
 				
@@ -33,9 +33,7 @@ func Islands_From_TerrainData(terrainData:Array[Map_Data.Terrain], convert_to_id
 					
 						var curr_terrain:Map_Data.Terrain = terrainData[World.Coord_To_Index(coord)];
 						
-						if _Is_Land(curr_terrain) && !checked.has(coord):
-							pendingCoords_Out.append(coord);
-						elif withShallow && !checked.has(coord) && curr_terrain == Map_Data.Terrain.SHALLOW:
+						if World.Terrain_Is_Land(curr_terrain) && !checked.has(coord):
 							pendingCoords_Out.append(coord);
 					
 					curr_island_chunks.append(p);
@@ -50,23 +48,25 @@ func Islands_From_TerrainData(terrainData:Array[Map_Data.Terrain], convert_to_id
 				curr_island_chunks = [];
 	
 			continue;
+	
+	return islands;
 		
-	if !convert_to_idx:
-		return islands;
-	else:
-		
-		var islands_in_idx:Array[Array];
-		
-		for island in islands:
-			var indices:Array[int];
-			for coord in island:
-				indices.push_back(World.Coord_To_Index(coord));
-			islands_in_idx.push_back(indices);
-		
-		return islands_in_idx;
+	#if !convert_to_idx:
+		#return islands;
+	#else:
+		#
+		#var islands_in_idx:Array[Array];
+		#
+		#for island in islands:
+			#var indices:Array[int];
+			#for coord in island:
+				#indices.push_back(World.Coord_To_Index(coord));
+			#islands_in_idx.push_back(indices);
+		#
+		#return islands_in_idx;
 
 
-func TerrainGroups_From_TerrainData(type:Map_Data.Terrain, terrainData:Array[Map_Data.Terrain], convert_to_idx:bool, callerPath:String) -> Array[Array]:
+func TerrainGroups_From_TerrainData(type:Map_Data.Terrain, islandData:Array[Map_Data.Terrain], terrainData:Array[Map_Data.Terrain], convert_to_idx:bool, callerPath:String) -> Array[Array]:
 	
 	if _debug: print_debug("TerrainGroup_From_TerrainData, called by: ", callerPath);
 	
@@ -125,15 +125,3 @@ func TerrainGroups_From_TerrainData(type:Map_Data.Terrain, terrainData:Array[Map
 			total_groups_in_idx.push_back(indices);
 		
 		return total_groups_in_idx;
-
-
-func _Is_Land(terrain:Map_Data.Terrain) -> bool:
-	if terrain == Map_Data.Terrain.MOUNTAIN \
-	|| terrain == Map_Data.Terrain.HIGHLAND \
-	|| terrain == Map_Data.Terrain.GROUND \
-	|| terrain == Map_Data.Terrain.SHORE \
-	|| terrain == Map_Data.Terrain.SHALLOW \
-	|| terrain == Map_Data.Terrain.TEMPLE_BROWN \
-	|| terrain == Map_Data.Terrain.DOCK:
-		return true;
-	return false;

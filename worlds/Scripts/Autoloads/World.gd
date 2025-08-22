@@ -75,3 +75,14 @@ func V2_Array_Around(pos:Vector2, range:int, skipCenter:bool = false) -> Array[V
 		#p.remove_at(length * range + range);
 	
 	return p;
+
+
+func Terrain_Is_Land(terrain:Map_Data.Terrain) -> bool:
+	if terrain == Map_Data.Terrain.MOUNTAIN \
+	|| terrain == Map_Data.Terrain.HIGHLAND \
+	|| terrain == Map_Data.Terrain.GROUND \
+	|| terrain == Map_Data.Terrain.SHORE \
+	|| terrain == Map_Data.Terrain.TEMPLE_BROWN \
+	|| terrain == Map_Data.Terrain.DOCK:
+		return true;
+	return false;

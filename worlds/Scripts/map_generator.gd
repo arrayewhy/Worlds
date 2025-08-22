@@ -40,7 +40,7 @@ const _valueThresh:float = 1.0 / _waterDepth;
 
 var _terrain_data:Array[Map_Data.Terrain];
 var _marking_data:Array[Map_Data.Marking];
-#var _islands:Array[Array];
+var _islands_data:Array[Array];
 var _mountains_data:Array[Array];
 
 # Sprite2D Arrays to quickly grab a Sprite2D by its Index
@@ -106,16 +106,15 @@ func _Generate_Map(newSeed:int) -> void:
 	_terrain_data = Map_Data.Amend_TerrainData_Using_MarkingData(_terrain_data, _marking_data);
 	#_marking_data = Map_Data.Amend_MarkingData_Houses(_marking_data);
 	
-	# Mountains
-	_mountains_data = _terrain_grouper.TerrainGroups_From_TerrainData(Map_Data.Terrain.MOUNTAIN, _terrain_data, true, self.get_path());
-	
-	#for mountain in _mountains_data:
-		#print(mountain.size());
-		#for idx in mountain:
-			#_terrain_data[idx] = Map_Data.Terrain.Null;
-	
 	# Derive Islands
-	#_islands = _terrain_grouper.Islands_From_TerrainData(_terrain_data, true, true, self.get_path());
+	_islands_data = _terrain_grouper.Island_CoordArrays_From_TerrainData(_terrain_data, self.get_path());
+	
+	# Mountains
+	#_mountains_data = _terrain_grouper.TerrainGroups_From_TerrainData(Map_Data.Terrain.MOUNTAIN, _islands_data, true, self.get_path());
+	
+	for island in _islands_data:
+		for coord in island:
+			_terrain_data[World.Coord_To_Index(coord)] = Map_Data.Terrain.Null;
 	
 	#for island in _islands:
 		#for idx in island:
@@ -633,7 +632,6 @@ func Is_Land(coord:Vector2, callerPath:String) -> bool:
 	|| t == Map_Data.Terrain.HIGHLAND \
 	|| t == Map_Data.Terrain.GROUND \
 	|| t == Map_Data.Terrain.SHORE \
-	|| t == Map_Data.Terrain.SHALLOW \
 	|| t == Map_Data.Terrain.TEMPLE_BROWN \
 	|| t == Map_Data.Terrain.DOCK:
 		return true;

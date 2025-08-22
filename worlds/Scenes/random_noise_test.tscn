@@ -234,7 +234,7 @@ func _Set(duration:float) -> void:
 func _On_Initial_MapGen_Complete() -> void:
 	_worldCenter = Vector2.ONE * (World.MapWidth() / 2) * World.CellSize;
 	self.position = _worldCenter;
-	await get_tree().create_timer(60);
+	await get_tree().create_timer(60).timeout;
 	_Set(_nightDur);
 	
 "
