@@ -3,6 +3,7 @@ class_name Drift extends Node
 var _master:Node2D;
 
 #REFACTOR
+#@onready var _mapGen:Node2D;
 @onready var _mapGen:Node2D = get_parent().get_parent().get_parent();
 
 const _moveThresh:float = 3;

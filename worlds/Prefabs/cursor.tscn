@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://6w5rgamcucc1"]
+
+[ext_resource type="Texture2D" uid="uid://ck8qoiiu78eh6" path="res://Sprites/Glyphs.png" id="1_itexh"]
+[ext_resource type="Script" uid="uid://cfisq7q1r08j0" path="res://Scripts/cursor.gd" id="2_njk8v"]
+
+[node name="Cursor" type="Sprite2D"]
+scale = Vector2(0.063, 0.063)
+texture = ExtResource("1_itexh")
+region_enabled = true
+region_rect = Rect2(256, 2304, 256, 256)
+script = ExtResource("2_njk8v")

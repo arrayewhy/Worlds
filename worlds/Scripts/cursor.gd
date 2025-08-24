@@ -8,7 +8,7 @@ extends Sprite2D
 
 #var World.CellSize:float;
 
-var _zoomed:bool;
+#var _zoomed:bool;
 
 var _moveTimer:float;
 var _moveInterval:float = .15;
@@ -40,7 +40,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	
-	_Hold();
+	#_Hold();
 	
 	#if !Input.is_anything_pressed():
 		#return;
@@ -49,28 +49,22 @@ func _process(delta: float) -> void:
 		
 		var pos:Vector2 = World.Coord_OnGrid(self.position);
 		var v2_array:Array[Vector2] = World.V2_Array_Around(pos, 1);
-		#v2_array = [pos];
 		_mapGen.ChangeTerrain(v2_array, 10, self.get_path());
-		#print(v2_array.size());
 		#_Position_Message();
 	
 	# Move Immediately on direction key Press
 	
 	if Input.is_action_just_pressed("Up"):
 		self.position.y -= World.CellSize;
-		#_Fade_InOut(Vector2.UP);
 		_moveTimer = 0;
 	elif Input.is_action_just_pressed("Down"):
 		self.position.y += World.CellSize;
-		#_Fade_InOut(Vector2.DOWN);
 		_moveTimer = 0;
 	elif Input.is_action_just_pressed("Left"):
 		self.position.x -= World.CellSize;
-		#_Fade_InOut(Vector2.LEFT);
 		_moveTimer = 0;
 	elif Input.is_action_just_pressed("Right"):
 		self.position.x += World.CellSize;
-		#_Fade_InOut(Vector2.RIGHT);
 		_moveTimer = 0;
 	
 	# Repeat Move
@@ -113,6 +107,9 @@ func _process(delta: float) -> void:
 				Vector2.RIGHT:
 					self.position.x += World.CellSize;
 					#_Fade_InOut(Vector2.RIGHT);
+
+
+# Functions ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
 func _DirKey_Is_Released_And_Matches_LastDir(lastDir:Vector2) -> bool:
@@ -162,6 +159,9 @@ func _Set_Zoomed(on:bool, _camTargPos:Vector2) -> void:
 	set_process(on);
 
 
+# Back Burner ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
 var terrain:Sprite2D;
 var marking:Sprite2D;
 var detail:Sprite2D;
@@ -172,9 +172,6 @@ var holdingTween:Tween;
 var mouseStart:Vector2;
 var follow:bool;
 var origin:Vector2;
-
-
-# Back Burner ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
 func _Position_Message() -> void:
@@ -202,7 +199,7 @@ func _Hold() -> void:
 			
 			mouseStart = get_global_mouse_position();
 			var coord:Vector2 = World.Coord_OnGrid(mouseStart);
-			terrain = _mapGen.MapGenerator_Get_TerrainSprite(coord, self.get_path());
+			terrain = _mapGen.Get_TerrainSprite(coord, self.get_path());
 			marking = _mapGen.MapGenerator_Get_MarkingSprite(coord, self.get_path());
 			detail = _mapGen.MapGenerator_Get_DetailSprite(coord, self.get_path());
 			
