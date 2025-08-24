@@ -16,7 +16,7 @@ func Island_CoordArrays_From_TerrainData(terrainData:Array[Map_Data.Terrain], ca
 	
 	for i in terrainData.size():
 		
-		var curr_island_chunks:Array[Vector2];
+		var curr_island_coords:Array[Vector2];
 		
 		if World.Terrain_Is_Land(terrainData[i]) && !checked.has(World.Index_To_Coord(i)):
 			
@@ -36,16 +36,16 @@ func Island_CoordArrays_From_TerrainData(terrainData:Array[Map_Data.Terrain], ca
 						if World.Terrain_Is_Land(curr_terrain) && !checked.has(coord):
 							pendingCoords_Out.append(coord);
 					
-					curr_island_chunks.append(p);
+					curr_island_coords.append(p);
 					checked.append(p);
 					checked.append_array(surr_coords);
 				
 				pendingCoords_In = pendingCoords_Out;
 				pendingCoords_Out = [];
 			
-			if curr_island_chunks.size() > 0:
-				islands.push_back(curr_island_chunks);
-				curr_island_chunks = [];
+			if curr_island_coords.size() > 0:
+				islands.push_back(curr_island_coords);
+				curr_island_coords = [];
 	
 			continue;
 	
@@ -66,28 +66,25 @@ func Island_CoordArrays_From_TerrainData(terrainData:Array[Map_Data.Terrain], ca
 		#return islands_in_idx;
 
 
-func TerrainGroups_From_TerrainData(type:Map_Data.Terrain, islandData:Array[Map_Data.Terrain], terrainData:Array[Map_Data.Terrain], convert_to_idx:bool, callerPath:String) -> Array[Array]:
-	
-	if _debug: print_debug("TerrainGroup_From_TerrainData, called by: ", callerPath);
-	
-	var total_groups:Array[Array] = [];
+func TerrainClusters_From_Island(type:Map_Data.Terrain, singleIsland:Array[int], terrainData:Array[Map_Data.Terrain]) -> Array[Array]:
+	var cluster_array:Array[Array];
 	
 	var checked:Array[Vector2];
 	
 	var pendingCoords_In:Array[Vector2];
 	var pendingCoords_Out:Array[Vector2];
 	
-	for i in terrainData.size():
+	for idx in singleIsland:
 		
-		var curr_group_cells:Array[Vector2];
+		var currCluster:Array[int];
 		
-		if terrainData[i] == type && !checked.has(World.Index_To_Coord(i)):
+		if terrainData[idx] == type && !checked.has(World.Index_To_Coord(idx)):
 			
-			pendingCoords_In.append(World.Index_To_Coord(i));
+			pendingCoords_In.append(World.Index_To_Coord(idx));
 				
 			while pendingCoords_In.size() > 0:
 				
-				# Loopcurr
+				# Loop
 				for p in pendingCoords_In:
 					
 					var surr_coords:Array[Vector2] = World.V2_Array_Around(p, 1, true);
@@ -99,29 +96,17 @@ func TerrainGroups_From_TerrainData(type:Map_Data.Terrain, islandData:Array[Map_
 						if curr_terrain == type && !checked.has(coord):
 							pendingCoords_Out.append(coord);
 					
-					curr_group_cells.append(p);
+					currCluster.append(World.Coord_To_Index(p));
 					checked.append(p);
 					checked.append_array(surr_coords);
 				
 				pendingCoords_In = pendingCoords_Out;
 				pendingCoords_Out = [];
 			
-			if curr_group_cells.size() > 0:
-				total_groups.push_back(curr_group_cells);
-				curr_group_cells = [];
+			if currCluster.size() > 0:
+				cluster_array.push_back(currCluster);
+				currCluster = [];
 	
 			continue;
-		
-	if !convert_to_idx:
-		return total_groups;
-	else:
-		
-		var total_groups_in_idx:Array[Array];
-		
-		for group in total_groups:
-			var indices:Array[int];
-			for coord in group:
-				indices.push_back(World.Coord_To_Index(coord));
-			total_groups_in_idx.push_back(indices);
-		
-		return total_groups_in_idx;
+	
+	return cluster_array;
