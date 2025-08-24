@@ -8,7 +8,8 @@ enum Terrain {
 	
 	# Land
 	MOUNTAIN,
-	HIGHLAND,
+	MOUNTAIN_PATH,
+	FOREST,
 	GROUND,
 	SHORE,
 	# Water
@@ -48,6 +49,7 @@ enum Marking {
 	MESSAGE_BOTTLE,
 	MINI_MOUNT,
 	HOBBIT_HOUSE,
+	STEPS,
 	}
 
 #var _messageBottle_spawned:bool;
@@ -56,7 +58,7 @@ enum Marking {
 # Functions ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
-static func Derive_TerrainData_From_NoiseData(mountain:float, highland:float, ground:float, shore:float, shallow:float, sea:float, ocean:float, depths:float, noiseData:Array) -> Array[Terrain]:
+static func Derive_TerrainData_From_NoiseData(mountain:float, forest:float, ground:float, shore:float, shallow:float, sea:float, ocean:float, depths:float, noiseData:Array) -> Array[Terrain]:
 	
 	var t:Array[Terrain];
 	
@@ -64,10 +66,10 @@ static func Derive_TerrainData_From_NoiseData(mountain:float, highland:float, gr
 		if d >= mountain:
 			t.append(Terrain.MOUNTAIN);
 			continue;
-		elif d >= highland && d < mountain:
-			t.append(Terrain.HIGHLAND);
+		elif d >= forest && d < mountain:
+			t.append(Terrain.FOREST);
 			continue;
-		elif d >= ground && d < highland:
+		elif d >= ground && d < forest:
 			t.append(Terrain.GROUND);
 			continue;
 		elif d >= shore && d < ground:
@@ -118,7 +120,11 @@ static func Derive_MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> A
 				m.append(Marking.Null);
 				continue;
 			
-			Terrain.HIGHLAND:
+			Terrain.MOUNTAIN_PATH:
+				m.append(Marking.STEPS)
+				continue;
+			
+			Terrain.FOREST:
 				#if randi_range(0, 1000) > 500:
 					#m.append(Marking.HILL);
 				if randi_range(0, 1000) > 50:
