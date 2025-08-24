@@ -1,82 +1,21 @@
 UPCOMING ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
+
 - Icons that look like Objects but are actually buildings
 - Building interiors
 - Terrain that forms a drawing of an idol
 - Hidden pathways up mountains
 - Houses hidden in trees
 - Pulling up plants to reveal harvest "drawer"
+- Ground rising underneath means Treasure (or something else...?)!
 
-HIGH PRIORITY:
-	- Change Discovered Biomes [Grid Position : (Object), Biome Type] -> Recorded Biomes [Grid Position : Biome Type, Object]
-		- Recorded Biomes can exist without a Biome Object, which can be instantiated later.
-	- Entering Forests and Towns opens a Zoom View, slowing Overworld Movement
-	- World Template / World Edge through Sprite Pixel Info
-	
-LOW PRIORITY:
-	- House in the Woods
-	- Cavern connects to town through tunnel
-	- Make biomes with empties around darker.
-	
-SPECULATIVE:
-	- Caverns
-	- Treasure chests hidden along water's edge on a mountain side
-	- Microview Interior
-	- Consider making Interaction Sprites look as if they are seen from "higher up", so we would see
-		Forests instead of a single Tree. Schools instead of a single fish.
-	- Inventory
-	- Riding the Fish
-	- Slow Random Biome Reveal phenomenon that does its own thing
-	- Use player's distance from center to determine biases.
-	
-	- Time of Day & Search Range
-	- Dog companion helps you explore land
-	- Lone water biome could lead to underground cavern
-	
->>> DONE:
-	- Spawn: Trees
-	- Tween Player Movement
-	- Biome Mouse Hover
-	- Fade Biomes
-	- Merge signals SpawnBiomesAroundPlayer & SpawnBiomes in World.gd
-	- PRETTY WATER DEPTHS
+Trivia:
+	- Mountains always have a way up or down them (stairs, moonlight stairs, tunnel leading out and down mountain with no way back up)
 
-BUGS ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-
-HIGH PRIORITY:
-	- In-land water sometimes causes Multi-Fade crash? Same as previous issue?
-	
-LOW PRIORITY:
-	- Interactions on Initial Biomes aren't visible
-
->>> FIXED:
-
-	- 1 Signal Emit, Multiple Function Calls:
-		Interaction-Updater function (On_WorldTick) connected to World.TimeTick fires between
-		1~3 times every time World.TimeTick is emitted.
-		
-		SOLUTION:
-			- Only connect Active Interactions to World.TimeTick, and 
-			disconnect them when NOT active (InteractionMaster.Type.NULL).
-
-	- Biome Melding Queue Free Issue:
-		Sometimes, we try to free a biome object when it is still fading, crashing the Multi-Fader
-
-		SOLUTION:
-			- Handle the fading with a local tween, and set queue_free as the callback.
 
 FEEDBACK ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
 
 OBSERVATIONS:
 	- Lesley<3: Wanted to click on the biomes
 	- Sherry: "How do I play? This is too hard!"
-
-STORY ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-
-SPECULATIVE:
-	- Forced to cross channel between 2 river mouths (war at one mouth, danger at the other)
-
-KEYS ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-
-# LEFTOFF - Where we left off from last session
-# HOTFIX - Temporary fixes
