@@ -100,7 +100,7 @@ func _Generate_Map(newSeed:int) -> void:
 	await _noiseTex.texture.changed;
 	var noiseData:PackedByteArray = _noiseTex.get_texture().get_image().get_data();
 	
-	World.Set_MapWidth(_noiseTex.get_texture().get_size().x, self.get_path());
+	World.Set_MapWidth_In_Units(_noiseTex.get_texture().get_size().x, self.get_path());
 	
 	# Generate Map Data
 	_terrain_data = Map_Data.Derive_TerrainData_From_NoiseData(_mountain, _forest, _ground, _shore, _shallow, _sea, _ocean, _depths, noiseData);
@@ -109,7 +109,7 @@ func _Generate_Map(newSeed:int) -> void:
 	var islands_coordArrays:Array[Array] = _terrain_grouper.Island_CoordArrays_From_TerrainData(_terrain_data, self.get_path());
 	# Convert Island Array[Array[Coord]] => Array[Array[Index]]
 	for coordArray in islands_coordArrays:
-		_array_islands.push_back(World.IdxArray_From_CoordArray(coordArray));
+		_array_islands.push_back(World.Convert_CoordArray_To_IdxArray(coordArray));
 	
 	# Derive Mountain Ranges
 	for island in _array_islands:
@@ -262,7 +262,7 @@ func _TerrainSprites_From_TerrainData(terrainData:Array[Map_Data.Terrain]) -> Ar
 		# Set Next sprite Position
 		
 		currX += 1;
-		if currX >= World.MapWidth():
+		if currX >= World.MapWidth_In_Units():
 			currX = 0;
 			currY += 1;
 	
@@ -426,7 +426,7 @@ func _MarkingSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Ar
 		# Set Next marking Position
 		
 		currX += 1;
-		if currX >= World.MapWidth():
+		if currX >= World.MapWidth_In_Units():
 			currX = 0;
 			currY += 1;
 			
@@ -571,7 +571,7 @@ func _DetailSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Arr
 		
 		# Set Next Detail Position
 		currX += 1;
-		if currX >= World.MapWidth():
+		if currX >= World.MapWidth_In_Units():
 			currX = 0;
 			currY += 1;
 			
@@ -674,30 +674,30 @@ func _Cluster_Edges_FourDir(type:Map_Data.Terrain, cluster:Array[int]) -> Array[
 	for i in cluster.size():
 		
 		var rocks:int;
-		var curr_coord:Vector2 = World.Index_To_Coord(cluster[i]);
+		var curr_coord:Vector2 = World.Convert_Index_To_Coord(cluster[i]);
 		
 		var up_coord:Vector2 = curr_coord + Vector2.UP * World.CellSize;
 		if up_coord.y <= World.CellSize:
 			continue;
-		if _terrain_data[World.Coord_To_Index(up_coord)] == Map_Data.Terrain.MOUNTAIN:
+		if _terrain_data[World.Convert_Coord_To_Index(up_coord)] == Map_Data.Terrain.MOUNTAIN:
 			rocks += 1;
 			
 		var down_coord:Vector2 = curr_coord + Vector2.DOWN * World.CellSize;
-		if down_coord.y >= World.MapWidth() * World.CellSize - World.CellSize:
+		if down_coord.y >= World.MapWidth_In_Units() * World.CellSize - World.CellSize:
 			continue;
-		if _terrain_data[World.Coord_To_Index(down_coord)] == Map_Data.Terrain.MOUNTAIN:
+		if _terrain_data[World.Convert_Coord_To_Index(down_coord)] == Map_Data.Terrain.MOUNTAIN:
 			rocks += 1;
 		
 		var left_coord:Vector2 = curr_coord + Vector2.LEFT * World.CellSize;
 		if left_coord.x <= World.CellSize:
 			continue;
-		if _terrain_data[World.Coord_To_Index(left_coord)] == Map_Data.Terrain.MOUNTAIN:
+		if _terrain_data[World.Convert_Coord_To_Index(left_coord)] == Map_Data.Terrain.MOUNTAIN:
 			rocks += 1;
 			
 		var right_coord:Vector2 = curr_coord + Vector2.RIGHT * World.CellSize;
-		if right_coord.x >= World.MapWidth() * World.CellSize - World.CellSize:
+		if right_coord.x >= World.MapWidth_In_Units() * World.CellSize - World.CellSize:
 			continue;
-		if _terrain_data[World.Coord_To_Index(right_coord)] == Map_Data.Terrain.MOUNTAIN:
+		if _terrain_data[World.Convert_Coord_To_Index(right_coord)] == Map_Data.Terrain.MOUNTAIN:
 			rocks += 1;
 		
 		if rocks > 0 && rocks < 4:
@@ -721,15 +721,15 @@ func _Get_All_Cells_Of_TerrainType_On_Island(type:Map_Data.Terrain, island_idxAr
 
 func Get_TerrainSprite(coord:Vector2, callerPath:String) -> Sprite2D:
 	if _debug: print("\nmap_generator.gd - Get_TerrainSprite, called by: ", callerPath);
-	return _sprite_array_Terrain[World.Coord_To_Index(coord)];
+	return _sprite_array_Terrain[World.Convert_Coord_To_Index(coord)];
 	
 func Get_MarkingSprite(coord:Vector2, callerPath:String) -> Sprite2D:
 	if _debug: print("\nmap_generator.gd - Get_MarkingSprite, called by: ", callerPath);
-	return _sprite_array_Marking[World.Coord_To_Index(coord)];
+	return _sprite_array_Marking[World.Convert_Coord_To_Index(coord)];
 	
 func Get_DetailSprite(coord:Vector2, callerPath:String) -> Sprite2D:
 	if _debug: print("\nmap_generator.gd - Get_DetailSprite, called by: ", callerPath);
-	return _sprite_array_Detail[World.Coord_To_Index(coord)];
+	return _sprite_array_Detail[World.Convert_Coord_To_Index(coord)];
 
 
 func Get_Terrain(idx:int, callerPath:String) -> Map_Data.Terrain:
@@ -754,7 +754,7 @@ func _Is_Land(coord:Vector2, idx:int = -1) -> bool:
 	var t:Map_Data.Terrain;
 	
 	if idx == -1:
-		t = _terrain_data[World.Coord_To_Index(coord)];
+		t = _terrain_data[World.Convert_Coord_To_Index(coord)];
 	else:
 		t = _terrain_data[idx];
 	
@@ -774,5 +774,5 @@ func ChangeTerrain(v2_array:Array[Vector2], terrainType:Map_Data.Terrain, caller
 
 func _ChangeTerrain(v2_array:Array[Vector2], terrainType:Map_Data.Terrain) -> void:
 	for v2 in v2_array:
-		var spr:Sprite2D = _sprite_array_Terrain[World.Coord_To_Index(v2)];
+		var spr:Sprite2D = _sprite_array_Terrain[World.Convert_Coord_To_Index(v2)];
 		_Configure_TerrainSprite_LandAndSea(spr, terrainType);

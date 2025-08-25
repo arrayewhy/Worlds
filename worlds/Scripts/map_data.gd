@@ -246,7 +246,7 @@ static func Amend_MarkingData_Houses(markingData:Array[Marking]) -> Array[Markin
 	
 	var m_array:Array[Marking] = markingData;
 	
-	#var width:float = World.MapWidth();
+	#var width:float = World.MapWidth_In_Units();
 	
 	for i in m_array.size():
 		
@@ -254,14 +254,14 @@ static func Amend_MarkingData_Houses(markingData:Array[Marking]) -> Array[Markin
 			
 			Marking.TREE:
 				
-				var center:Vector2 = World.Index_To_Coord(i);
+				var center:Vector2 = World.Convert_Index_To_Coord(i);
 				
 				var surr_coords:Array[Vector2] = World.V2_Array_Around(center, 1, true);
 				
 				var trees:int = 0;
 				
 				for coord in surr_coords:
-					if m_array[World.Coord_To_Index(coord)] == Marking.TREE:
+					if m_array[World.Convert_Coord_To_Index(coord)] == Marking.TREE:
 						trees += 1;
 
 				if trees >= 8:
@@ -290,7 +290,7 @@ static func Amend_TerrainData_Docks(terrainData:Array[Terrain]) -> Array[Terrain
 				#if !done:
 					#done = true;
 					
-				var start:Vector2 = World.Index_To_Coord(t_idx);
+				var start:Vector2 = World.Convert_Index_To_Coord(t_idx);
 				
 				var dockTarget:Vector2 = -Vector2.ONE;
 				var dockIdx:int = 0;
@@ -307,7 +307,7 @@ static func Amend_TerrainData_Docks(terrainData:Array[Terrain]) -> Array[Terrain
 							
 					var surr_indices:Array[int];
 					for c_index in surr_coords.size():
-						surr_indices.append(World.Coord_To_Index(surr_coords[c_index]));
+						surr_indices.append(World.Convert_Coord_To_Index(surr_coords[c_index]));
 					
 					var score:int = 0;
 					for index in surr_indices:
@@ -327,13 +327,13 @@ static func Amend_TerrainData_Docks(terrainData:Array[Terrain]) -> Array[Terrain
 						highest_waterScore = score;
 						dockTarget = check_center;
 				
-				#t_array[World.Coord_To_Index(start)] = Terrain.Null;
+				#t_array[World.Convert_Coord_To_Index(start)] = Terrain.Null;
 				
 				if highest_waterScore > 20:
 
 					if dockTarget != -Vector2.ONE:
 						
-						#t_array[World.Coord_To_Index(dockTarget)] = Terrain.DEBUG_HOLE;
+						#t_array[World.Convert_Coord_To_Index(dockTarget)] = Terrain.DEBUG_HOLE;
 						
 						var dist:float = start.distance_to(dockTarget) / World.CellSize;
 						
@@ -345,18 +345,18 @@ static func Amend_TerrainData_Docks(terrainData:Array[Terrain]) -> Array[Terrain
 							
 							currCoord += dir;
 							
-							if t_array[World.Coord_To_Index(currCoord)] == Terrain.DOCK:
+							if t_array[World.Convert_Coord_To_Index(currCoord)] == Terrain.DOCK:
 								#print("Short Dock");
 								break;
 							
-							t_array[World.Coord_To_Index(currCoord)] = Terrain.DOCK;
+							t_array[World.Convert_Coord_To_Index(currCoord)] = Terrain.DOCK;
 						#print("Full Dock");
 						#var next:Vector2 = start + dir;
 						
 						
 						
 						#while !done:
-							#t_array[World.Coord_To_Index(next)] = Terrain.Dock;
+							#t_array[World.Convert_Coord_To_Index(next)] = Terrain.Dock;
 							#next += dir;
 							#if next == dockTarget:
 								#done = true;
@@ -387,7 +387,7 @@ static func Amend_TerrainData_Docks(terrainData:Array[Terrain]) -> Array[Terrain
 							#
 							#var surr_idx:Array[int];
 							#for c_idx in surr_coord.size():
-								#surr_idx.append(World.Coord_To_Index(surr_coord[c_idx]));
+								#surr_idx.append(World.Convert_Coord_To_Index(surr_coord[c_idx]));
 							#
 							#var waterScore:int = 0;
 							#for idx in surr_idx:
@@ -418,8 +418,8 @@ static func Amend_TerrainData_Docks(terrainData:Array[Terrain]) -> Array[Terrain
 					##|| dockIdx == 7:
 						##pass;
 					#
-					#t_array[World.Coord_To_Index(start)] = Terrain.Null;
+					#t_array[World.Convert_Coord_To_Index(start)] = Terrain.Null;
 					#if dockTarget != -Vector2.ONE:
-						#t_array[World.Coord_To_Index(dockTarget)] = Terrain.TEMPLE_BROWN;
+						#t_array[World.Convert_Coord_To_Index(dockTarget)] = Terrain.TEMPLE_BROWN;
 	
 	return t_array;

@@ -92,7 +92,7 @@ func _Move(dir:Vector2) -> void:
 		#return;
 	
 	_destination = self.position + dir * World.CellSize;
-	_next_idx = World.Coord_To_Index(_destination);
+	_next_idx = World.Convert_Coord_To_Index(_destination);
 	
 	var next_terrain:Map_Data.Terrain = _mapGen.Get_Terrain(_next_idx, self.get_path());
 	var next_marking:Map_Data.Marking = _mapGen.Get_Marking(_next_idx, self.get_path());

@@ -141,7 +141,7 @@ func Reset_CamSpeed(callerPath:String) -> void:
 
 
 func _On_Initial_MapGen_Complete() -> void:
-	self.position = Vector2.ONE * World.CellSize * (World.MapWidth() / 2);
+	self.position = Vector2.ONE * World.CellSize * (World.MapWidth_In_Units() / 2);
 	_targPos = self.position;
 	#_Zoom_In();
 	Cam_Pos_On_MapGenComplete.emit(self.position);

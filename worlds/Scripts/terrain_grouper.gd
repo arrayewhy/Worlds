@@ -18,9 +18,9 @@ func Island_CoordArrays_From_TerrainData(terrainData:Array[Map_Data.Terrain], ca
 		
 		var curr_island_coords:Array[Vector2];
 		
-		if World.Terrain_Is_Land(terrainData[i]) && !checked.has(World.Index_To_Coord(i)):
+		if World.Terrain_Is_Land(terrainData[i]) && !checked.has(World.Convert_Index_To_Coord(i)):
 			
-			pendingCoords_In.append(World.Index_To_Coord(i));
+			pendingCoords_In.append(World.Convert_Index_To_Coord(i));
 				
 			while pendingCoords_In.size() > 0:
 				
@@ -31,7 +31,7 @@ func Island_CoordArrays_From_TerrainData(terrainData:Array[Map_Data.Terrain], ca
 					
 					for coord in surr_coords:
 					
-						var curr_terrain:Map_Data.Terrain = terrainData[World.Coord_To_Index(coord)];
+						var curr_terrain:Map_Data.Terrain = terrainData[World.Convert_Coord_To_Index(coord)];
 						
 						if World.Terrain_Is_Land(curr_terrain) && !checked.has(coord):
 							pendingCoords_Out.append(coord);
@@ -60,7 +60,7 @@ func Island_CoordArrays_From_TerrainData(terrainData:Array[Map_Data.Terrain], ca
 		#for island in islands:
 			#var indices:Array[int];
 			#for coord in island:
-				#indices.push_back(World.Coord_To_Index(coord));
+				#indices.push_back(World.Convert_Coord_To_Index(coord));
 			#islands_in_idx.push_back(indices);
 		#
 		#return islands_in_idx;
@@ -78,9 +78,9 @@ func TerrainClusters_From_Island(type:Map_Data.Terrain, singleIsland:Array[int],
 		
 		var currCluster:Array[int];
 		
-		if terrainData[idx] == type && !checked.has(World.Index_To_Coord(idx)):
+		if terrainData[idx] == type && !checked.has(World.Convert_Index_To_Coord(idx)):
 			
-			pendingCoords_In.append(World.Index_To_Coord(idx));
+			pendingCoords_In.append(World.Convert_Index_To_Coord(idx));
 				
 			while pendingCoords_In.size() > 0:
 				
@@ -91,12 +91,12 @@ func TerrainClusters_From_Island(type:Map_Data.Terrain, singleIsland:Array[int],
 					
 					for coord in surr_coords:
 					
-						var curr_terrain:Map_Data.Terrain = terrainData[World.Coord_To_Index(coord)];
+						var curr_terrain:Map_Data.Terrain = terrainData[World.Convert_Coord_To_Index(coord)];
 						
 						if curr_terrain == type && !checked.has(coord):
 							pendingCoords_Out.append(coord);
 					
-					currCluster.append(World.Coord_To_Index(p));
+					currCluster.append(World.Convert_Coord_To_Index(p));
 					checked.append(p);
 					checked.append_array(surr_coords);
 				

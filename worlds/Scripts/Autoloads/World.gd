@@ -10,19 +10,19 @@ var _debug:bool;
 
 
 func Signal_Initial_MapGen_Complete(callerPath:String) -> void:
-	if _debug: print_debug("Signal_Initial_MapGen_Complete, called by: ", callerPath);
+	if _debug: print("\nWorld.gd - Signal_Initial_MapGen_Complete, called by: ", callerPath);
 	Initial_MapGen_Complete.emit();
 
 
 # Functions: Get Set ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
-func Set_MapWidth(width:int, callerPath:String) -> void:
-	if _debug: print_debug("Set_MapWidth, called by: ", callerPath);
+func Set_MapWidth_In_Units(width:int, callerPath:String) -> void:
+	if _debug: print("\nWorld.gd - Set_MapWidth_In_Units, called by: ", callerPath);
 	_mapWidth = width;
 
 
-func MapWidth() -> int:
+func MapWidth_In_Units() -> int:
 	return _mapWidth;
 
 
@@ -44,11 +44,11 @@ func Coord_OnGrid(v2:Vector2) -> Vector2:
 	#return floor(v2 / CellSize) * CellSize;
 
 
-func Index_To_Coord(idx:int) -> Vector2:
+func Convert_Index_To_Coord(idx:int) -> Vector2:
 	return Vector2(idx % int(_mapWidth), idx / _mapWidth) * CellSize;
 
 
-func Coord_To_Index(coord:Vector2) -> int:
+func Convert_Coord_To_Index(coord:Vector2) -> int:
 	return (_mapWidth * coord.y + coord.x) / CellSize;
 
 
@@ -78,7 +78,7 @@ func V2_Array_Around(pos:Vector2, range:int, skipCenter:bool = false) -> Array[V
 	return p;
 
 
-func IdxArray_From_CoordArray(coordArray:Array[Vector2]) -> Array[int]:
+func Convert_CoordArray_To_IdxArray(coordArray:Array[Vector2]) -> Array[int]:
 	var idx_array:Array[int];
 	for coord in coordArray:
 		var idx:int = int((_mapWidth * coord.y + coord.x) / CellSize);
