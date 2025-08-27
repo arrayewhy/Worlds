@@ -3,8 +3,8 @@ extends Sprite2D
 @export var _mapGen:Node2D;
 
 @export var _cam:Camera2D;
-@export var _message:Node2D;
-@export var _messagePanelCont:PanelContainer;
+#@export var _message:Node2D;
+#@export var _messagePanelCont:PanelContainer;
 
 #var World.CellSize:float;
 
@@ -174,8 +174,8 @@ var follow:bool;
 var origin:Vector2;
 
 
-func _Position_Message() -> void:
-	_message.Message_Set_Position_And_Size(self.position, self.get_path());
+#func _Position_Message() -> void:
+	#_message.Set_Position_And_Size(self.position, self.get_path());
 
 
 func _Hold() -> void:
