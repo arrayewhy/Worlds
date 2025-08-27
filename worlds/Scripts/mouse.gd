@@ -15,12 +15,17 @@ func _process(delta: float) -> void:
 		if _terrain_lifters.has(mousePos):
 			return;
 		
+		var treasureType:int = _mapGen.Get_Buried(World.Convert_Coord_To_Index(mousePos), self.get_path());
+		
+		if treasureType < 0:
+			return;
+		
 		var spr:Sprite2D = _mapGen.Get_TerrainSprite(mousePos, self.get_path());
 		
 		if !spr:
 			return;
-			
-		var lifter:Terrain_Lifter = Terrain_Lifter.new(spr, mousePos);
+		
+		var lifter:Terrain_Lifter = Terrain_Lifter.new(spr, mousePos, treasureType, get_global_mouse_position().y);
 		self.add_child(lifter);
 		
 		# Record Terrain Lifter
