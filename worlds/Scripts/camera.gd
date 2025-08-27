@@ -12,7 +12,9 @@ var _zoomed:bool;
 
 var _targPos:Vector2;
 
-var _speedTween:Tween;
+var _showHide_tween:Tween;
+var _zoom_tween:Tween;
+var _speed_tween:Tween;
 
 signal Zoom(on:bool, camTargPos:Vector2);
 # TEMPORARY: For Positioning the Player under the camera on start
@@ -54,6 +56,9 @@ func _process(delta: float) -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	
+	if event.is_action_pressed("Enter"):
+		_targObj.position = World.Coord_OnGrid(self.position);
+	
 	if event.is_action_pressed("Zoom") && _zoomed:
 		_Zoom_Out();
 	elif event.is_action_pressed("Zoom") && !_zoomed:
@@ -76,20 +81,23 @@ func _Zoom_Out() -> void:
 		
 		Zoom.emit(_zoomed, _targPos);
 		
-		var objTween:Tween = create_tween();
-		objTween.set_trans(Tween.TRANS_CUBIC);
-		objTween.set_ease(Tween.EASE_IN_OUT);
-		objTween.tween_property(_hide_on_zoom, "modulate:a", 1.0, .5);
+		if _showHide_tween && _showHide_tween.is_running():
+			_showHide_tween.stop();
 		
-		var objZoomTween:Tween = create_tween();
-		objZoomTween.set_trans(Tween.TRANS_CUBIC);
-		objZoomTween.set_ease(Tween.EASE_IN_OUT);
-		objZoomTween.tween_property(_show_on_zoom, "modulate:a", 0, .5);
+		_showHide_tween = create_tween();
+		_showHide_tween.set_trans(Tween.TRANS_CUBIC);
+		_showHide_tween.set_ease(Tween.EASE_IN_OUT);
+		_showHide_tween.set_parallel(true);
+		_showHide_tween.tween_property(_hide_on_zoom, "modulate:a", 1.0, .5);
+		_showHide_tween.tween_property(_show_on_zoom, "modulate:a", 0, .5);
 		
-		var zoomTween:Tween = create_tween();
-		zoomTween.set_trans(Tween.TRANS_QUINT);
-		zoomTween.set_ease(Tween.EASE_OUT);
-		zoomTween.tween_property(self, "zoom", Vector2(1, 1), 1.5);
+		if _zoom_tween && _zoom_tween.is_running():
+			_zoom_tween.stop();
+		
+		_zoom_tween = create_tween();
+		_zoom_tween.set_trans(Tween.TRANS_QUINT);
+		_zoom_tween.set_ease(Tween.EASE_OUT);
+		_zoom_tween.tween_property(self, "zoom", Vector2(1, 1), 1.5);
 
 func _Zoom_In() -> void:
 	
@@ -97,20 +105,23 @@ func _Zoom_In() -> void:
 		
 		Zoom.emit(_zoomed, _targPos);
 		
-		var objTween:Tween = create_tween();
-		objTween.set_trans(Tween.TRANS_CUBIC);
-		objTween.set_ease(Tween.EASE_IN_OUT);
-		objTween.tween_property(_hide_on_zoom, "modulate:a", 0, .5);
+		if _showHide_tween && _showHide_tween.is_running():
+			_showHide_tween.stop();
 		
-		var objZoomTween:Tween = create_tween();
-		objZoomTween.set_trans(Tween.TRANS_CUBIC);
-		objZoomTween.set_ease(Tween.EASE_IN_OUT);
-		objZoomTween.tween_property(_show_on_zoom, "modulate:a", 1.0, .5);
+		_showHide_tween = create_tween();
+		_showHide_tween.set_trans(Tween.TRANS_CUBIC);
+		_showHide_tween.set_ease(Tween.EASE_IN_OUT);
+		_showHide_tween.set_parallel(true);
+		_showHide_tween.tween_property(_hide_on_zoom, "modulate:a", 0, .5);
+		_showHide_tween.tween_property(_show_on_zoom, "modulate:a", 1.0, .5);
 		
-		var zoomTween:Tween = create_tween();
-		zoomTween.set_trans(Tween.TRANS_CUBIC);
-		zoomTween.set_ease(Tween.EASE_IN_OUT);
-		zoomTween.tween_property(self, "zoom", Vector2(3, 3), 2.5);
+		if _zoom_tween && _zoom_tween.is_running():
+			_zoom_tween.stop();
+		
+		_zoom_tween = create_tween();
+		_zoom_tween.set_trans(Tween.TRANS_CUBIC);
+		_zoom_tween.set_ease(Tween.EASE_IN_OUT);
+		_zoom_tween.tween_property(self, "zoom", Vector2(3, 3), 2.5);
 
 
 # Functions: Get Set ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -123,18 +134,18 @@ func Is_Zoomed(callerPath:String) -> bool:
 
 func Slow_CamSpeed(callerPath:String) -> void:
 	if _debug: print("\ncamera.gd - Slow_CamSpeed, called by: ", callerPath);
-	if _speedTween && _speedTween.is_running():
-		_speedTween.stop();
-	_speedTween = create_tween();
-	_speedTween.tween_property(self, "_currSpeed", _normSpeed / 32, 1);
+	if _speed_tween && _speed_tween.is_running():
+		_speed_tween.stop();
+	_speed_tween = create_tween();
+	_speed_tween.tween_property(self, "_currSpeed", _normSpeed / 32, 1);
 
 
 func Reset_CamSpeed(callerPath:String) -> void:
 	if _debug: print("\ncamera.gd - Reset_CamSpeed, called by: ", callerPath);
-	if _speedTween && _speedTween.is_running():
-		_speedTween.stop();
-	_speedTween = create_tween();
-	_speedTween.tween_property(self, "_currSpeed", _normSpeed, 1);
+	if _speed_tween && _speed_tween.is_running():
+		_speed_tween.stop();
+	_speed_tween = create_tween();
+	_speed_tween.tween_property(self, "_currSpeed", _normSpeed, 1);
 
 
 # Functions: Signals ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -143,5 +154,5 @@ func Reset_CamSpeed(callerPath:String) -> void:
 func _On_Initial_MapGen_Complete() -> void:
 	self.position = Vector2.ONE * World.CellSize * (World.MapWidth_In_Units() / 2);
 	_targPos = self.position;
-	#_Zoom_In();
+	self.zoom = Vector2(.5, .5);
 	Cam_Pos_On_MapGenComplete.emit(self.position);
