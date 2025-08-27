@@ -4,7 +4,11 @@ const CellSize:float = 16;
 const Spr_Reg_Size:float = 256;
 var _mapWidth:int;
 
+const _spriteSheet:Texture2D = preload("res://Sprites/sparks_in_the_dark.png");
+
 signal Initial_MapGen_Complete;
+
+signal Replace_Terrain(idx:int, type:Map_Data.Terrain, spr:Sprite2D);
 
 var _debug:bool;
 
@@ -12,6 +16,11 @@ var _debug:bool;
 func Signal_Initial_MapGen_Complete(callerPath:String) -> void:
 	if _debug: print("\nWorld.gd - Signal_Initial_MapGen_Complete, called by: ", callerPath);
 	Initial_MapGen_Complete.emit();
+
+
+func Signal_Replace_Terrain_Sprite(idx:int, type:Map_Data.Terrain, spr:Sprite2D, callerPath:String) -> void:
+	if _debug: print("\nWorld.gd - Signal_Replace_Terrain_Sprite, called by: ", callerPath);
+	Replace_Terrain.emit(idx, type, spr);
 
 
 # Functions: Get Set ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -95,3 +104,20 @@ func Terrain_Is_Land(terrain:Map_Data.Terrain) -> bool:
 	|| terrain == Map_Data.Terrain.DOCK:
 		return true;
 	return false;
+
+
+func Create_Sprite(regPosX:float, regPosY:float, cells_y:int = 1, tex:Texture2D = _spriteSheet) -> Sprite2D:
+	var spr:Sprite2D = Sprite2D.new();
+	spr.texture = tex;
+	spr.region_enabled = true;
+	spr.region_rect.size = Vector2(World.Spr_Reg_Size, World.Spr_Reg_Size);
+	spr.region_rect.position = Vector2(regPosX, regPosY) * World.Spr_Reg_Size;
+	spr.scale /= World.CellSize;
+	
+	spr.region_rect.size = Vector2(World.Spr_Reg_Size, World.Spr_Reg_Size * cells_y);
+	
+	if cells_y > 1:
+		var displace_units:float = cells_y / 2;
+		spr.offset.y -= World.CellSize * 8 * displace_units;
+	
+	return spr;
