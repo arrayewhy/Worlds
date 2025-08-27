@@ -4,7 +4,7 @@ enum Terrain {
 	Null, # 0
 	
 	#DEBUG
-	DEBUG_HOLE,
+	HOLE,
 	
 	# Land
 	MOUNTAIN,
@@ -109,15 +109,15 @@ static func Derive_MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> A
 					#m.append(Marking.HOUSE);
 				#elif randi_range(0, 1000) > 995:
 					#m.append(Marking.TENT);
-				#if randi_range(0, 1000) > 900:
-					#m.append(Marking.PEAK);
-				#elif randi_range(0, 1000) > 200:
-					#m.append(Marking.MINI_MOUNT);
+				if randi_range(0, 1000) > 900:
+					m.append(Marking.PEAK);
+				elif randi_range(0, 1000) > 200:
+					m.append(Marking.MINI_MOUNT);
 				#elif randi_range(0, 1000) > 990:
 					#m.append(Marking.HOT_AIR_BALLOON);
-				#else:
-					#m.append(Marking.Null);
-				m.append(Marking.Null);
+				else:
+					m.append(Marking.Null);
+				#m.append(Marking.Null);
 				continue;
 			
 			Terrain.MOUNTAIN_PATH:
@@ -217,7 +217,7 @@ static func Derive_MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> A
 				m.append(Marking.Null);
 				continue;
 				
-			Terrain.DEBUG_HOLE:
+			Terrain.HOLE:
 				m.append(Marking.Null);
 				continue;
 				
@@ -333,7 +333,7 @@ static func Amend_TerrainData_Docks(terrainData:Array[Terrain]) -> Array[Terrain
 
 					if dockTarget != -Vector2.ONE:
 						
-						#t_array[World.Convert_Coord_To_Index(dockTarget)] = Terrain.DEBUG_HOLE;
+						#t_array[World.Convert_Coord_To_Index(dockTarget)] = Terrain.HOLE;
 						
 						var dist:float = start.distance_to(dockTarget) / World.CellSize;
 						
