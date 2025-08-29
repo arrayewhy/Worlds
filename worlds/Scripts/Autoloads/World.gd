@@ -6,16 +6,16 @@ var _mapWidth:int;
 
 const _spriteSheet:Texture2D = preload("res://Sprites/sparks_in_the_dark.png");
 
-signal Initial_MapGen_Complete;
+#signal Initial_MapGen_Complete;
 
 signal Replace_Terrain(idx:int, type:Map_Data.Terrain, spr:Sprite2D);
 
 var _debug:bool;
 
 
-func Signal_Initial_MapGen_Complete(callerPath:String) -> void:
-	if _debug: print("\nWorld.gd - Signal_Initial_MapGen_Complete, called by: ", callerPath);
-	Initial_MapGen_Complete.emit();
+#func Signal_Initial_MapGen_Complete(callerPath:String) -> void:
+	#if _debug: print("\nWorld.gd - Signal_Initial_MapGen_Complete, called by: ", callerPath);
+	#Initial_MapGen_Complete.emit();
 
 
 func Signal_Replace_Terrain_Sprite(idx:int, type:Map_Data.Terrain, spr:Sprite2D, callerPath:String) -> void:
@@ -97,6 +97,7 @@ func Convert_CoordArray_To_IdxArray(coordArray:Array[Vector2]) -> Array[int]:
 
 func Terrain_Is_Land(terrain:Map_Data.Terrain) -> bool:
 	if terrain == Map_Data.Terrain.MOUNTAIN \
+	|| terrain == Map_Data.Terrain.MOUNTAIN_PATH \
 	|| terrain == Map_Data.Terrain.FOREST \
 	|| terrain == Map_Data.Terrain.GROUND \
 	|| terrain == Map_Data.Terrain.SHORE \
