@@ -42,7 +42,10 @@ func _Move_Right() -> void:
 	var currX = World.Float_OnGrid(_master.position.x);
 	_master.position.x = currX + World.CellSize;
 	
-	if _mapGen.Is_Land(_master.position, self.get_path()):
+	var currTerrain:Map_Data.Terrain = _mapGen.Get_Terrain(World.Convert_Coord_To_Index(_master.position), self.get_path());
+	
+	if World.Terrain_Is_Land(currTerrain):
+	#if _mapGen.Is_Land(_master.position, self.get_path()):
 		set_process(false);
 		_master.modulate = Color(0, 0, 0, 0);
 	

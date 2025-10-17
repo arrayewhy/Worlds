@@ -50,6 +50,8 @@ enum Marking {
 	MINI_MOUNT,
 	HOBBIT_HOUSE,
 	STEPS,
+	BOAT,
+	#TREE_HOUSE,
 	}
 
 #var _messageBottle_spawned:bool;
@@ -131,6 +133,8 @@ static func Derive_MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> A
 					m.append(Marking.TREE);
 				#elif randi_range(0, 1000) > 995:
 					#m.append(Marking.TENT);
+				#elif randi_range(0, 1000) > 50:
+					#m.append(Marking.TREE_HOUSE);
 				elif randi_range(0, 1000) > 50:
 					m.append(Marking.HILL);
 				elif randi_range(0, 1000) > 200:
@@ -173,13 +177,17 @@ static func Derive_MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> A
 					m.append(Marking.SMALL_FISH);
 				#elif randi_range(0, 1000) > 995:
 					#m.append(Marking.JETTY);
+				#elif randf_range(0, 1000) > 990:
+					#m.append(Marking.BOAT);
 				else:
 					m.append(Marking.Null);
 				continue;
 				
 			Terrain.OCEAN:
-				if randi_range(0, 1000) > 900:
+				if randi_range(0, 1000) > 700:
 					m.append(Marking.SEAGRASS);
+				#elif randf_range(0, 1000) > 990:
+					#m.append(Marking.BOAT);
 				elif randi_range(0, 1000) > 990:
 					m.append(Marking.BIG_FISH);
 				elif randi_range(0, 1000) > 990:
@@ -193,6 +201,8 @@ static func Derive_MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> A
 					m.append(Marking.GOLD);
 				elif randi_range(0, 1000) > 999:
 					m.append(Marking.MESSAGE_BOTTLE);
+				elif randf_range(0, 1000) > 980:
+					m.append(Marking.BOAT);
 				else:
 					m.append(Marking.Null);
 				continue;

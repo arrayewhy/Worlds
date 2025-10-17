@@ -1,6 +1,6 @@
 extends Node2D
 
-@onready var _mapGen:Node2D = %map_generator;
+@export var _mapGen:Node2D;
 
 var _terrain_lifters:Dictionary;
 

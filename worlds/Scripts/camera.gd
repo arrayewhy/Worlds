@@ -1,24 +1,26 @@
 extends Camera2D
 
+@export var _initialiser:Node;
 @export var _hide_on_zoom:Node2D;
 @export var _show_on_zoom:Node2D;
-
-@export var _targObj:Sprite2D;
 
 const _normSpeed:float = 256;
 var _currSpeed:float = _normSpeed;
 
 var _zoomed:bool;
 
+var _targObj:Sprite2D;
 var _targPos:Vector2;
 
 var _showHide_tween:Tween;
 var _zoom_tween:Tween;
 var _speed_tween:Tween;
 
+var _move_dest:Vector2;
+
 signal Zoom(on:bool, camTargPos:Vector2);
 # TEMPORARY: For Positioning the Player under the camera on start
-signal Cam_Pos_On_MapGenComplete(camPos:Vector2);
+#signal Cam_Pos_On_MapGenComplete(camPos:Vector2);
 
 @export var _debug:bool;
 
@@ -29,29 +31,31 @@ signal Cam_Pos_On_MapGenComplete(camPos:Vector2);
 func _ready() -> void:
 	
 	# Wait for Initial Map Generation
-	World.Initial_MapGen_Complete.connect(_On_Initial_MapGen_Complete);
+	_initialiser.Player_Created.connect(_On_Player_Created);
 	# It is Good Practice to Connect to Signals instead of Awaiting Directly,
 	# so when we want to Check Connections to this Signal, we can.
 
 
 func _process(delta: float) -> void:
 	
-	if !_zoomed:
+	if Input.is_action_pressed("Up"):
+		_targPos.y -= delta * _currSpeed;
+	if Input.is_action_pressed("Down"):
+		_targPos.y += delta * _currSpeed;
+	if Input.is_action_pressed("Left"):
+		_targPos.x -= delta * _currSpeed;
+	if Input.is_action_pressed("Right"):
+		_targPos.x += delta * _currSpeed;
 	
-		if Input.is_action_pressed("Up"):
-			_targPos.y -= delta * _currSpeed;
-		if Input.is_action_pressed("Down"):
-			_targPos.y += delta * _currSpeed;
-		if Input.is_action_pressed("Left"):
-			_targPos.x -= delta * _currSpeed;
-		if Input.is_action_pressed("Right"):
-			_targPos.x += delta * _currSpeed;
+	if !_zoomed || !_targObj:
 
-		self.position += (_targPos - self.position) * delta * (_currSpeed / 64);
+		_move_dest = self.position + (_targPos - self.position) * delta * (_currSpeed / 64);
+		self.position = _move_dest;
 	
 	else:
 		
-		self.position += (_targObj.position - self.position) * delta * (_currSpeed / 128);
+		_move_dest = self.position + (_targObj.position - self.position) * delta * (_currSpeed / 128);
+		self.position = _move_dest;
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
@@ -77,7 +81,8 @@ func _Zoom_Out() -> void:
 	
 		_zoomed = false;
 		
-		_targPos = _targObj.position;
+		if _targObj:
+			_targPos = _targObj.position;
 		
 		Zoom.emit(_zoomed, _targPos);
 		
@@ -151,8 +156,14 @@ func Reset_CamSpeed(callerPath:String) -> void:
 # Functions: Signals ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
-func _On_Initial_MapGen_Complete() -> void:
+func _On_Player_Created(player:Sprite2D) -> void:
+	
+	_targObj = player;
+	
 	self.position = Vector2.ONE * World.CellSize * (World.MapWidth_In_Units() / 2);
+	
 	_targPos = self.position;
+	
 	self.zoom = Vector2(.5, .5);
-	Cam_Pos_On_MapGenComplete.emit(self.position);
+	
+	#Cam_Pos_On_MapGenComplete.emit(self.position);

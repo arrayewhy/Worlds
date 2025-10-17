@@ -1,33 +1,36 @@
-[gd_scene load_steps=25 format=3 uid="uid://86tq3blbo8rs"]
+[gd_scene load_steps=23 format=3 uid="uid://86tq3blbo8rs"]
 
 [ext_resource type="Script" uid="uid://ddx5i8d1mr1lo" path="res://Scripts/map_generator.gd" id="1_0um4f"]
 [ext_resource type="Script" uid="uid://bu55c8rfhtrsl" path="res://Scripts/camera.gd" id="1_o4r1h"]
-[ext_resource type="Texture2D" uid="uid://5hbjqblbd0ft" path="res://Sprites/sparks_in_the_dark.png" id="3_rydrt"]
+[ext_resource type="Script" uid="uid://bl2cub7bc84g5" path="res://Scripts/initialiser.gd" id="1_rydrt"]
+[ext_resource type="Script" uid="uid://bb51tcti0v1ae" path="res://Scripts/message.gd" id="2_c1oqp"]
 [ext_resource type="FontFile" uid="uid://bn56m5j1acs0j" path="res://Misc/Fonts/Georgia.ttf" id="5_n34cn"]
 [ext_resource type="Texture2D" uid="uid://da0t66iwxuyxq" path="res://Sprites/textbox_yellow.png" id="6_svxh6"]
-[ext_resource type="Script" uid="uid://cvm1insy3g2kp" path="res://Scripts/player.gd" id="7_rydrt"]
 [ext_resource type="Script" uid="uid://cal2wnxopwt2h" path="res://Scripts/terrain_grouper.gd" id="8_rydrt"]
 [ext_resource type="Script" uid="uid://vp1q6c1vpebf" path="res://Scripts/mouse.gd" id="9_c1oqp"]
 
 [sub_resource type="GDScript" id="GDScript_wxdwa"]
 script/source = "extends CanvasLayer
 
-@onready var texRect:TextureRect = $Control/TextureRect;
+@onready var _texRect:TextureRect = $Control/TextureRect;
+@export var _noiseTexture:TextureRect;
 
 
-#func _ready() -> void:
+func _ready() -> void:
+	_texRect.size = _noiseTexture.texture.get_size() * World.CellSize;
+	#_texRect.size = _noiseTexture.size;
 	#
-	#texRect.modulate.a = 0;
+	#_texRect.modulate.a = 0;
 	#self.show();
 	#
 	#var cloudTween:Tween = create_tween();
 	#cloudTween.set_trans(Tween.TRANS_SINE);
 	#cloudTween.set_ease(Tween.EASE_IN_OUT);
-	#cloudTween.tween_property(texRect, \"modulate:a\", .5, 4);
+	#cloudTween.tween_property(_texRect, \"modulate:a\", .5, 4);
 #
 #
 func _process(delta: float) -> void:
-	texRect.texture.noise.offset.x -= delta * 4;
+	_texRect.texture.noise.offset.x -= delta * 4;
 "
 
 [sub_resource type="Gradient" id="Gradient_k6548"]
@@ -67,83 +70,6 @@ func _ready() -> void:
 	curtainTween.tween_property(colRect, \"modulate:a\", 0, 4);
 "
 
-[sub_resource type="GDScript" id="GDScript_rrw6a"]
-resource_name = "message"
-script/source = "extends Node2D
-
-@onready var _ninePatch:NinePatchRect = $NinePatchRect;
-@onready var _panelContainer:PanelContainer = $PanelContainer;
-@onready var _label:Label = $PanelContainer/Label;
-
-const _padding:Vector2 = Vector2(128, 16);
-
-
-# Functions: Built-in ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-
-
-func _ready() -> void:
-	
-	self.modulate.a = 0;
-	
-	# I can't remember why this is here.
-	# Maybe to make sure Resizing works?
-	_panelContainer.custom_minimum_size = Vector2(World.CellSize, World.CellSize);
-
-
-#func _unhandled_key_input(event: InputEvent) -> void:
-	#if event.is_action_pressed(\"Cancel\"):
-		#_Set_Position_And_Size();
-
-
-# Functions ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-
-
-func Set_Text(messageText:String, callerPath:String) -> void:
-	print(\"\\nmessage => Set_Text() called by: \", callerPath);
-	_Set_Text(messageText);
-
-func _Set_Text(messageText:String) -> void:
-	if messageText.contains(\"\\n\"):
-		_ninePatch.patch_margin_top = 64 * 2;
-		_ninePatch.patch_margin_bottom = 64 * 2;
-	else:
-		_ninePatch.patch_margin_top = 64;
-		_ninePatch.patch_margin_bottom = 64;
-	_label.text = messageText;
-
-
-func Set_Position_And_Size(pos:Vector2, callerPath:String) -> void:
-	print(\"\\nmessage => Set_Position_And_Size() called by: \", callerPath);
-	_Set_Position_And_Size(pos);
-
-func _Set_Position_And_Size(pos:Vector2) -> void:
-	
-	_panelContainer.reset_size();
-
-	self.position = World.Coord_OnGrid(pos) - _panelContainer.size;
-
-	_panelContainer.position = _panelContainer.size / 2;
-	
-	_ninePatch.size = _panelContainer.size * (1 / _ninePatch.scale.x) + _padding;
-	_ninePatch.position = _panelContainer.position - _padding / 8 / 2
-	
-	if self.modulate.a <= 0:
-		_Appear();
-
-
-func _Appear() -> void:
-	var fade:Fade = Fade.new(Fade.Phase.IN, self, -1, .25);
-	self.add_child(fade);
-
-func Disappear(callerPath:String) -> void:
-	print(\"\\nmessage => Disappear() called by: \", callerPath);
-	_Disappear();
-
-func _Disappear() -> void:
-	var fade:Fade = Fade.new(Fade.Phase.OUT, self, .25);
-	self.add_child(fade);
-"
-
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_svxh6"]
 
 [sub_resource type="FontVariation" id="FontVariation_svxh6"]
@@ -155,25 +81,14 @@ font_size = 8
 font_color = Color(0, 0, 0, 1)
 outline_color = Color(0, 0, 0, 1)
 
-[sub_resource type="Gradient" id="Gradient_lnlyj"]
-interpolation_mode = 2
-offsets = PackedFloat32Array(0.0502092, 1)
-colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_c1oqp"]
-gradient = SubResource("Gradient_lnlyj")
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(0.85, 0.15)
-
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_g2m6q"]
 noise_type = 5
 frequency = 0.04
 fractal_weighted_strength = 0.1
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ue23j"]
-width = 128
-height = 128
+width = 64
+height = 64
 invert = true
 generate_mipmaps = false
 seamless_blend_skirt = 1.0
@@ -181,9 +96,14 @@ noise = SubResource("FastNoiseLite_g2m6q")
 
 [sub_resource type="GDScript" id="GDScript_c1oqp"]
 resource_name = "lighting"
-script/source = "@icon(\"res://Misc/icons/sun_icon_yellow.png\")
+script/source = "@icon(\"res://Misc/icons/asterisk_icon_yellow.png\")
 extends Node2D
 "
+
+[sub_resource type="Gradient" id="Gradient_lnlyj"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0.0502092, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_snou4"]
 gradient = SubResource("Gradient_lnlyj")
@@ -284,9 +204,17 @@ func _On_Initial_MapGen_Complete() -> void:
 
 [node name="RandomNoiseTest" type="Node2D"]
 
-[node name="Clouds" type="CanvasLayer" parent="."]
+[node name="initialiser" type="Node" parent="." node_paths=PackedStringArray("_mapGen", "_cont_showOnZoom", "_cam", "_message")]
+script = ExtResource("1_rydrt")
+_mapGen = NodePath("../map_generator")
+_cont_showOnZoom = NodePath("../map_generator/show_on_zoom")
+_cam = NodePath("../Camera2D")
+_message = NodePath("../message")
+
+[node name="Clouds" type="CanvasLayer" parent="." node_paths=PackedStringArray("_noiseTexture")]
 follow_viewport_enabled = true
 script = SubResource("GDScript_wxdwa")
+_noiseTexture = NodePath("../map_generator/Noise/Control/Noise Rect")
 
 [node name="Control" type="Control" parent="Clouds"]
 layout_mode = 3
@@ -308,12 +236,12 @@ grow_vertical = 2
 texture = SubResource("NoiseTexture2D_2n0ns")
 stretch_mode = 6
 
-[node name="Camera2D" type="Camera2D" parent="." node_paths=PackedStringArray("_hide_on_zoom", "_show_on_zoom", "_targObj")]
+[node name="Camera2D" type="Camera2D" parent="." node_paths=PackedStringArray("_initialiser", "_hide_on_zoom", "_show_on_zoom")]
 position = Vector2(0, 1)
 script = ExtResource("1_o4r1h")
+_initialiser = NodePath("../initialiser")
 _hide_on_zoom = NodePath("../map_generator/hide_on_zoom")
 _show_on_zoom = NodePath("../map_generator/show_on_zoom")
-_targObj = NodePath("../map_generator/show_on_zoom/Player")
 
 [node name="Curtain" type="CanvasLayer" parent="."]
 visible = false
@@ -340,7 +268,7 @@ color = Color(0, 0, 0, 1)
 z_index = 1000
 z_as_relative = false
 position = Vector2(1014, 801)
-script = SubResource("GDScript_rrw6a")
+script = ExtResource("2_c1oqp")
 
 [node name="NinePatchRect" type="NinePatchRect" parent="message"]
 offset_right = 128.0
@@ -373,7 +301,6 @@ label_settings = SubResource("LabelSettings_ormxn")
 vertical_alignment = 1
 
 [node name="map_generator" type="Node2D" parent="." node_paths=PackedStringArray("_noiseTex")]
-unique_name_in_owner = true
 script = ExtResource("1_0um4f")
 _noiseTex = NodePath("Noise/Control/Noise Rect")
 metadata/_edit_lock_ = true
@@ -392,23 +319,6 @@ metadata/_edit_lock_ = true
 z_index = 1
 y_sort_enabled = true
 metadata/_edit_lock_ = true
-
-[node name="Player" type="Sprite2D" parent="map_generator/show_on_zoom" node_paths=PackedStringArray("_cam", "_message")]
-scale = Vector2(0.047, 0.047)
-texture = ExtResource("3_rydrt")
-region_enabled = true
-region_rect = Rect2(0, 1536, 256, 256)
-script = ExtResource("7_rydrt")
-_cam = NodePath("../../../Camera2D")
-_message = NodePath("../../../message")
-
-[node name="torch" type="PointLight2D" parent="map_generator/show_on_zoom/Player"]
-visible = false
-position = Vector2(0, -64)
-scale = Vector2(32, 32)
-color = Color(0.929412, 0.909804, 0.705882, 1)
-energy = 0.9
-texture = SubResource("GradientTexture2D_c1oqp")
 
 [node name="always_show" type="Node2D" parent="map_generator"]
 metadata/_edit_lock_ = true
@@ -455,9 +365,10 @@ script = SubResource("GDScript_cl1kf")
 [node name="CanvasModulate" type="CanvasModulate" parent="lighting"]
 color = Color(0.03, 0.0918333, 0.1, 1)
 
-[node name="mouse" type="Node2D" parent="."]
+[node name="mouse" type="Node2D" parent="." node_paths=PackedStringArray("_mapGen")]
 z_index = 10
 script = ExtResource("9_c1oqp")
+_mapGen = NodePath("../map_generator")
 metadata/_edit_lock_ = true
 
 [node name="Background" type="CanvasLayer" parent="."]

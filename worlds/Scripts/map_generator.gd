@@ -25,6 +25,7 @@ const _goodSeeds:Array[int] = [
 	3790769020, # The Howl
 	2239492294,
 	2989861102,
+	1223885537,
 	];
 #const _lighthouseLamp:PackedScene = preload("res://Prefabs/lighthouse_lamp.tscn");
 
@@ -69,6 +70,8 @@ var _sprite_array_Detail:Array[Sprite2D]; # Details / NULL
 @export_group("#DEBUG")
 @export var _debug:bool;
 
+signal Map_Generated;
+
 
 # Functions: Built-in ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
@@ -80,7 +83,7 @@ func _ready() -> void:
 	# Make sure Zoom Objects start off Invisible
 	_cont_showOnZoom.modulate.a = 0;
 	
-	_Generate_Map(2989861102);
+	#_Generate_Map(2989861102);
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
@@ -96,6 +99,10 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 # Functions ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
+
+func Generate_Map(newSeed:int, callerPath:String) -> void:
+	if _debug: print("\nmap_generator => Generate_map() called by: ", callerPath);
+	_Generate_Map(newSeed);
 
 func _Generate_Map(newSeed:int) -> void:
 	
@@ -125,9 +132,7 @@ func _Generate_Map(newSeed:int) -> void:
 	
 	for m_range in _array_mountainRanges:
 		
-		var edge_ring:Array[int] = _Cluster_Edges_FourDir(Map_Data.Terrain.MOUNTAIN, m_range);
-		
-		print("Edges: ", edge_ring.size());
+		var edge_ring:Array[int] = _TerrainCluster_Edges_FourDir(Map_Data.Terrain.MOUNTAIN, m_range);
 		
 		if edge_ring.size() > 0:
 			edgeRing_array.push_back(edge_ring);
@@ -206,8 +211,8 @@ func _Generate_Map(newSeed:int) -> void:
 		#var col:Color = Color(randf_range(.25, 1), randf_range(.25, 1), randf_range(.25, 1));
 		#for idx in m_range:
 			#_sprite_array_Terrain[idx].modulate = col;
-	
-	World.Signal_Initial_MapGen_Complete(self.get_path());
+			
+	Map_Generated.emit();
 
 
 func _Clear() -> void:
@@ -327,6 +332,14 @@ func _MarkingSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Ar
 				#spr.scale.x *= randf_range(.9, 1.125);
 				spr.scale.y *= randf_range(.9, 1.125);
 				spr.rotation += randf_range(-.125, .125);
+			
+			#Map_Data.Marking.TREE_HOUSE:
+				## Same as TREE
+				#spr = World.Create_Sprite(7, 6);
+				#_cont_showOnZoom.add_child(spr);
+				##spr.scale.x *= randf_range(.9, 1.125);
+				#spr.scale.y *= randf_range(.9, 1.125);
+				#spr.rotation += randf_range(-.125, .125);
 				
 			Map_Data.Marking.LIGHTHOUSE:
 				#s_array.append(null);
@@ -412,6 +425,13 @@ func _MarkingSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Ar
 				spr = World.Create_Sprite(5, 7);
 				_cont_hideOnZoom.add_child(spr);
 				spr.modulate = Color.BLACK;
+			
+			Map_Data.Marking.BOAT:
+				spr = World.Create_Sprite(randi_range(8, 10), 7);
+				_cont_alwaysShow.add_child(spr);
+				spr.modulate = Color(.25, .5, .5, 1);
+				#spr.modulate = Color.BLACK;
+				spr.modulate.a = .25;
 			
 			Map_Data.Marking.Null:
 				s_array.append(null);
@@ -511,6 +531,20 @@ func _DetailSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Arr
 				#spr.position += Vector2.ONE * randf_range(-.4, .4);
 				#spr.scale += Vector2.ONE * randf_range(-.01, .02);
 				#spr.offset.y -= World.CellSize * 4;
+			
+			#Map_Data.Marking.TREE_HOUSE:
+				## Same as HOUSE
+				#spr = World.Create_Sprite(randi_range(2, 4), 14);
+				#_cont_showOnZoom.add_child(spr);
+				#
+				#spr.position = Vector2(currX * World.CellSize, currY * World.CellSize);
+				## Randomise Transform
+				#spr.position.y = currY * World.CellSize - randf_range(0, World.CellSize * .5);
+				##spr.scale *= randf_range(1, 1.125);
+				#spr.scale *= 0.75;
+				#spr.rotation += randf_range(-.125, .125);
+				#
+				#spr.modulate.a = 0;
 				
 			Map_Data.Marking.LIGHTHOUSE:
 				
@@ -568,6 +602,9 @@ func _DetailSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Arr
 			
 			Map_Data.Marking.SEAGRASS:
 				pass;
+			
+			Map_Data.Marking.BOAT:
+				pass;
 				
 			Map_Data.Marking.Null:
 				pass;
@@ -607,7 +644,7 @@ func _Configure_TerrainSprite_LandAndSea(spr:Sprite2D, terrainType:Map_Data.Terr
 			#spr.region_rect.position.x = World.Spr_Reg_Size * 2;
 			spr.region_rect.position.x = World.Spr_Reg_Size * 3; # Green
 			spr.modulate.v -= .125;
-			spr.modulate.v -= randf_range(0, 0.125);
+			spr.modulate.v -= randf_range(0.125, 0.2);
 			spr.scale *= randf_range(1.125, 1.5);
 		Map_Data.Terrain.GROUND:
 			spr.region_rect.position.x = World.Spr_Reg_Size * 3; # Green
@@ -675,7 +712,7 @@ func _Configure_TerrainSprite_LandAndSea(spr:Sprite2D, terrainType:Map_Data.Terr
 # Functions ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
-func _Cluster_Edges_FourDir(type:Map_Data.Terrain, cluster:Array[int]) -> Array[int]:
+func _TerrainCluster_Edges_FourDir(type:Map_Data.Terrain, cluster:Array[int]) -> Array[int]:
 	var edges:Array[int];
 	#
 	for i in cluster.size():
@@ -752,27 +789,28 @@ func Get_Buried(idx:int, callerPath:String) -> int:
 	return _buried_data[idx];
 
 
-func Is_Land(coord:Vector2, callerPath:String, idx:int = -1) -> bool:
-	if _debug: print("\nmap_generator.gd - Is_Land, called by: ", callerPath);
-	return _Is_Land(coord, idx);
-
-func _Is_Land(coord:Vector2, idx:int = -1) -> bool:
-	
-	var t:Map_Data.Terrain;
-	
-	if idx == -1:
-		t = _terrain_data[World.Convert_Coord_To_Index(coord)];
-	else:
-		t = _terrain_data[idx];
-	
-	if t == Map_Data.Terrain.MOUNTAIN \
-	|| t == Map_Data.Terrain.FOREST \
-	|| t == Map_Data.Terrain.GROUND \
-	|| t == Map_Data.Terrain.SHORE \
-	|| t == Map_Data.Terrain.TEMPLE_BROWN \
-	|| t == Map_Data.Terrain.DOCK:
-		return true;
-	return false;
+#func Is_Land(coord:Vector2, callerPath:String, idx:int = -1) -> bool:
+	#if _debug: print("\nmap_generator.gd - Is_Land, called by: ", callerPath);
+	#return _Is_Land(coord, idx);
+#
+#func _Is_Land(coord:Vector2, idx:int = -1) -> bool:
+	#
+	#var t:Map_Data.Terrain;
+	#
+	#if idx == -1:
+		#t = _terrain_data[World.Convert_Coord_To_Index(coord)];
+	#else:
+		#t = _terrain_data[idx];
+	#
+	#if t == Map_Data.Terrain.MOUNTAIN \
+	#|| t == Map_Data.Terrain.MOUNTAIN_PATH \
+	#|| t == Map_Data.Terrain.FOREST \
+	#|| t == Map_Data.Terrain.GROUND \
+	#|| t == Map_Data.Terrain.SHORE \
+	#|| t == Map_Data.Terrain.TEMPLE_BROWN \
+	#|| t == Map_Data.Terrain.DOCK:
+		#return true;
+	#return false;
 
 
 func ChangeTerrain(v2_array:Array[Vector2], terrainType:Map_Data.Terrain, callerPath:String) -> void:

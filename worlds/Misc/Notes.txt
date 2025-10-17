@@ -5,13 +5,20 @@ UPCOMING |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 - Building interiors
 - Terrain that forms a drawing of an idol
 - Hidden pathways up mountains
-- Houses hidden in trees
-- Pulling up plants to reveal harvest "drawer"
 - Ground rising underneath means Treasure (or something else...?)!
+- Boats in the distance (you can get on by not control, and sail past treasures just out of reach)
+
+Done:
+	- Houses hidden in trees
 
 Trivia:
 	- Mountains always have a way up or down them (stairs, moonlight stairs, tunnel leading out and down mountain with no way back up)
 
+
+MUSIC ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+- House at Swamp Bottom
+- Fisherman's Horizon
+- Following Muta
 
 FEEDBACK ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
@@ -19,3 +26,7 @@ FEEDBACK |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 OBSERVATIONS:
 	- Lesley<3: Wanted to click on the biomes
 	- Sherry: "How do I play? This is too hard!"
+
+SHELVED ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+- Pulling up plants to reveal harvest "drawer"
