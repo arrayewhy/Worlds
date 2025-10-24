@@ -195,24 +195,29 @@ func _Generate_Map(newSeed:int) -> void:
 	_sprite_array_Detail = _DetailSprites_From_MarkingData(_marking_data);
 	
 	# Buried Treasure
+	_Create_Buried_Treasure();
+	
+	#for m_range in _array_mountainRanges:
+		#var col:Color = Color(randf_range(.25, 1), randf_range(.25, 1), randf_range(.25, 1));
+		#for idx in m_range:
+			#_sprite_array_Terrain[idx].modulate = col;
+	
+	Map_Generated.emit();
+
+
+func _Create_Buried_Treasure() -> void:
 	for t in _terrain_data:
 		
-		if t == Map_Data.Terrain.SHORE || t == Map_Data.Terrain.GROUND || t == Map_Data.Terrain.FOREST:
+		if t == Map_Data.Terrain.SHORE:
 			
 			if randf_range(0, 1000) > 800:
+				# Append with the ID of the Treasure Type
 				_buried_data.push_back(1);
 			else:
 				_buried_data.push_back(-1);
 				
 		else:
 			_buried_data.push_back(-1);
-	
-	#for m_range in _array_mountainRanges:
-		#var col:Color = Color(randf_range(.25, 1), randf_range(.25, 1), randf_range(.25, 1));
-		#for idx in m_range:
-			#_sprite_array_Terrain[idx].modulate = col;
-			
-	Map_Generated.emit();
 
 
 func _Clear() -> void:
@@ -303,7 +308,7 @@ func _MarkingSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Ar
 				#_cont_showOnZoom.add_child(spr);
 				#spr.modulate = Color.BLACK;
 			
-			Map_Data.Marking.STEPS:
+			Map_Data.Marking.MOUNTAIN_ENTRANCE:
 				s_array.append(null);
 			
 			Map_Data.Marking.PEAK:
@@ -360,7 +365,8 @@ func _MarkingSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Ar
 			
 			Map_Data.Marking.MESSAGE_BOTTLE:
 				spr = World.Create_Sprite(14, 8, 1, _glyphs);
-				_cont_treasures.add_child(spr);
+				_cont_alwaysShow.add_child(spr)
+				#_cont_treasures.add_child(spr);
 				spr.add_child(Drift.new());
 				#spr.texture = _glyphs;
 				#spr.region_enabled = true;
@@ -487,7 +493,7 @@ func _DetailSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Arr
 				
 				spr.modulate.a = 0;
 				
-			Map_Data.Marking.STEPS:
+			Map_Data.Marking.MOUNTAIN_ENTRANCE:
 				spr = World.Create_Sprite(1, 3, 1, _glyphs);
 				_cont_showOnZoom.add_child(spr);
 				spr.position = Vector2(currX * World.CellSize, currY * World.CellSize);
