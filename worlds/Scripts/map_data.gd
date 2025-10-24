@@ -49,7 +49,7 @@ enum Marking {
 	MESSAGE_BOTTLE,
 	MINI_MOUNT,
 	HOBBIT_HOUSE,
-	STEPS,
+	MOUNTAIN_ENTRANCE,
 	BOAT,
 	#TREE_HOUSE,
 	}
@@ -123,7 +123,7 @@ static func Derive_MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> A
 				continue;
 			
 			Terrain.MOUNTAIN_PATH:
-				m.append(Marking.STEPS)
+				m.append(Marking.MOUNTAIN_ENTRANCE)
 				continue;
 			
 			Terrain.FOREST:
