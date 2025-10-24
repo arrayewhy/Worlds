@@ -251,9 +251,10 @@ func _Fade_CloseUps_And_Markings(pos:Vector2) -> void:
 		if World.Convert_Index_To_Coord(f_idx).distance_to(_destination) > World.CellSize * 1.5:
 			
 			# Fade Message Out
-			if _message_curr_idx == f_idx:
-				_message_curr_idx = -1;
-				_message.Disappear(self.get_path());
+			#if _message_curr_idx == f_idx:
+				#_message_curr_idx = -1;
+				#_message.Disappear(self.get_path());
+				
 			# Fade Close-up sprite Out
 			fade_records_CloseUps.get(f_idx).Interrupt(Fade.Phase.OUT);
 			# Connect to Signal to Remove this Fade from the Records

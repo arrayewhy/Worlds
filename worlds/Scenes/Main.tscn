@@ -1,415 +1,438 @@
-[gd_scene load_steps=26 format=3 uid="uid://dpw5ih7gg3btv"]
+[gd_scene load_steps=25 format=3 uid="uid://86tq3blbo8rs"]
 
-[ext_resource type="Texture2D" uid="uid://dk06eplgkeoi2" path="res://Sprites/Clack_Map_SpriteSheet_2048.png" id="1_ntyhy"]
-[ext_resource type="Script" uid="uid://drw52aevlh6nm" path="res://Scripts/Mover.gd" id="1_vinv6"]
-[ext_resource type="Script" uid="uid://dkar0geogr5ve" path="res://Scripts/Player.gd" id="2_54uhw"]
-[ext_resource type="Script" uid="uid://c2u5fphlbkc07" path="res://Scripts/Cam-Zoom.gd" id="3_xox30"]
-[ext_resource type="Script" uid="uid://6bhfvutg1243" path="res://Scripts/Biomes/Biome-Spawner.gd" id="5_nwltf"]
-[ext_resource type="PackedScene" uid="uid://dau0b5fcbsdk8" path="res://Prefabs/Illumination.tscn" id="6_2cew8"]
-[ext_resource type="Script" uid="uid://ymbp8wh5xb30" path="res://Scripts/UI/Illuminations-Handler.gd" id="6_ljcja"]
-[ext_resource type="Image" uid="uid://b3sydyghnrqb7" path="res://Sprites/World-Templates/WT_Birth.png" id="7_fcw8p"]
-[ext_resource type="Script" uid="uid://dycnagd8w48f6" path="res://Scripts/UI/Illumination-Spawner.gd" id="7_rmeg4"]
-[ext_resource type="Script" uid="uid://cjhttbpgqxkcs" path="res://Scripts/World-Templates.gd" id="7_t1ont"]
-[ext_resource type="Script" uid="uid://dmsv3tnmvi8tm" path="res://Scripts/Fader.gd" id="8_u5mxs"]
-[ext_resource type="Script" uid="uid://blnbql2sudlgh" path="res://Scripts/UI/Black-Bars.gd" id="8_umww4"]
-[ext_resource type="AudioStream" uid="uid://sos25qvtf0mq" path="res://Audio/SFX/Desert-Wind_611257__newlocknew__windsynth-3winter3osc.wav" id="12_py2jo"]
-[ext_resource type="AudioStream" uid="uid://cgv7itiiugmiq" path="res://Audio/SFX/Forest_634315__klankbeeld__border-forestfarmfield-727am-nl-eu-220515_0345.wav" id="13_wbwr2"]
-[ext_resource type="PackedScene" uid="uid://cf233120e3l52" path="res://Prefabs/Dice.tscn" id="14_1cw2s"]
-[ext_resource type="Image" uid="uid://bvafusrsjjlrn" path="res://Sprites/World-Templates/WT-Circle64.png" id="15_y08cy"]
+[ext_resource type="Script" uid="uid://bl2cub7bc84g5" path="res://Scripts/initialiser.gd" id="1_50glp"]
+[ext_resource type="Script" uid="uid://bu55c8rfhtrsl" path="res://Scripts/camera.gd" id="2_vy5pj"]
+[ext_resource type="Script" uid="uid://bb51tcti0v1ae" path="res://Scripts/message.gd" id="3_bmxlf"]
+[ext_resource type="Texture2D" uid="uid://da0t66iwxuyxq" path="res://Sprites/textbox_yellow.png" id="4_4kpch"]
+[ext_resource type="FontFile" uid="uid://bn56m5j1acs0j" path="res://Misc/Fonts/Georgia.ttf" id="5_grg3l"]
+[ext_resource type="Texture2D" uid="uid://c7mfwjyhhq810" path="res://Sprites/textbox.png" id="5_vy5pj"]
+[ext_resource type="Script" uid="uid://ddx5i8d1mr1lo" path="res://Scripts/map_generator.gd" id="6_frkhe"]
+[ext_resource type="Script" uid="uid://cal2wnxopwt2h" path="res://Scripts/terrain_grouper.gd" id="7_1p5hy"]
+[ext_resource type="Script" uid="uid://vp1q6c1vpebf" path="res://Scripts/mouse.gd" id="8_h1m7h"]
 
-[sub_resource type="GDScript" id="GDScript_lhawh"]
-resource_name = "Player-Sprite"
-script/source = "extends Sprite2D;
+[sub_resource type="GDScript" id="GDScript_wxdwa"]
+script/source = "extends CanvasLayer
 
-enum SpriteState { NULL, Normal, Swim };
-var _currState:SpriteState = SpriteState.Normal;
+@onready var _texRect:TextureRect = $Control/TextureRect;
+@export var _noiseTexture:TextureRect;
 
-func ChangeTo_Normal() -> void:
-	_currState = SpriteState.Normal;
-	Change_SpriteCoord(Vector2i(0, 1536));
-	
-func ChangeTo_Swim() -> void:
-	_currState = SpriteState.Swim;
-	Change_SpriteCoord(Vector2i(0, 768));
-
-func Change_SpriteCoord(coords:Vector2i) -> void:
-	self.region_rect.position.x = coords.x;
-	self.region_rect.position.y = coords.y;
-
-func Is_Normal() -> bool:
-	return _currState == SpriteState.Normal;
-	
-func Is_Swim() -> bool:
-	return _currState == SpriteState.Swim;
-"
-
-[sub_resource type="GDScript" id="GDScript_wj4f3"]
-resource_name = "Visual Reference"
-script/source = "extends Node2D;
 
 func _ready() -> void:
-	hide();
-"
-
-[sub_resource type="GDScript" id="GDScript_acxdq"]
-resource_name = "Hover"
-script/source = "extends Node2D;
-
-var hoverTargs:Dictionary = {};
-
-var detectionRange:float = 128;
-var offset:float = -48;
-
-func _process(_delta: float) -> void:
-	
-	var mousePos:Vector2 = get_global_mouse_position();
-	
-	for i in World.DiscoveredBiomes():
-		
-		# If mouse is near biome object
-		var worldPos:Vector2 = i * float(World.CellSize());
-		if worldPos.distance_to(mousePos) < detectionRange:
-			
-			# If it has already been offset, skip it.
-			if hoverTargs.has(i):
-				continue;
-			
-			# 1. Get the biome's object
-			var biomeObj:Object = World.DiscoveredBiomes().get(i)[0];
-			# 2. Record its position
-			hoverTargs[i] = biomeObj.position;
-			# 3. Offset its Y
-			biomeObj.position.y += offset;
-			return;
-			
-		# If mouse is NOT near biome object, and it was offset
-		if hoverTargs.has(i):
-			# Reset its position
-			World.DiscoveredBiomes().get(i)[0].position = hoverTargs[i];
-			# Remove its record
-			hoverTargs.erase(i);
-"
-
-[sub_resource type="GDScript" id="GDScript_s5h60"]
-script/source = "extends ColorRect;
-
-@export var player:Node2D;
-
-var _fadeIn:bool;
-
-func _ready() -> void:
-	set_process(false);
-	if !get_parent().is_visible():
-		return;
-	color.a = 0;
-	get_parent().hide();
-
+	_texRect.size = _noiseTexture.texture.get_size() * World.CellSize;
+	#_texRect.size = _noiseTexture.size;
+	#
+	#_texRect.modulate.a = 0;
+	#self.show();
+	#
+	#var cloudTween:Tween = create_tween();
+	#cloudTween.set_trans(Tween.TRANS_SINE);
+	#cloudTween.set_ease(Tween.EASE_IN_OUT);
+	#cloudTween.tween_property(_texRect, \"modulate:a\", .5, 4);
+#
+#
 func _process(delta: float) -> void:
-	
-	var speed:float = 2;
-	
-	if _fadeIn:
-		if color.a < 1:
-			color.a += delta * speed;
-			return;
-		else:
-			color.a = 1;
-			set_process(false);
-			return;
-			
-	if color.a > 0:
-			color.a -= delta * speed;
-			return;
-	else:
-		color.a = 0;
-		get_parent().hide();
-		set_process(false);
-
-func On_EnterInteraction(state:bool) -> void:
-	_fadeIn = state;
-	get_parent().show();
-	set_process(true);
+	_texRect.texture.noise.offset.x -= delta * 4;
 "
 
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_bu5ns"]
-size = Vector2(1920, 48)
+[sub_resource type="Gradient" id="Gradient_k6548"]
+offsets = PackedFloat32Array(0, 0.34728, 1)
+colors = PackedColorArray(1, 1, 1, 0.490196, 1, 1, 1, 0, 0, 0, 0, 0.392157)
 
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_dwwpb"]
-size = Vector2(48, 1080)
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_sial6"]
+offset = Vector3(770.44, 0, 0)
+fractal_octaves = 4
+fractal_lacunarity = 1.0
+fractal_weighted_strength = 1.0
 
-[sub_resource type="GDScript" id="GDScript_cp1f4"]
-resource_name = "Num-Inputs"
-script/source = "extends Node2D;
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_2n0ns"]
+width = 64
+height = 64
+invert = true
+generate_mipmaps = false
+seamless_blend_skirt = 1.0
+color_ramp = SubResource("Gradient_k6548")
+noise = SubResource("FastNoiseLite_sial6")
 
-# Two
-@export var camZoom:Node;
-# Three
-const lightPrefab:PackedScene = preload(\"res://Prefabs/Cavern-Light.tscn\");
-@export var lightHolder:Node;
+[sub_resource type="GDScript" id="GDScript_ho7ea"]
+resource_name = "curtain"
+script/source = "extends CanvasLayer
 
-func _unhandled_input(event: InputEvent) -> void:
+@onready var colRect:ColorRect = $Control/ColorRect;
+
+
+func _init() -> void:
+	self.show();
+
+
+func _ready() -> void:
+	var curtainTween:Tween = create_tween();
+	curtainTween.set_trans(Tween.TRANS_SINE);
+	curtainTween.set_ease(Tween.EASE_IN_OUT);
+	curtainTween.tween_property(colRect, \"modulate:a\", 0, 4);
 	
-	# Three
+	await curtainTween.finished;
 	
-	if event.is_action_pressed(\"Left-Click\"):
-	
-		for light in lightHolder.get_children():
-			#if light.global_position.distance_to(World.PlayerGridPos() * World.CellSize()) <= 1:
-			if light.global_position.distance_to(get_global_mouse_position()) <= 256:
-				light.queue_free();
-				return;
-			
-		var newLight:PointLight2D = lightPrefab.instantiate();
-		lightHolder.add_child(newLight);
-		#newLight.position = World.PlayerGridPos() * World.CellSize();
-		newLight.position = get_global_mouse_position();
-		return;
+	self.hide();
+"
+
+[sub_resource type="GDScript" id="GDScript_vy5pj"]
+resource_name = "message_button"
+script/source = "extends Button
+
+@onready var _message:Node2D = get_parent().get_parent();
+
+
+func _ready() -> void:
+	self.button_down.connect(_Click);
+
 
 func _unhandled_key_input(event: InputEvent) -> void:
-	
-	#if event.is_action_pressed(\"One\"):
-	
-	if event.is_action_pressed(\"Two\"):
-		camZoom.Zoom();
+	if event.is_action_pressed(\"Enter\"):
+		_message.Disappear(self.get_path());
 
-	if event.is_action_pressed(\"Three\"):
-		
-		for light in lightHolder.get_children():
-			if light.global_position.distance_to(World.PlayerGridPos() * World.CellSize()) <= 1:
-			#if light.global_position.distance_to(get_global_mouse_position()) <= 256:
-				light.queue_free();
-				return;
-		
-		var newLight:PointLight2D = lightPrefab.instantiate();
-		lightHolder.add_child(newLight);
-		newLight.position = World.PlayerGridPos() * World.CellSize();
-		#newLight.position = get_global_mouse_position();
-		return;
 
-	if event.is_action_pressed(\"Zero\"):
-		InGameDebugger.Say(World.PlayerGridPos());
+func _Click() -> void:
+	_message.Disappear(self.get_path());
 "
 
-[sub_resource type="Gradient" id="Gradient_vy1kf"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_svxh6"]
+content_margin_left = 2.0
+content_margin_right = 2.0
+
+[sub_resource type="FontVariation" id="FontVariation_svxh6"]
+base_font = ExtResource("5_grg3l")
+
+[sub_resource type="LabelSettings" id="LabelSettings_ormxn"]
+line_spacing = 0.0
+font_size = 8
+font_color = Color(0, 0, 0, 1)
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_g2m6q"]
+noise_type = 5
+frequency = 0.04
+fractal_weighted_strength = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ue23j"]
+width = 64
+height = 64
+invert = true
+generate_mipmaps = false
+seamless_blend_skirt = 1.0
+noise = SubResource("FastNoiseLite_g2m6q")
+
+[sub_resource type="GDScript" id="GDScript_c1oqp"]
+resource_name = "lighting"
+script/source = "@icon(\"res://Misc/icons/asterisk_icon_yellow.png\")
+extends Node2D
+"
+
+[sub_resource type="Gradient" id="Gradient_lnlyj"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0.0502092, 1)
 colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
 
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_7v4ub"]
-gradient = SubResource("Gradient_vy1kf")
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_snou4"]
+gradient = SubResource("Gradient_lnlyj")
 fill = 1
 fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(0.75, 0.75)
+fill_to = Vector2(0.85, 0.15)
 
-[node name="World" type="Node2D"]
-top_level = true
+[sub_resource type="GDScript" id="GDScript_cl1kf"]
+resource_name = "sun"
+script/source = "extends PointLight2D
 
-[node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(0.125, 0.125)
+const _dayDur:float = 60;
+const _nightDur:float = 30;
 
-[node name="Mover" type="Node" parent="Camera2D" node_paths=PackedStringArray("master")]
-script = ExtResource("1_vinv6")
-master = NodePath("..")
-speed = 0.5
+var _worldCenter:Vector2;
 
-[node name="Cam-Zoom" type="Node" parent="Camera2D"]
-script = ExtResource("3_xox30")
+var _rising:bool = true;
 
-[node name="Player" type="Node2D" parent="." node_paths=PackedStringArray("microView", "cam", "camMover")]
-z_index = 100
-script = ExtResource("2_54uhw")
-microView = NodePath("../Misc/MicroView")
-cam = NodePath("../Camera2D")
-camMover = NodePath("../Camera2D/Mover")
+var _posTween:Tween;
+var _energyTween:Tween;
 
-[node name="Player-Sprite" type="Sprite2D" parent="Player"]
-texture = ExtResource("1_ntyhy")
-region_enabled = true
-region_rect = Rect2(0, 1536, 256, 256)
-script = SubResource("GDScript_lhawh")
 
-[node name="Biome-Spawner" type="Node" parent="Player" node_paths=PackedStringArray("biomeHolder")]
-script = ExtResource("5_nwltf")
-biomeHolder = NodePath("../../Biome-Holder")
+func _ready() -> void:
+	# Wait for Initial Map Generation
+	#World.Initial_MapGen_Complete.connect(_On_Initial_MapGen_Complete);
+	pass;
 
-[node name="Mover" type="Node" parent="Player" node_paths=PackedStringArray("master")]
-script = ExtResource("1_vinv6")
-master = NodePath("..")
-speed = 6.0
-minDist = 1.0
-frameByFrame = true
-emitSignal = true
 
-[node name="World-Templates" type="Node" parent="Player" node_paths=PackedStringArray("biomeHolder")]
-script = ExtResource("7_t1ont")
-images = Array[Image]([ExtResource("7_fcw8p"), ExtResource("15_y08cy")])
-biomeHolder = NodePath("../../Biome-Holder")
+func _unhandled_key_input(event: InputEvent) -> void:
+	if event.is_action_pressed(\"Zero\"):
+		if _posTween != null:
+			_posTween.stop();
+			_energyTween.stop();
+		if _rising:
+			#self.position.x = _worldCenter.x;
+			_Set(_nightDur);
+		else:
+			_Rise(_dayDur);
 
-[node name="Biome-Holder" type="Node2D" parent="."]
-y_sort_enabled = true
-metadata/_edit_lock_ = true
 
-[node name="Audio" type="Node" parent="."]
-process_mode = 4
+func _Rise(duration:float) -> void:
+	
+	#self.position.x = _worldCenter.x + World.MapWidth() / 2;
+	
+	#_posTween = create_tween();
+	#_posTween.set_trans(Tween.TRANS_CUBIC);
+	#_posTween.set_ease(Tween.EASE_OUT);
+	#_posTween.tween_property(self, \"position:x\", _worldCenter.x, duration);
+	
+	_rising = !_rising;
+	var sun_energy:float = _rising;
+	
+	_energyTween = create_tween();
+	_energyTween.set_trans(Tween.TRANS_CUBIC);
+	_energyTween.set_ease(Tween.EASE_OUT);
+	_energyTween.tween_property(self, \"energy\", sun_energy, duration);
+	
+	await _energyTween.finished;
+	
+	_Set(_nightDur);
 
-[node name="Desert-Wind" type="AudioStreamPlayer" parent="Audio"]
-stream = ExtResource("12_py2jo")
-volume_db = -8.0
-autoplay = true
 
-[node name="Forest" type="AudioStreamPlayer" parent="Audio"]
-stream = ExtResource("13_wbwr2")
-volume_db = -8.0
-autoplay = true
+func _Set(duration:float) -> void:
+	
+	#var endX:float = _worldCenter.x - World.MapWidth() / 2;
+	#
+	#_posTween = create_tween();
+	#_posTween.set_trans(Tween.TRANS_CUBIC);
+	#_posTween.set_ease(Tween.EASE_IN);
+	#_posTween.tween_property(self, \"position:x\", endX, duration);
+	
+	_rising = !_rising;
+	var sun_energy:float = _rising;
+	sun_energy += 0.05;
+	
+	_energyTween = create_tween();
+	_energyTween.set_trans(Tween.TRANS_CUBIC);
+	_energyTween.set_ease(Tween.EASE_OUT);
+	_energyTween.tween_property(self, \"energy\", sun_energy, duration);
+	
+	await _energyTween.finished;
+	
+	await get_tree().create_timer(_nightDur).timeout;
+	
+	_Rise(_dayDur);
 
-[node name="Visual-Reference" type="Node2D" parent="."]
-script = SubResource("GDScript_wj4f3")
 
-[node name="Sprite2D" type="Sprite2D" parent="Visual-Reference"]
-position = Vector2(-256, -256)
-texture = ExtResource("1_ntyhy")
-region_enabled = true
-region_rect = Rect2(768, 0, 256, 256)
+# Functions: Signals ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
-[node name="Sprite2D10" type="Sprite2D" parent="Visual-Reference"]
-position = Vector2(-256, -256)
-texture = ExtResource("1_ntyhy")
-region_enabled = true
-region_rect = Rect2(768, 0, 256, 256)
 
-[node name="Sprite2D2" type="Sprite2D" parent="Visual-Reference"]
-position = Vector2(0, -256)
-texture = ExtResource("1_ntyhy")
-region_enabled = true
-region_rect = Rect2(0, 0, 256, 256)
+func _On_Initial_MapGen_Complete() -> void:
+	_worldCenter = Vector2.ONE * (World.MapWidth() / 2) * World.CellSize;
+	self.position = _worldCenter;
+	await get_tree().create_timer(60).timeout;
+	_Set(_nightDur);
+	
+"
 
-[node name="Sprite2D3" type="Sprite2D" parent="Visual-Reference"]
-position = Vector2(256, -256)
-texture = ExtResource("1_ntyhy")
-region_enabled = true
-region_rect = Rect2(0, 0, 256, 256)
+[node name="Main" type="Node2D"]
 
-[node name="Sprite2D4" type="Sprite2D" parent="Visual-Reference"]
-position = Vector2(-256, 0)
-texture = ExtResource("1_ntyhy")
-region_enabled = true
-region_rect = Rect2(0, 0, 256, 256)
+[node name="initialiser" type="Node" parent="." node_paths=PackedStringArray("_mapGen", "_cont_showOnZoom", "_cam", "_message")]
+script = ExtResource("1_50glp")
+_mapGen = NodePath("../map_generator")
+_cont_showOnZoom = NodePath("../map_generator/show_on_zoom")
+_cam = NodePath("../Camera2D")
+_message = NodePath("../message")
 
-[node name="Sprite2D5" type="Sprite2D" parent="Visual-Reference"]
-texture = ExtResource("1_ntyhy")
-region_enabled = true
-region_rect = Rect2(0, 0, 256, 256)
+[node name="Clouds" type="CanvasLayer" parent="." node_paths=PackedStringArray("_noiseTexture")]
+follow_viewport_enabled = true
+script = SubResource("GDScript_wxdwa")
+_noiseTexture = NodePath("../map_generator/Noise/Control/Noise Rect")
 
-[node name="Sprite2D6" type="Sprite2D" parent="Visual-Reference"]
-position = Vector2(256, 0)
-texture = ExtResource("1_ntyhy")
-region_enabled = true
-region_rect = Rect2(0, 0, 256, 256)
+[node name="Control" type="Control" parent="Clouds"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -8.0
+offset_top = -8.0
+offset_right = 2040.0
+offset_bottom = 2040.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 
-[node name="Sprite2D7" type="Sprite2D" parent="Visual-Reference"]
-position = Vector2(-256, 256)
-texture = ExtResource("1_ntyhy")
-region_enabled = true
-region_rect = Rect2(0, 0, 256, 256)
-
-[node name="Sprite2D8" type="Sprite2D" parent="Visual-Reference"]
-position = Vector2(0, 256)
-texture = ExtResource("1_ntyhy")
-region_enabled = true
-region_rect = Rect2(0, 0, 256, 256)
-
-[node name="Sprite2D9" type="Sprite2D" parent="Visual-Reference"]
-position = Vector2(256, 256)
-texture = ExtResource("1_ntyhy")
-region_enabled = true
-region_rect = Rect2(0, 0, 256, 256)
-
-[node name="Misc" type="Node2D" parent="."]
-process_mode = 4
-visible = false
-
-[node name="Dice" parent="Misc" instance=ExtResource("14_1cw2s")]
-position = Vector2(0, 0)
-
-[node name="Hover" type="Node2D" parent="Misc"]
-script = SubResource("GDScript_acxdq")
-
-[node name="MicroView" type="CanvasLayer" parent="Misc"]
-visible = false
-
-[node name="ColorRect" type="ColorRect" parent="Misc/MicroView" node_paths=PackedStringArray("player")]
-z_index = 1
+[node name="TextureRect" type="TextureRect" parent="Clouds/Control"]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 512.0
-offset_top = 256.0
-offset_right = -512.0
-offset_bottom = -256.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(1, 0, 1, 1)
-script = SubResource("GDScript_s5h60")
-player = NodePath("../../../Player")
+mouse_filter = 2
+texture = SubResource("NoiseTexture2D_2n0ns")
+stretch_mode = 6
 
-[node name="Illuminations-Layer" type="CanvasLayer" parent="Misc"]
-process_mode = 4
+[node name="Camera2D" type="Camera2D" parent="." node_paths=PackedStringArray("_initialiser", "_hide_on_zoom", "_show_on_zoom")]
+position = Vector2(0, 1)
+script = ExtResource("2_vy5pj")
+_initialiser = NodePath("../initialiser")
+_hide_on_zoom = NodePath("../map_generator/hide_on_zoom")
+_show_on_zoom = NodePath("../map_generator/show_on_zoom")
+
+[node name="Curtain" type="CanvasLayer" parent="."]
 visible = false
-script = ExtResource("6_ljcja")
+script = SubResource("GDScript_ho7ea")
 
-[node name="Illumination-Spawner" type="Node2D" parent="Misc/Illuminations-Layer"]
-z_index = 1
-script = ExtResource("7_rmeg4")
-illum = ExtResource("6_2cew8")
+[node name="Control" type="Control" parent="Curtain"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="Black-Bars" type="Node2D" parent="Misc/Illuminations-Layer"]
-script = ExtResource("8_umww4")
-
-[node name="Top" type="Sprite2D" parent="Misc/Illuminations-Layer/Black-Bars"]
-modulate = Color(0, 0, 0, 1)
-position = Vector2(960, 0)
-texture = SubResource("PlaceholderTexture2D_bu5ns")
-offset = Vector2(0, 24)
-metadata/_edit_lock_ = true
-
-[node name="Bottom" type="Sprite2D" parent="Misc/Illuminations-Layer/Black-Bars"]
-modulate = Color(0, 0, 0, 1)
-position = Vector2(960, 1080)
-texture = SubResource("PlaceholderTexture2D_bu5ns")
-offset = Vector2(0, -24)
-metadata/_edit_lock_ = true
-
-[node name="Left" type="Sprite2D" parent="Misc/Illuminations-Layer/Black-Bars"]
-modulate = Color(0, 0, 0, 1)
-position = Vector2(0, 540)
-texture = SubResource("PlaceholderTexture2D_dwwpb")
-offset = Vector2(24, 0)
-metadata/_edit_lock_ = true
-
-[node name="Right" type="Sprite2D" parent="Misc/Illuminations-Layer/Black-Bars"]
-modulate = Color(0, 0, 0, 1)
-position = Vector2(1920, 540)
-texture = SubResource("PlaceholderTexture2D_dwwpb")
-offset = Vector2(-24, 0)
-metadata/_edit_lock_ = true
-
-[node name="Illumination-Fader" type="Node" parent="Misc/Illuminations-Layer" node_paths=PackedStringArray("target")]
-script = ExtResource("8_u5mxs")
-target = NodePath("../Illumination-Spawner")
-startVisible = false
-
-[node name="Number-Input-Handler" type="Node2D" parent="." node_paths=PackedStringArray("camZoom", "lightHolder")]
-script = SubResource("GDScript_cp1f4")
-camZoom = NodePath("../Camera2D/Cam-Zoom")
-lightHolder = NodePath("../Lighting/Lights")
-metadata/_edit_lock_ = true
-
-[node name="Lighting" type="Node" parent="."]
-
-[node name="CanvasModulate" type="CanvasModulate" parent="Lighting"]
+[node name="ColorRect" type="ColorRect" parent="Curtain/Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 color = Color(0, 0, 0, 1)
 
-[node name="Lights" type="Node" parent="Lighting"]
+[node name="message" type="Node2D" parent="."]
+z_index = 1000
+z_as_relative = false
+position = Vector2(1014, 801)
+script = ExtResource("3_bmxlf")
 
-[node name="Sun" type="PointLight2D" parent="Lighting/Lights"]
-position = Vector2(512, 512)
-scale = Vector2(1000, 1000)
-texture = SubResource("GradientTexture2D_7v4ub")
+[node name="NinePatchRect" type="NinePatchRect" parent="message"]
+offset_right = 128.0
+offset_bottom = 128.0
+scale = Vector2(0.125, 0.125)
+texture = ExtResource("4_4kpch")
+patch_margin_left = 64
+patch_margin_top = 64
+patch_margin_right = 64
+patch_margin_bottom = 64
+
+[node name="Button" type="Button" parent="message/NinePatchRect"]
+layout_direction = 2
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -96.0
+offset_top = -48.0
+scale = Vector2(0.125, 0.125)
+action_mode = 0
+icon = ExtResource("5_vy5pj")
+icon_alignment = 1
+script = SubResource("GDScript_vy5pj")
+
+[node name="PanelContainer" type="PanelContainer" parent="message"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -50.5
+offset_right = 55.5
+offset_bottom = 9.33333
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxEmpty_svxh6")
+
+[node name="Label" type="Label" parent="message/PanelContainer"]
+layout_mode = 2
+theme_override_fonts/font = SubResource("FontVariation_svxh6")
+text = "Fortune favours the prepared."
+label_settings = SubResource("LabelSettings_ormxn")
+vertical_alignment = 1
+
+[node name="map_generator" type="Node2D" parent="." node_paths=PackedStringArray("_noiseTex")]
+script = ExtResource("6_frkhe")
+_noiseTex = NodePath("Noise/Control/Noise Rect")
+metadata/_edit_lock_ = true
+
+[node name="terrain" type="Node2D" parent="map_generator"]
+z_index = -1
+y_sort_enabled = true
+metadata/_edit_lock_ = true
+
+[node name="hide_on_zoom" type="Node2D" parent="map_generator"]
+z_index = 1
+y_sort_enabled = true
+metadata/_edit_lock_ = true
+
+[node name="show_on_zoom" type="Node2D" parent="map_generator"]
+z_index = 1
+y_sort_enabled = true
+metadata/_edit_lock_ = true
+
+[node name="always_show" type="Node2D" parent="map_generator"]
+metadata/_edit_lock_ = true
+
+[node name="treasures" type="CanvasLayer" parent="map_generator"]
+follow_viewport_enabled = true
+
+[node name="Noise" type="CanvasLayer" parent="map_generator"]
+visible = false
+
+[node name="Control" type="Control" parent="map_generator/Noise"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Noise Rect" type="TextureRect" parent="map_generator/Noise/Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("NoiseTexture2D_ue23j")
+stretch_mode = 5
+
+[node name="terrain_grouper" type="Node" parent="map_generator"]
+script = ExtResource("7_1p5hy")
+
+[node name="lighting" type="Node2D" parent="."]
+visible = false
+script = SubResource("GDScript_c1oqp")
+
+[node name="Sun" type="PointLight2D" parent="lighting"]
+position = Vector2(1024, 1024)
+scale = Vector2(64, 64)
+color = Color(1, 0.983333, 0.9, 1)
+energy = 0.9
+texture = SubResource("GradientTexture2D_snou4")
+script = SubResource("GDScript_cl1kf")
+
+[node name="CanvasModulate" type="CanvasModulate" parent="lighting"]
+color = Color(0.03, 0.0918333, 0.1, 1)
+
+[node name="mouse" type="Node2D" parent="." node_paths=PackedStringArray("_mapGen")]
+z_index = 10
+script = ExtResource("8_h1m7h")
+_mapGen = NodePath("../map_generator")
+metadata/_edit_lock_ = true
+
+[node name="Background" type="CanvasLayer" parent="."]
+layer = -1
+follow_viewport_enabled = true
+
+[node name="Control" type="Control" parent="Background"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -8.0
+offset_top = -8.0
+offset_right = 1016.0
+offset_bottom = 1016.0
+
+[node name="ColorRect" type="ColorRect" parent="Background/Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.929412, 0.909804, 0.705882, 1)
