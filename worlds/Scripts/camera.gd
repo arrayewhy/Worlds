@@ -86,23 +86,21 @@ func _Zoom_Out() -> void:
 		
 		Zoom.emit(_zoomed, _targPos);
 		
-		if _showHide_tween && _showHide_tween.is_running():
-			_showHide_tween.stop();
-		
-		_showHide_tween = create_tween();
-		_showHide_tween.set_trans(Tween.TRANS_CUBIC);
-		_showHide_tween.set_ease(Tween.EASE_IN_OUT);
-		_showHide_tween.set_parallel(true);
-		_showHide_tween.tween_property(_hide_on_zoom, "modulate:a", 1.0, .5);
-		_showHide_tween.tween_property(_show_on_zoom, "modulate:a", 0, .5);
+		_Show_Zoomed_OUT_Sprites();
 		
 		if _zoom_tween && _zoom_tween.is_running():
 			_zoom_tween.stop();
 		
 		_zoom_tween = create_tween();
+		_zoom_tween.set_parallel(true);
 		_zoom_tween.set_trans(Tween.TRANS_QUINT);
 		_zoom_tween.set_ease(Tween.EASE_OUT);
 		_zoom_tween.tween_property(self, "zoom", Vector2(1, 1), 1.5);
+		
+		# Show Screen Center Cursor
+		if self.get_child(0):
+			self.get_child(0).show();
+			_zoom_tween.tween_property(self.get_child(0), "modulate:a", 1.0, 1.5);
 
 func _Zoom_In() -> void:
 	
@@ -110,23 +108,60 @@ func _Zoom_In() -> void:
 		
 		Zoom.emit(_zoomed, _targPos);
 		
-		if _showHide_tween && _showHide_tween.is_running():
-			_showHide_tween.stop();
-		
-		_showHide_tween = create_tween();
-		_showHide_tween.set_trans(Tween.TRANS_CUBIC);
-		_showHide_tween.set_ease(Tween.EASE_IN_OUT);
-		_showHide_tween.set_parallel(true);
-		_showHide_tween.tween_property(_hide_on_zoom, "modulate:a", 0, .5);
-		_showHide_tween.tween_property(_show_on_zoom, "modulate:a", 1.0, .5);
+		_Show_Zoomed_IN_Sprites();
 		
 		if _zoom_tween && _zoom_tween.is_running():
 			_zoom_tween.stop();
 		
 		_zoom_tween = create_tween();
+		_zoom_tween.set_parallel(true);
 		_zoom_tween.set_trans(Tween.TRANS_CUBIC);
 		_zoom_tween.set_ease(Tween.EASE_IN_OUT);
 		_zoom_tween.tween_property(self, "zoom", Vector2(3, 3), 2.5);
+		
+		# Hide Screen Center Cursor
+		if self.get_child(0):
+			_zoom_tween.tween_property(self.get_child(0), "modulate:a", 0, 1.5);
+			await _zoom_tween.finished;
+			self.get_child(0).hide();
+
+
+func _Show_Zoomed_IN_Sprites() -> void:
+	
+	if _showHide_tween && _showHide_tween.is_running():
+		_showHide_tween.stop();
+	
+	_showHide_tween = create_tween();
+	_showHide_tween.set_trans(Tween.TRANS_CUBIC);
+	_showHide_tween.set_ease(Tween.EASE_IN_OUT);
+	_showHide_tween.set_parallel(true);
+	_showHide_tween.tween_property(_hide_on_zoom, "modulate:a", 0, .5);
+	_showHide_tween.tween_property(_show_on_zoom, "modulate:a", 1.0, .5);
+	
+	_show_on_zoom.show();
+	
+	await _showHide_tween.finished;
+	
+	_hide_on_zoom.hide();
+
+
+func _Show_Zoomed_OUT_Sprites() -> void:
+	
+	if _showHide_tween && _showHide_tween.is_running():
+		_showHide_tween.stop();
+	
+	_showHide_tween = create_tween();
+	_showHide_tween.set_trans(Tween.TRANS_CUBIC);
+	_showHide_tween.set_ease(Tween.EASE_IN_OUT);
+	_showHide_tween.set_parallel(true);
+	_showHide_tween.tween_property(_hide_on_zoom, "modulate:a", 1.0, .5);
+	_showHide_tween.tween_property(_show_on_zoom, "modulate:a", 0, .5);
+	
+	_hide_on_zoom.show();
+	
+	await _showHide_tween.finished;
+	
+	_show_on_zoom.hide();
 
 
 # Functions: Get Set ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -139,8 +174,10 @@ func Is_Zoomed(callerPath:String) -> bool:
 
 func Slow_CamSpeed(callerPath:String) -> void:
 	if _debug: print("\ncamera.gd - Slow_CamSpeed, called by: ", callerPath);
+	
 	if _speed_tween && _speed_tween.is_running():
 		_speed_tween.stop();
+		
 	_speed_tween = create_tween();
 	_speed_tween.tween_property(self, "_currSpeed", _normSpeed / 32, 1);
 
