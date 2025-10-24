@@ -12,7 +12,7 @@ var _destination:Vector2;
 var _next_idx:int;
 
 var _anim_StaggerTimer:float;
-const _anim_stagger_thresh:float = .07;
+const _anim_stagger_thresh:float = .06;
 
 # Tweens
 var _moveTween:Tween;
@@ -25,6 +25,9 @@ var fade_records_Markings:Dictionary;
 var _message_curr_idx:int = -1;
 
 #var _currCoord:Vector2;
+
+@export_category("#DEBUG")
+@export var _debug:bool;
 
 
 # Functions: Built-in ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -121,18 +124,20 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 func _Move(dir:Vector2) -> void:
 	
-	# If we receive Movement input while Moving, Snap the player to the Destination
-	if _moveDir != Vector2.ZERO && self.position.distance_to(_destination) > 1:
+	# If we receive Movement input while Moving, do Nothing
+	if _moveDir != Vector2.ZERO:
 		return;
 		#self.position = _destination;
-	
+
 	var curr_coord:Vector2 = World.Coord_OnGrid(self.position);
-	var curr_idx:int = World.Convert_Coord_To_Index(curr_coord);
-	var curr_marking:Map_Data.Marking = _mapGen.Get_Marking(curr_idx, self.get_path());
 	
 	var next_coord:Vector2 = curr_coord + dir * World.CellSize;
 	
 	# Messages
+	
+	var curr_idx:int = World.Convert_Coord_To_Index(curr_coord);
+	var curr_marking:Map_Data.Marking = _mapGen.Get_Marking(curr_idx, self.get_path());
+	
 	if dir == Vector2.UP:
 		if curr_marking == Map_Data.Marking.HOUSE:
 			_message.Set_Text("*knock knock*", self.get_path());
@@ -145,11 +150,14 @@ func _Move(dir:Vector2) -> void:
 			_message_curr_idx = curr_idx;
 			return;
 	
+	# Movement
+	
 	_destination = next_coord;
 	_next_idx = World.Convert_Coord_To_Index(_destination);
 	
 	var next_terrain:Map_Data.Terrain = _mapGen.Get_Terrain(_next_idx, self.get_path());
-	var next_marking:Map_Data.Marking = _mapGen.Get_Marking(_next_idx, self.get_path());
+	
+	if _debug: print_debug(Map_Data.Terrain.find_key(next_terrain));
 	
 	if !World.Terrain_Is_Land(next_terrain) || next_terrain == Map_Data.Terrain.MOUNTAIN:
 		return;
@@ -163,6 +171,9 @@ func _Move(dir:Vector2) -> void:
 	_Fade_CloseUps_And_Markings(_destination);
 	
 	# Forest
+	
+	#var next_marking:Map_Data.Marking = _mapGen.Get_Marking(_next_idx, self.get_path());
+	
 	#if next_marking == Map_Data.Marking.TREE && next_terrain == Map_Data.Terrain.FOREST:
 		#_Enter_Forest();
 	#else:
