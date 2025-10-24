@@ -7,6 +7,7 @@ extends Node2D
 
 const _padding:Vector2 = Vector2(128, 2);
 
+@export_category("#DEBUG")
 @export var _debug:bool;
 
 
@@ -31,7 +32,7 @@ func _ready() -> void:
 
 
 func Set_Text(messageText:String, callerPath:String) -> void:
-	if _debug: print("\nmessage => Set_Text() called by: ", callerPath);
+	if _debug: print_debug("\nmessage => Set_Text() called by: ", callerPath);
 	_Set_Text(messageText);
 
 func _Set_Text(messageText:String) -> void:
@@ -45,13 +46,13 @@ func _Set_Text(messageText:String) -> void:
 
 
 func Set_Position_And_Size(pos:Vector2, displaceY, callerPath:String) -> void:
-	if _debug: print("\nmessage => Set_Position_And_Size() called by: ", callerPath);
+	if _debug: print_debug("\nmessage => Set_Position_And_Size() called by: ", callerPath);
 	_Set_Position_And_Size(pos, displaceY);
 
 func _Set_Position_And_Size(pos:Vector2, displaceY:float) -> void:
 	
 	_panelContainer.reset_size();
-	print(_panelContainer.size);
+	if _debug: print_debug(_panelContainer.size);
 	self.position = World.Coord_OnGrid(pos) - _panelContainer.size;
 
 	_panelContainer.position = _panelContainer.size / 2;
@@ -68,7 +69,7 @@ func _Appear() -> void:
 	self.add_child(fade);
 
 func Disappear(callerPath:String) -> void:
-	if _debug: print("\nmessage => Disappear() called by: ", callerPath);
+	if _debug: print_debug("\nmessage => Disappear() called by: ", callerPath);
 	_Disappear();
 
 func _Disappear() -> void:
