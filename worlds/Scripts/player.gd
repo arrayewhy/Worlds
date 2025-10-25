@@ -1,11 +1,11 @@
-extends Sprite2D
+extends AnimatedSprite2D
 
 @onready var _mapGen:Node2D;
 
 @export var _cam:Camera2D;
 @export var _message:Node2D;
 
-const _moveSpeed:float = 128;
+const _moveSpeed:float = 72;
 
 var _moveDir:Vector2;
 var _destination:Vector2;
@@ -13,6 +13,8 @@ var _next_idx:int;
 
 var _anim_StaggerTimer:float;
 const _anim_stagger_thresh:float = .06;
+
+var _facing_right:bool = true;
 
 # Tweens
 var _moveTween:Tween;
@@ -68,15 +70,47 @@ func _process(delta: float) -> void:
 	else:
 		_anim_StaggerTimer = 0;
 	#
-	var next_step:Vector2 = self.position + (_destination - self.position) * 32 * delta;
+	#var next_step:Vector2 = self.position + (_destination - self.position) * _moveSpeed * delta;
+	var next_step:Vector2 = self.position + _moveDir * _moveSpeed * delta;
 	
-	if self.position.distance_to(next_step) < .125:
-		_Reach_Destination();
-		_Step_On_BuriedTreasure(_next_idx);
-		#_Fade_CloseUps_And_Markings(_destination);
-		return;
-	else:
-		self.position = next_step;
+	#TEMPORARY
+	
+	# Up
+	if _moveDir.y < 0:
+		if (_destination.y - next_step.y) < 0:
+			self.position = next_step;
+		else:
+			_Reach_Destination(next_step);
+			_Step_On_BuriedTreasure(_next_idx);
+	# Down
+	elif _moveDir.y > 0:
+		if (_destination.y - next_step.y) > 0:
+			self.position = next_step;
+		else:
+			_Reach_Destination(next_step);
+			_Step_On_BuriedTreasure(_next_idx);
+	# Left
+	elif _moveDir.x < 0:
+		if (_destination.x - next_step.x) < 0:
+			self.position = next_step;
+		else:
+			_Reach_Destination(next_step);
+			_Step_On_BuriedTreasure(_next_idx);
+	# Right
+	elif _moveDir.x > 0:
+		if (_destination.x - next_step.x) > 0:
+			self.position = next_step;
+		else:
+			_Reach_Destination(next_step);
+			_Step_On_BuriedTreasure(_next_idx);
+	
+	#if self.position.distance_to(next_step) < .125:
+		#_Reach_Destination();
+		#_Step_On_BuriedTreasure(_next_idx);
+		##_Fade_CloseUps_And_Markings(_destination);
+		#return;
+	#else:
+		#self.position = next_step;
 	
 	#var next_step:Vector2 = self.position + _moveDir * _moveSpeed * delta;
 	#
@@ -128,7 +162,14 @@ func _Move(dir:Vector2) -> void:
 	if _moveDir != Vector2.ZERO:
 		return;
 		#self.position = _destination;
-
+	
+	if dir.x < 0 && _facing_right:
+		_facing_right = false;
+		self.scale.x *= -1;
+	elif dir.x > 0 && !_facing_right:
+		_facing_right = true;
+		self.scale.x *= -1;
+	
 	var curr_coord:Vector2 = World.Coord_OnGrid(self.position);
 	
 	var next_coord:Vector2 = curr_coord + dir * World.CellSize;
@@ -163,10 +204,12 @@ func _Move(dir:Vector2) -> void:
 		return;
 	
 	_moveDir = dir;
-	
+
 	_anim_StaggerTimer = 0;
 	
 	set_process(true);
+	
+	self.play("Walk_Right");
 	
 	_Fade_CloseUps_And_Markings(_destination);
 	
@@ -180,10 +223,33 @@ func _Move(dir:Vector2) -> void:
 		#_Exit_Forest();
 
 
-func _Reach_Destination() -> void:
-	self.position = _destination;
-	_moveDir = Vector2.ZERO;
-	set_process(false);
+func _Reach_Destination(next_step:Vector2) -> void:
+	
+	if Input.is_action_pressed("Up") && _moveDir.y < 0:
+		self.position = next_step;
+		_moveDir = Vector2.ZERO;
+		_Move(Vector2.UP);
+		return;
+	elif Input.is_action_pressed("Down") && _moveDir.y > 0:
+		self.position = next_step;
+		_moveDir = Vector2.ZERO;
+		_Move(Vector2.DOWN);
+		return;
+	elif Input.is_action_pressed("Left") && _moveDir.x < 0:
+		self.position = next_step;
+		_moveDir = Vector2.ZERO;
+		_Move(Vector2.LEFT);
+		return;
+	elif Input.is_action_pressed("Right") && _moveDir.x > 0:
+		self.position = next_step;
+		_moveDir = Vector2.ZERO;
+		_Move(Vector2.RIGHT);
+		return;
+	else:
+		_moveDir = Vector2.ZERO;
+		self.position = _destination;
+		set_process(false);
+		self.play("Idle");
 
 
 func _Step_On_BuriedTreasure(idx:int) -> void:
