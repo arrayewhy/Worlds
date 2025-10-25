@@ -9,7 +9,7 @@ var _currSpeed:float = _normSpeed;
 
 var _zoomed:bool;
 
-var _targObj:Sprite2D;
+var _targObj:AnimatedSprite2D;
 var _targPos:Vector2;
 
 var _showHide_tween:Tween;
@@ -62,11 +62,15 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	
 	if event.is_action_pressed("Enter"):
 		_targObj.position = World.Coord_OnGrid(self.position);
+		_Zoom_In();
+		return;
 	
 	if event.is_action_pressed("Zoom") && _zoomed:
 		_Zoom_Out();
+		return;
 	elif event.is_action_pressed("Zoom") && !_zoomed:
 		_Zoom_In();
+		return;
 		
 	if event.is_action_pressed("Shift"):
 		_currSpeed = _normSpeed * 2;
@@ -117,7 +121,7 @@ func _Zoom_In() -> void:
 		_zoom_tween.set_parallel(true);
 		_zoom_tween.set_trans(Tween.TRANS_CUBIC);
 		_zoom_tween.set_ease(Tween.EASE_IN_OUT);
-		_zoom_tween.tween_property(self, "zoom", Vector2(3, 3), 2.5);
+		_zoom_tween.tween_property(self, "zoom", Vector2(3, 3), 1.5);
 		
 		# Hide Screen Center Cursor
 		if self.get_child(0):
@@ -193,7 +197,7 @@ func Reset_CamSpeed(callerPath:String) -> void:
 # Functions: Signals ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
-func _On_Player_Created(player:Sprite2D) -> void:
+func _On_Player_Created(player:AnimatedSprite2D) -> void:
 	
 	_targObj = player;
 	
