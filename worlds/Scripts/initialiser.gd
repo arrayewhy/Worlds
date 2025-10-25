@@ -8,7 +8,7 @@ extends Node
 @export var _cam:Camera2D;
 @export var _message:Node2D;
 
-signal Player_Created(player:Sprite2D);
+signal Player_Created(player:AnimatedSprite2D);
 
 
 func _ready() -> void:
@@ -20,7 +20,7 @@ func _ready() -> void:
 
 func _Create_Player() -> void:
 	
-	var player = _playerPrefab.instantiate()
+	var player:AnimatedSprite2D = _playerPrefab.instantiate()
 	_cont_showOnZoom.add_child(player);
 	player.Initialise(_mapGen, _cam, _message);
 	

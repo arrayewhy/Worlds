@@ -1,7 +1,55 @@
-[gd_scene load_steps=5 format=3 uid="uid://bv8jsonjit21y"]
+[gd_scene load_steps=11 format=3 uid="uid://bv8jsonjit21y"]
 
 [ext_resource type="Texture2D" uid="uid://5hbjqblbd0ft" path="res://Sprites/sparks_in_the_dark.png" id="1_5wxv7"]
 [ext_resource type="Script" uid="uid://cvm1insy3g2kp" path="res://Scripts/player.gd" id="2_y5hcb"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5wxv7"]
+atlas = ExtResource("1_5wxv7")
+region = Rect2(0, 1536, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_y5hcb"]
+atlas = ExtResource("1_5wxv7")
+region = Rect2(768, 1024, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2nftw"]
+atlas = ExtResource("1_5wxv7")
+region = Rect2(512, 1024, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_knrd4"]
+atlas = ExtResource("1_5wxv7")
+region = Rect2(768, 1024, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hck1p"]
+atlas = ExtResource("1_5wxv7")
+region = Rect2(1024, 1024, 256, 256)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_juxdh"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5wxv7")
+}],
+"loop": true,
+"name": &"Idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_y5hcb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2nftw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_knrd4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hck1p")
+}],
+"loop": true,
+"name": &"Walk_Right",
+"speed": 4.0
+}]
 
 [sub_resource type="Gradient" id="Gradient_lnlyj"]
 interpolation_mode = 2
@@ -14,11 +62,11 @@ fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(0.85, 0.15)
 
-[node name="Player" type="Sprite2D"]
+[node name="Player" type="AnimatedSprite2D"]
 scale = Vector2(0.047, 0.047)
-texture = ExtResource("1_5wxv7")
-region_enabled = true
-region_rect = Rect2(0, 1536, 256, 256)
+sprite_frames = SubResource("SpriteFrames_juxdh")
+animation = &"Walk_Right"
+autoplay = "Idle"
 script = ExtResource("2_y5hcb")
 
 [node name="torch" type="PointLight2D" parent="."]
