@@ -143,13 +143,13 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if !_cam.Is_Zoomed(self.get_path()):
 		return;
 	
-	if event.is_action_pressed("Up"):
+	if event.is_action("Up"):
 		_Move(Vector2.UP);
-	elif event.is_action_pressed("Down"):
+	elif event.is_action("Down"):
 		_Move(Vector2.DOWN);
-	elif event.is_action_pressed("Left"):
+	elif event.is_action("Left"):
 		_Move(Vector2.LEFT);
-	elif event.is_action_pressed("Right"):
+	elif event.is_action("Right"):
 		_Move(Vector2.RIGHT);
 
 
@@ -196,12 +196,21 @@ func _Move(dir:Vector2) -> void:
 	_destination = next_coord;
 	_next_idx = World.Convert_Coord_To_Index(_destination);
 	
+	var next_marking:Map_Data.Marking = _mapGen.Get_Marking(_next_idx, self.get_path());
+	
 	var next_terrain:Map_Data.Terrain = _mapGen.Get_Terrain(_next_idx, self.get_path());
 	
 	if _debug: print_debug(Map_Data.Terrain.find_key(next_terrain));
 	
+	# Block Movement
+	
 	if !World.Terrain_Is_Land(next_terrain) || next_terrain == Map_Data.Terrain.MOUNTAIN:
 		return;
+		
+	if dir == Vector2.DOWN && next_marking == Map_Data.Marking.HOUSE:
+		return;
+		
+	# Allow Movement
 	
 	_moveDir = dir;
 
@@ -215,12 +224,10 @@ func _Move(dir:Vector2) -> void:
 	
 	# Forest
 	
-	#var next_marking:Map_Data.Marking = _mapGen.Get_Marking(_next_idx, self.get_path());
-	
-	#if next_marking == Map_Data.Marking.TREE && next_terrain == Map_Data.Terrain.FOREST:
-		#_Enter_Forest();
-	#else:
-		#_Exit_Forest();
+	if next_marking == Map_Data.Marking.TREE && next_terrain == Map_Data.Terrain.FOREST:
+		_Enter_Forest();
+	else:
+		_Exit_Forest();
 
 
 func _Reach_Destination(next_step:Vector2) -> void:
@@ -356,27 +363,33 @@ func _Create_And_Record_Fade(phase:Fade.Phase, idx:int, spr:Sprite2D, records:Di
 	return fade;
 
 
-#func _Enter_Forest() -> void:
-	# TEMPORARY: Rotate TREE sprite
-	#_mapGen.Get_MarkingSprite(_destination, self.get_path()).rotation_degrees = randf_range(-4, 4);
+func _Enter_Forest() -> void:
 	
-	#if _hideTween && _hideTween.is_running():
-		#_hideTween.stop();
-	#_hideTween = create_tween();
-	#_hideTween.tween_property(self, "modulate:a", 0, .5);
+	# TEMPORARY: Rotate TREE sprite
+	_mapGen.Get_MarkingSprite(_destination, self.get_path()).rotation_degrees = randf_range(-4, 4);
+	
+	if _hideTween && _hideTween.is_running():
+		_hideTween.stop();
+	_hideTween = create_tween();
+	_hideTween.tween_property(self, "modulate:a", 0, .5);
+	
+	await _hideTween.finished;
+	self.hide();
 	
 	#_cam.Slow_CamSpeed(self.get_path());
 
 
-#func _Exit_Forest() -> void:
+func _Exit_Forest() -> void:
 	
-	#if self.modulate.a >= 1:
-		#return;
+	if self.modulate.a >= 1:
+		return;
 		
-	#if _hideTween && _hideTween.is_running():
-		#_hideTween.stop();
-	#_hideTween = create_tween();
-	#_hideTween.tween_property(self, "modulate:a", 1, .5);
+	self.show();
+		
+	if _hideTween && _hideTween.is_running():
+		_hideTween.stop();
+	_hideTween = create_tween();
+	_hideTween.tween_property(self, "modulate:a", 1, .5);
 	
 	#_cam.Reset_CamSpeed(self.get_path());
 
