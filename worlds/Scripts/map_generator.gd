@@ -86,15 +86,16 @@ func _ready() -> void:
 	#_Generate_Map(2989861102);
 
 
-func _unhandled_key_input(event: InputEvent) -> void:
+func _process(delta: float) -> void:
 	
-	if event.is_action_pressed("Cancel"):
-		
-		_Clear();
-		
-		var newSeed:int = randi();
-		print("map_generator, Latest Seed: ", newSeed);
-		_Generate_Map(newSeed);
+	if !Input.is_action_pressed("Cancel") || !Input.is_action_just_pressed("Enter"):
+		return;
+			
+	_Clear();
+	
+	var newSeed:int = randi();
+	print("map_generator, Latest Seed: ", newSeed);
+	_Generate_Map(newSeed);
 
 
 # Functions ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -260,6 +261,7 @@ func _TerrainSprites_From_TerrainData(terrainData:Array[Map_Data.Terrain]) -> Ar
 			#s_array.append(null);
 		#else:
 		# Create Sprite
+		
 		var spr:Sprite2D = World.Create_Sprite(0, 0);
 		_cont_terrainSprites.add_child(spr);
 		
