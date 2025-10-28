@@ -5,9 +5,14 @@ extends Node2D
 var _terrain_lifters:Dictionary;
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	
 	if Input.is_action_just_pressed("Left-Click"):
+		
+		var gPos:Vector2 = World.Coord_OnGrid(get_global_mouse_position());
+		var idx:int = World.Convert_Coord_To_Index(gPos);
+		if _mapGen.Get_Marking(idx, self.get_path()) == Map_Data.Marking.BOAT:
+			SoundMaster.Ship_Horn();
 		
 		# Get Mouse Position on Grid
 		var mousePos:Vector2 = World.Coord_OnGrid(get_global_mouse_position());
