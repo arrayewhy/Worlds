@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 World="*res://Scripts/Autoloads/World.gd"
 InGameDebugger="*res://Scripts/Debug/InGameDebugger.gd"
 TimeMaster="*res://Scripts/Autoloads/TimeMaster.gd"
+SoundMaster="*res://Scripts/Autoloads/Sound-Master.gd"
 
 [display]
 
