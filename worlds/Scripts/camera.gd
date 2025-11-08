@@ -62,6 +62,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	
 	if event.is_action_pressed("Enter"):
 		_targObj.position = World.Coord_OnGrid(self.position);
+		World.Set_Player_Coord(World.Coord_OnGrid(_targObj.position), self.get_path());
 		_Zoom_In();
 		return;
 	
