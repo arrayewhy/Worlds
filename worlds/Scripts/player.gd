@@ -14,6 +14,8 @@ var _next_idx:int;
 var _anim_StaggerTimer:float;
 const _anim_stagger_thresh:float = .06;
 
+var _busy:bool;
+
 var _facing_right:bool = true;
 
 # Tweens
@@ -42,6 +44,8 @@ func _ready() -> void:
 	#_currCoord = World.Coord_OnGrid(self.position);
 	
 	set_process(false);
+	
+	World.Set_Player_Coord(World.Coord_OnGrid(self.position), self.get_path());
 
 
 func _process(delta: float) -> void:
@@ -140,6 +144,9 @@ func _process(delta: float) -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	
+	if _busy:
+		return;
+	
 	if !_cam.Is_Zoomed(self.get_path()):
 		return;
 	
@@ -163,6 +170,8 @@ func _Move(dir:Vector2) -> void:
 		return;
 		#self.position = _destination;
 	
+	# Flip player Sprite
+	
 	if dir.x < 0 && _facing_right:
 		_facing_right = false;
 		self.scale.x *= -1;
@@ -184,11 +193,17 @@ func _Move(dir:Vector2) -> void:
 			_message.Set_Text("*knock knock*", self.get_path());
 			_message.Set_Position_And_Size(next_coord + dir * World.CellSize, .5, self.get_path());
 			_message_curr_idx = curr_idx;
+			_busy = true;
+			if !_message.Message_Closed.is_connected(_Set_Not_Busy):
+				_message.Message_Closed.connect(_Set_Not_Busy);
 			return;
 		elif curr_marking == Map_Data.Marking.LIGHTHOUSE:
 			_message.Set_Text("I wonder if the guard is asleep.\nHe's usually up all night.", self.get_path());
 			_message.Set_Position_And_Size(next_coord + dir * World.CellSize, 3, self.get_path());
 			_message_curr_idx = curr_idx;
+			_busy = true;
+			if !_message.Message_Closed.is_connected(_Set_Not_Busy):
+				_message.Message_Closed.connect(_Set_Not_Busy);
 			return;
 	
 	# Movement
@@ -211,6 +226,8 @@ func _Move(dir:Vector2) -> void:
 		return;
 		
 	# Allow Movement
+	
+	World.Set_Player_Coord(World.Coord_OnGrid(next_coord), self.get_path());
 	
 	_moveDir = dir;
 
@@ -392,6 +409,12 @@ func _Exit_Forest() -> void:
 	_hideTween.tween_property(self, "modulate:a", 1, .5);
 	
 	#_cam.Reset_CamSpeed(self.get_path());
+
+
+func _Set_Not_Busy() -> void:
+	_busy = false;
+	if _message.Message_Closed.is_connected(_Set_Not_Busy):
+		_message.Message_Closed.disconnect(_Set_Not_Busy);
 
 
 # Functions: Signals ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
