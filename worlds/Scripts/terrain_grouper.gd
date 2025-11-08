@@ -48,7 +48,7 @@ func Island_CoordArrays_From_TerrainData(terrainData:Array[Map_Data.Terrain], ca
 				curr_island_coords = [];
 	
 			continue;
-	
+
 	return islands;
 		
 	#if !convert_to_idx:
