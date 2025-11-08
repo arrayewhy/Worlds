@@ -7,6 +7,8 @@ extends Node2D
 
 const _padding:Vector2 = Vector2(128, 2);
 
+signal Message_Closed;
+
 @export_category("#DEBUG")
 @export var _debug:bool;
 
@@ -62,6 +64,10 @@ func _Set_Position_And_Size(pos:Vector2, displaceY:float) -> void:
 	
 	if self.modulate.a <= 0:
 		_Appear();
+
+
+func Signal_Message_Closed() -> void:
+	Message_Closed.emit();
 
 
 func _Appear() -> void:
