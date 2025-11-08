@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://86tq3blbo8rs"]
+[gd_scene load_steps=29 format=3 uid="uid://86tq3blbo8rs"]
 
 [ext_resource type="Script" uid="uid://bl2cub7bc84g5" path="res://Scripts/initialiser.gd" id="1_50glp"]
 [ext_resource type="Script" uid="uid://bu55c8rfhtrsl" path="res://Scripts/camera.gd" id="2_vy5pj"]
@@ -9,7 +9,10 @@
 [ext_resource type="Texture2D" uid="uid://c7mfwjyhhq810" path="res://Sprites/textbox.png" id="5_vy5pj"]
 [ext_resource type="Script" uid="uid://ddx5i8d1mr1lo" path="res://Scripts/map_generator.gd" id="6_frkhe"]
 [ext_resource type="Script" uid="uid://cal2wnxopwt2h" path="res://Scripts/terrain_grouper.gd" id="7_1p5hy"]
+[ext_resource type="Script" uid="uid://cfouw4aofu4hw" path="res://Scripts/message_button.gd" id="7_4kpch"]
 [ext_resource type="Script" uid="uid://vp1q6c1vpebf" path="res://Scripts/mouse.gd" id="8_h1m7h"]
+[ext_resource type="Script" uid="uid://bqb4aevrhrx27" path="res://Scripts/inventory.gd" id="12_frkhe"]
+[ext_resource type="Texture2D" uid="uid://5hbjqblbd0ft" path="res://Sprites/sparks_in_the_dark.png" id="13_frkhe"]
 
 [sub_resource type="GDScript" id="GDScript_wxdwa"]
 script/source = "extends CanvasLayer
@@ -37,7 +40,7 @@ func _process(delta: float) -> void:
 
 [sub_resource type="Gradient" id="Gradient_k6548"]
 offsets = PackedFloat32Array(0, 0.34728, 1)
-colors = PackedColorArray(1, 1, 1, 0.490196, 1, 1, 1, 0, 0, 0, 0, 0.392157)
+colors = PackedColorArray(1, 1, 1, 0.490196, 1, 1, 1, 0, 1, 1, 1, 0.392157)
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_sial6"]
 offset = Vector3(770.44, 0, 0)
@@ -76,26 +79,6 @@ func _ready() -> void:
 	self.hide();
 "
 
-[sub_resource type="GDScript" id="GDScript_vy5pj"]
-resource_name = "message_button"
-script/source = "extends Button
-
-@onready var _message:Node2D = get_parent().get_parent();
-
-
-func _ready() -> void:
-	self.button_down.connect(_Click);
-
-
-func _unhandled_key_input(event: InputEvent) -> void:
-	if event.is_action_pressed(\"Enter\"):
-		_message.Disappear(self.get_path());
-
-
-func _Click() -> void:
-	_message.Disappear(self.get_path());
-"
-
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_svxh6"]
 content_margin_left = 2.0
 content_margin_right = 2.0
@@ -121,6 +104,91 @@ generate_mipmaps = false
 noise = SubResource("FastNoiseLite_g2m6q")
 invert = true
 seamless_blend_skirt = 1.0
+
+[sub_resource type="GDScript" id="GDScript_4kpch"]
+resource_name = "map_exporter"
+script/source = "extends Node
+
+@onready var _map_gen:Node2D = get_parent();
+
+@export var _save_image:bool;
+@export var _image_name:String;
+
+
+func _process(delta: float) -> void:
+	
+	if _save_image:
+		
+		if _image_name == \"\":
+			printerr(\"map_exporter: Export Image Name NOT set.\");
+			_save_image = false;
+			return;
+		
+		var terrain_data:Array[Map_Data.Terrain] = _map_gen.Get_Terrain_Data(self.get_path());
+		
+		var map_diameter:float = sqrt(terrain_data.size());
+		
+		var img:Image = Image.create(map_diameter, map_diameter, false, Image.FORMAT_RGB8);
+		
+		var currIdx:int = 0;
+		
+		for y in map_diameter:
+			for x in map_diameter:
+				
+				var col:Color;
+				
+				match terrain_data[currIdx]:
+					
+					Map_Data.Terrain.Null:
+						col = Color.MAGENTA;
+	
+					#DEBUG
+					Map_Data.Terrain.HOLE:
+						col = Color.BROWN;
+					
+					# Land
+					Map_Data.Terrain.MOUNTAIN:
+						col = Color.GRAY;
+					Map_Data.Terrain.MOUNTAIN_PATH:
+						col = Color.LIGHT_GRAY;
+					Map_Data.Terrain.FOREST:
+						col = Color.FOREST_GREEN;
+					Map_Data.Terrain.GROUND:
+						col = Color.GREEN;
+					Map_Data.Terrain.SHORE:
+						col = Color.SANDY_BROWN;
+					# Water
+					Map_Data.Terrain.SHALLOW:
+						col = Color.SKY_BLUE;
+					Map_Data.Terrain.SEA:
+						col = Color.DEEP_SKY_BLUE;
+					Map_Data.Terrain.OCEAN:
+						col = Color.DODGER_BLUE;
+					Map_Data.Terrain.DEPTHS:
+						col = Color.DARK_SLATE_BLUE;
+					Map_Data.Terrain.ABYSS:
+						col = Color.DARK_BLUE;
+					
+					# Special: Land
+					Map_Data.Terrain.TEMPLE_BROWN:
+						col = Color.INDIAN_RED;
+					Map_Data.Terrain.DOCK:
+						col = Color.SADDLE_BROWN;
+					# Special: Water
+					#SEA_GREEN,
+					Map_Data.Terrain.WATER_COAST:
+						col = Color.FUCHSIA;
+				
+				img.set_pixel(x, y, col);
+				
+				currIdx += 1;
+		
+		img.save_png(\"res://Exports/\" + _image_name + \".png\");
+		
+		print(\"map_exporter: Image Exported => \" + _image_name);
+		_image_name = \"\";
+		_save_image = false;
+"
 
 [sub_resource type="GDScript" id="GDScript_c1oqp"]
 resource_name = "lighting"
@@ -328,7 +396,7 @@ scale = Vector2(0.125, 0.125)
 action_mode = 0
 icon = ExtResource("5_vy5pj")
 icon_alignment = 1
-script = SubResource("GDScript_vy5pj")
+script = ExtResource("7_4kpch")
 
 [node name="PanelContainer" type="PanelContainer" parent="message"]
 anchors_preset = 15
@@ -400,6 +468,9 @@ stretch_mode = 5
 [node name="terrain_grouper" type="Node" parent="map_generator"]
 script = ExtResource("7_1p5hy")
 
+[node name="map_exporter" type="Node" parent="map_generator"]
+script = SubResource("GDScript_4kpch")
+
 [node name="lighting" type="Node2D" parent="."]
 visible = false
 script = SubResource("GDScript_c1oqp")
@@ -441,3 +512,21 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.929412, 0.909804, 0.705882, 1)
+
+[node name="inventory" type="CanvasLayer" parent="." node_paths=PackedStringArray("_mouse")]
+follow_viewport_enabled = true
+script = ExtResource("12_frkhe")
+_mouse = NodePath("../mouse")
+_debug = true
+
+[node name="slot_holder" type="Node2D" parent="inventory"]
+position = Vector2(912, 494)
+scale = Vector2(0.063, 0.063)
+
+[node name="slot" type="Node2D" parent="inventory/slot_holder"]
+
+[node name="Sprite2D" type="Sprite2D" parent="inventory/slot_holder/slot"]
+texture_repeat = 2
+texture = ExtResource("13_frkhe")
+region_enabled = true
+region_rect = Rect2(2560, 0, 256, 256)
