@@ -1,16 +1,41 @@
 extends Node;
 
+const _spriteSheet:Texture2D = preload("res://Sprites/sparks_in_the_dark.png");
+
 const CellSize:float = 16;
 const Spr_Reg_Size:float = 256;
 var _mapWidth:int;
 
-const _spriteSheet:Texture2D = preload("res://Sprites/sparks_in_the_dark.png");
+var _player_coord:Vector2;
 
 #signal Initial_MapGen_Complete;
 
 signal Replace_Terrain(idx:int, type:Map_Data.Terrain, spr:Sprite2D);
 
 var _debug:bool;
+
+
+# Player ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+func Set_Player_Coord(coord:Vector2, callerPath:String) -> void:
+	_Set_Player_Coord(coord);
+	if _debug: print("\nWorld.gd - Set_Player_Coord, called by: ", callerPath);
+
+func _Set_Player_Coord(coord:Vector2) -> void:
+	_player_coord = coord;
+
+
+func Player_Coord() -> Vector2:
+	return _player_coord;
+
+
+func Distance_From_Player(pos:Vector2) -> float:
+	return _player_coord.distance_to(pos);
+
+
+#func Near_Player(pos:Vector2) -> bool:
+	#return _player_coord.distance_to(pos) <= CellSize;
 
 
 #func Signal_Initial_MapGen_Complete(callerPath:String) -> void:
