@@ -2,31 +2,11 @@ extends Node2D
 
 # Resources
 const _glyphs:Texture2D = preload("res://Sprites/Glyphs.png");
+const _terrain_sprites:Texture2D = preload("res://Sprites/terrain_sprites.png");
+
 const _fadeInOut:Shader = preload("res://Shaders/fadeInOut.gdshader");
 const _wiggle:Shader = preload("res://Shaders/wiggle.gdshader");
-const _goodSeeds:Array[int] = [
-	3184197067,
-	3043322721,
-	3879980289,
-	3302025460,
-	3869609850,
-	3622769036,
-	3726595959, # Three Brothers
-	278936286,
-	462604253, # Broken Bridge
-	1504345747, # Jurassic
-	1852288905, # The Argument
-	920171824,
-	2219318034, # Cut through the Mountains
-	2912471184,
-	1970006309, # Leviathan
-	429314510,
-	787546645, # Big Boy
-	3790769020, # The Howl
-	2239492294,
-	2989861102,
-	1223885537,
-	];
+
 #const _lighthouseLamp:PackedScene = preload("res://Prefabs/lighthouse_lamp.tscn");
 
 # Thresholds
@@ -122,6 +102,25 @@ func _Generate_Map(newSeed:int) -> void:
 	for coordArray in islands_coordArrays:
 		_array_islands.push_back(World.Convert_CoordArray_To_IdxArray(coordArray));
 	
+	# Largest Island - START * * * * *
+	
+	var largest_island:int;
+	
+	for i in _array_islands.size():
+		if _array_islands[i].size() > _array_islands[largest_island].size():
+			largest_island = i;
+	
+	# Make Other islands water
+	
+	for i in _array_islands.size():
+		if i == largest_island:
+			continue;
+		else:
+			for idx in _array_islands[i]:
+				_terrain_data[idx] = Map_Data.Terrain.SHALLOW;
+	
+	# END
+	
 	# Derive Mountain Ranges
 	for island in _array_islands:
 		var m_cluster_array:Array[Array] = _terrain_grouper.TerrainClusters_From_Island(Map_Data.Terrain.MOUNTAIN, island, _terrain_data);
@@ -141,16 +140,44 @@ func _Generate_Map(newSeed:int) -> void:
 	for edgeIndices in edgeRing_array:
 		_terrain_data[edgeIndices.pick_random()] = Map_Data.Terrain.MOUNTAIN_PATH;
 	
-	# Add Docks
-	#_terrain_data = Map_Data.Amend_TerrainData_Docks(_terrain_data);
 	_marking_data = Map_Data.Derive_MarkingData_From_TerrainData(_terrain_data);
 	# Amend Map Data
 	_terrain_data = Map_Data.Amend_TerrainData_Using_MarkingData(_terrain_data, _marking_data);
 	#_marking_data = Map_Data.Amend_MarkingData_Houses(_marking_data);
 	
+	# Add Docks
+	#_terrain_data = Map_Data.Amend_TerrainData_Docks(_terrain_data);
+	
+	# Mark Lighthouse - START * * * * *
+	
+	var lighthouse_spawned:bool;
+	
+	for i in _array_islands[largest_island].size():
+		
+		var idx:int = _array_islands[largest_island][i];
+		
+		if _terrain_data[idx] == Map_Data.Terrain.SHORE && randf_range(0, 1000) > 995:
+			_marking_data[idx] = Map_Data.Marking.LIGHTHOUSE;
+			lighthouse_spawned = true;
+			break;
+		else:
+			continue;
+	
+	if !lighthouse_spawned:
+		
+		for i in _array_islands[largest_island].size():
+			
+			var idx:int = _array_islands[largest_island][i];
+			
+			if _terrain_data[idx] == Map_Data.Terrain.SHORE:
+				_marking_data[idx] = Map_Data.Marking.LIGHTHOUSE;
+				break;
+	# END
+	
 	#for island in _array_islands:
-		#for idx in island:
-			#_terrain_data[idx] = Map_Data.Terrain.Null;
+		#if island.size() > 100:
+			#for idx in island:
+				#_terrain_data[idx] = Map_Data.Terrain.Null;
 	
 	#for island in _islands:
 		#for idx in island:
@@ -262,7 +289,7 @@ func _TerrainSprites_From_TerrainData(terrainData:Array[Map_Data.Terrain]) -> Ar
 		#else:
 		# Create Sprite
 		
-		var spr:Sprite2D = World.Create_Sprite(0, 0);
+		var spr:Sprite2D = World.Create_Sprite(0, 0, 1, _terrain_sprites);
 		_cont_terrainSprites.add_child(spr);
 		
 		_Configure_TerrainSprite_LandAndSea(spr, t);
@@ -414,11 +441,11 @@ func _MarkingSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Ar
 				#spr = World.Create_Sprite(10, 5);
 				#_cont_treasures.add_child(spr);
 			
-			Map_Data.Marking.SEAGRASS:
-				spr = World.Create_Sprite(0, 5);
-				_cont_showOnZoom.add_child(spr);
-				spr.rotation_degrees = 90;
-				spr.modulate.a = randf_range(.125, .25);
+			#Map_Data.Marking.SEAGRASS:
+				#spr = World.Create_Sprite(0, 5);
+				#_cont_showOnZoom.add_child(spr);
+				#spr.rotation_degrees = 90;
+				#spr.modulate.a = randf_range(.125, .25);
 			
 			Map_Data.Marking.TEMPLE:
 				spr = World.Create_Sprite(13, 11, 1, _glyphs);
@@ -582,8 +609,8 @@ func _DetailSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Arr
 				pass;
 			#Map_Data.Marking.WHALE:
 				#pass;
-			Map_Data.Marking.SEAGRASS:
-				pass;
+			#Map_Data.Marking.SEAGRASS:
+				#pass;
 			Map_Data.Marking.TEMPLE:
 				pass;
 				
@@ -608,8 +635,8 @@ func _DetailSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Arr
 				spr.position = Vector2(currX * World.CellSize, currY * World.CellSize);
 				spr.modulate = Color.BLACK;
 			
-			Map_Data.Marking.SEAGRASS:
-				pass;
+			#Map_Data.Marking.SEAGRASS:
+				#pass;
 			
 			Map_Data.Marking.BOAT:
 				pass;
@@ -795,6 +822,11 @@ func Get_Marking(idx:int, callerPath:String) -> Map_Data.Marking:
 func Get_Buried(idx:int, callerPath:String) -> int:
 	if _debug: print("\nmap_generator.gd - Get_Marking, called by: ", callerPath);
 	return _buried_data[idx];
+
+
+func Get_Terrain_Data(callerPath:String) -> Array[Map_Data.Terrain]:
+	if _debug: print("\nmap_generator.gd - Get_Terrain_Data, called by: ", callerPath);
+	return _terrain_data;
 
 
 #func Is_Land(coord:Vector2, callerPath:String, idx:int = -1) -> bool:
