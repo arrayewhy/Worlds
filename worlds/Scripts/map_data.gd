@@ -43,7 +43,7 @@ enum Marking {
 	#WHALE,
 	#HOT_AIR_BALLOON,
 	OARFISH,
-	SEAGRASS,
+	#SEAGRASS,
 	TEMPLE,
 	GOLD,
 	MESSAGE_BOTTLE,
@@ -53,6 +53,32 @@ enum Marking {
 	BOAT,
 	#TREE_HOUSE,
 	}
+
+const goodSeeds:Dictionary[int, String] = {
+	3184197067 : "",
+	3043322721 : "",
+	3879980289 : "",
+	3302025460 : "",
+	3869609850 : "",
+	3622769036 : "",
+	3726595959 : "three_brothers",
+	278936286 : "",
+	462604253 : "broken_bridge",
+	1504345747 : "jurassic",
+	1852288905 : "the_argument",
+	920171824 : "",
+	2219318034 : "cut_through_the_mountains",
+	2912471184 : "",
+	1970006309 : "leviathan",
+	429314510 : "",
+	787546645 : "big_boy",
+	3790769020 : "the_howl",
+	2239492294 : "",
+	2989861102 : "",
+	1223885537 : "",
+	652673025 : "lakes",
+	1300341631 : "",
+	};
 
 #var _messageBottle_spawned:bool;
 
@@ -158,9 +184,9 @@ static func Derive_MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> A
 				continue;
 				
 			Terrain.SHORE:
+				#if randi_range(0, 1000) > 990:
+					#m.append(Marking.LIGHTHOUSE);
 				if randi_range(0, 1000) > 990:
-					m.append(Marking.LIGHTHOUSE);
-				elif randi_range(0, 1000) > 990:
 					m.append(Marking.SHELL);
 				#elif randi_range(0, 1000) > 995:
 					#m.append(Marking.TENT);
@@ -184,11 +210,11 @@ static func Derive_MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> A
 				continue;
 				
 			Terrain.OCEAN:
-				if randi_range(0, 1000) > 700:
-					m.append(Marking.SEAGRASS);
+				#if randi_range(0, 1000) > 700:
+					#m.append(Marking.SEAGRASS);
 				#elif randf_range(0, 1000) > 990:
 					#m.append(Marking.BOAT);
-				elif randi_range(0, 1000) > 990:
+				if randi_range(0, 1000) > 990:
 					m.append(Marking.BIG_FISH);
 				elif randi_range(0, 1000) > 990:
 					m.append(Marking.GOLD);
@@ -291,7 +317,7 @@ static func Amend_TerrainData_Docks(terrainData:Array[Terrain]) -> Array[Terrain
 		
 		match t_array[t_idx]:
 			
-			Terrain.SHALLOW:
+			Terrain.SHORE:
 			
 				if randf_range(0, 1000) < 990:
 					continue;

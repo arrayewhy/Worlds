@@ -13,7 +13,7 @@ signal Player_Created(player:AnimatedSprite2D);
 
 func _ready() -> void:
 	
-	_mapGen.Generate_Map(2989861102, self.get_path());
+	_mapGen.Generate_Map(Map_Data.goodSeeds.find_key("cut_through_the_mountains"), self.get_path());
 	
 	_mapGen.Map_Generated.connect(_Create_Player);
 
