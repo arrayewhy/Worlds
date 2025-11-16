@@ -2,22 +2,24 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dxgm185uuhekd"
-path="res://.godot/imported/asterisk_icon_yellow.png-0f47da1fbe4050df84283f13630bf3e2.ctex"
+uid="uid://v2h7ci5xqk3t"
+path="res://.godot/imported/Screenshot 2025-02-26 at 1.28.26 AM.png-2ad041cf510dfdf4fea26a6579eb8fbe.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Misc/icons/asterisk_icon_yellow.png"
-dest_files=["res://.godot/imported/asterisk_icon_yellow.png-0f47da1fbe4050df84283f13630bf3e2.ctex"]
+source_file="res://Misc/Screenshots/Screenshot 2025-02-26 at 1.28.26 AM.png"
+dest_files=["res://.godot/imported/Screenshot 2025-02-26 at 1.28.26 AM.png-2ad041cf510dfdf4fea26a6579eb8fbe.ctex"]
 
 [params]
 
 compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
+compress/uastc_level=0
+compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
@@ -25,6 +27,10 @@ mipmaps/generate=false
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""
+process/channel_remap/red=0
+process/channel_remap/green=1
+process/channel_remap/blue=2
+process/channel_remap/alpha=3
 process/fix_alpha_border=true
 process/premult_alpha=false
 process/normal_map_invert_y=false
