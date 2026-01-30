@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://4m2bjksh78d3"
+path="res://.godot/imported/The Sea - Tomas Dvorak, Machinarium.mp3-cd29dec0ab0f6fa579f2b7709aef4ed5.mp3str"
+
+[deps]
+
+source_file="res://Audio/Music/The Sea - Tomas Dvorak, Machinarium.mp3"
+dest_files=["res://.godot/imported/The Sea - Tomas Dvorak, Machinarium.mp3-cd29dec0ab0f6fa579f2b7709aef4ed5.mp3str"]
+
+[params]
+
+loop=true
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
