@@ -7,6 +7,7 @@ extends AnimatedSprite2D
 
 const _moveSpeed:float = 72;
 
+var _moving:bool;
 var _moveDir:Vector2;
 var _destination:Vector2;
 var _next_idx:int;
@@ -43,12 +44,47 @@ func _ready() -> void:
 	
 	#_currCoord = World.Coord_OnGrid(self.position);
 	
-	set_process(false);
+	_moving = false;
+	#set_process(false);
 	
 	World.Set_Player_Coord(World.Coord_OnGrid(self.position), self.get_path());
 
 
 func _process(delta: float) -> void:
+	
+	if Input.is_action_pressed("Left-Click"):
+		var direction:Vector2 = self.global_position.direction_to(get_global_mouse_position());
+		
+		if abs(direction.y) > abs(direction.x):
+			if direction.y < 0:
+				_Move(Vector2.UP);
+			else:
+				_Move(Vector2.DOWN);
+		else:
+			if direction.x > 0:
+				_Move(Vector2.RIGHT);
+			else:
+				_Move(Vector2.LEFT);
+		
+		#if direction.y < 0:
+			#if abs(direction.y) > abs(direction.x):
+				#_Move(Vector2.UP);
+			#else:
+				#if direction.x > 0:
+					#_Move(Vector2.RIGHT);
+				#else:
+					#_Move(Vector2.LEFT);
+		#elif direction.y > 0:
+			#if abs(direction.y) > abs(direction.x):
+				#_Move(Vector2.DOWN);
+			#else:
+				#if direction.x > 0:
+					#_Move(Vector2.RIGHT);
+				#else:
+					#_Move(Vector2.LEFT);
+	
+	if !_moving:
+		return;
 	
 	#var xMoveVal:float = Input.get_axis("Left", "Right");
 	#var yMoveVal:float = Input.get_axis("Up", "Down");
@@ -233,7 +269,8 @@ func _Move(dir:Vector2) -> void:
 
 	_anim_StaggerTimer = 0;
 	
-	set_process(true);
+	_moving = true;
+	#set_process(true);
 	
 	self.play("Walk_Right");
 	
@@ -272,7 +309,8 @@ func _Reach_Destination(next_step:Vector2) -> void:
 	else:
 		_moveDir = Vector2.ZERO;
 		self.position = _destination;
-		set_process(false);
+		_moving = false;
+		#set_process(false);
 		self.play("Idle");
 
 

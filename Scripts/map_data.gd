@@ -203,8 +203,8 @@ static func Derive_MarkingData_From_TerrainData(terrainData:Array[Terrain]) -> A
 					m.append(Marking.SMALL_FISH);
 				#elif randi_range(0, 1000) > 995:
 					#m.append(Marking.JETTY);
-				#elif randf_range(0, 1000) > 990:
-					#m.append(Marking.BOAT);
+				elif randf_range(0, 1000) > 990:
+					m.append(Marking.BOAT);
 				else:
 					m.append(Marking.Null);
 				continue;

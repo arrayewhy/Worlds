@@ -21,6 +21,7 @@ func _ready() -> void:
 func _Create_Player() -> void:
 	
 	var player:AnimatedSprite2D = _playerPrefab.instantiate()
+	player.name = "Player";
 	_cont_showOnZoom.add_child(player);
 	player.Initialise(_mapGen, _cam, _message);
 	

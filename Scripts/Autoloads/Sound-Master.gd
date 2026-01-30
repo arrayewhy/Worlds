@@ -6,7 +6,7 @@ const _sounds:Dictionary[String, Object] = {
 }
 
 
-func _Play_Sound(sound:Object, vol:float) -> void:
+func _Play_Sound(sound:Object, vol:float, rand_pitch:bool = false) -> void:
 	
 	# Play sound with AudioStreamPlayer that is NOT Busy
 	
@@ -14,6 +14,10 @@ func _Play_Sound(sound:Object, vol:float) -> void:
 		
 		if !aud_player.playing:
 			aud_player.stream = sound;
+			
+			if rand_pitch:
+				aud_player.pitch_scale = randf_range(-.1, .1);
+			
 			aud_player.play();
 			return;
 		else:
@@ -26,6 +30,10 @@ func _Play_Sound(sound:Object, vol:float) -> void:
 	
 	new_aud_player.stream = sound;
 	new_aud_player.volume_db = vol;
+	
+	if rand_pitch:
+		new_aud_player.pitch_scale = randf_range(-1, 1);
+	
 	new_aud_player.play();
 
 
@@ -33,7 +41,7 @@ func _Play_Sound(sound:Object, vol:float) -> void:
 
 
 func Ship_Horn(vol:float = 0) -> void:
-	_Play_Sound(_sounds.get("SHIP_HORN"), vol);
+	_Play_Sound(_sounds.get("SHIP_HORN"), vol, true);
 
 func Dog_Bark(vol:float = 0) -> void:
-	_Play_Sound(_sounds.get("DOG_BARK"), vol);
+	_Play_Sound(_sounds.get("DOG_BARK"), vol, true);
