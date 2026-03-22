@@ -6,6 +6,8 @@ var _size:int = 1;
 
 var _open:bool;
 
+var _alpha_tween:Tween;
+
 @export_group("#DEBUG")
 @export var _debug:bool;
 
@@ -51,8 +53,19 @@ func Open(callerPath:String) -> void:
 	if _debug: print_debug("\ninventory.gd - Open, called by: ", callerPath);
 
 func _Open() -> void:
+	
 	_open = true;
+	
 	$slot_holder.position = World.Player_Coord() + Vector2.UP * World.CellSize;
+	
+	$slot_holder.modulate.a = 0;
+	
+	if _alpha_tween != null && _alpha_tween.is_running():
+		_alpha_tween.kill();
+	
+	_alpha_tween = create_tween();
+	_alpha_tween.tween_property($slot_holder, "modulate:a", 1, .2);
+	
 	self.show();
 
 
@@ -62,4 +75,13 @@ func Close(callerPath:String) -> void:
 
 func _Close() -> void:
 	_open = false;
+	
+	if _alpha_tween != null && _alpha_tween.is_running():
+		_alpha_tween.kill();
+	
+	_alpha_tween = create_tween();
+	_alpha_tween.tween_property($slot_holder, "modulate:a", 0, .2);
+	
+	await _alpha_tween.finished;
+	
 	self.hide();
