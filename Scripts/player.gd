@@ -19,6 +19,8 @@ var _busy:bool;
 
 var _facing_right:bool = true;
 
+var _dbl_click_timer:float;
+
 # Tweens
 var _moveTween:Tween;
 var _hideTween:Tween;
@@ -31,6 +33,8 @@ var _message_curr_idx:int = -1;
 
 #var _currCoord:Vector2;
 
+signal Player_Request_Zoom_Out;
+
 @export_category("#DEBUG")
 @export var _debug:bool;
 
@@ -40,7 +44,7 @@ var _message_curr_idx:int = -1;
 
 func _ready() -> void:
 	
-	self.position = floor(self.position / World.CellSize) * World.CellSize;
+	#self.position = floor(self.position / World.CellSize) * World.CellSize;
 	
 	#_currCoord = World.Coord_OnGrid(self.position);
 	
@@ -52,7 +56,32 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	
+	if Input.is_action_just_pressed("Left-Click"):
+		# On Left-click:
+		# 1. Start Timer
+		if _dbl_click_timer == 0:
+			_dbl_click_timer += delta;
+		# 2. If the Timer is Running and is within Double-click Threshold, Reset the Timer
+		elif _dbl_click_timer < .5:
+			_dbl_click_timer = 0;
+			# Do your thing
+			Player_Request_Zoom_Out.emit();
+	
+	# If the Timer has been started:
+	# 1. If it has not Exceeded the Double-click Threshold, keep counting
+	# 2. If Exceeded Threshold, Reset
+	if _dbl_click_timer > 0:
+		if _dbl_click_timer < .2:
+			_dbl_click_timer += delta;
+		else:
+			_dbl_click_timer = 0;
+			
+		return;
+	
+	# Mouse Click Movement
+	
 	if Input.is_action_pressed("Left-Click"):
+		
 		var direction:Vector2 = self.global_position.direction_to(get_global_mouse_position());
 		
 		if abs(direction.y) > abs(direction.x):
@@ -65,27 +94,10 @@ func _process(delta: float) -> void:
 				_Move(Vector2.RIGHT);
 			else:
 				_Move(Vector2.LEFT);
-		
-		#if direction.y < 0:
-			#if abs(direction.y) > abs(direction.x):
-				#_Move(Vector2.UP);
-			#else:
-				#if direction.x > 0:
-					#_Move(Vector2.RIGHT);
-				#else:
-					#_Move(Vector2.LEFT);
-		#elif direction.y > 0:
-			#if abs(direction.y) > abs(direction.x):
-				#_Move(Vector2.DOWN);
-			#else:
-				#if direction.x > 0:
-					#_Move(Vector2.RIGHT);
-				#else:
-					#_Move(Vector2.LEFT);
 	
 	if !_moving:
 		return;
-	
+		
 	#var xMoveVal:float = Input.get_axis("Left", "Right");
 	#var yMoveVal:float = Input.get_axis("Up", "Down");
 	#
