@@ -15,6 +15,20 @@ signal Replace_Terrain(idx:int, type:Map_Data.Terrain, spr:Sprite2D);
 var _debug:bool;
 
 
+func _process(_delta: float) -> void:
+	if Input.is_action_just_pressed("Cancel"):
+		$"../Main/Curtain".Obscure();
+		$"../Main/Curtain".Fade_Complete.connect(_Quit);
+		
+
+
+# Functions: Signals ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+func _Quit() -> void:
+	get_tree().quit();
+
+
 # Player ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
