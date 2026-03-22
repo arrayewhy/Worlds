@@ -1,9 +1,10 @@
-[gd_scene load_steps=29 format=3 uid="uid://86tq3blbo8rs"]
+[gd_scene load_steps=33 format=3 uid="uid://86tq3blbo8rs"]
 
 [ext_resource type="Script" uid="uid://bl2cub7bc84g5" path="res://Scripts/initialiser.gd" id="1_50glp"]
 [ext_resource type="Script" uid="uid://bu55c8rfhtrsl" path="res://Scripts/camera.gd" id="2_vy5pj"]
 [ext_resource type="Texture2D" uid="uid://dxgm185uuhekd" path="res://Misc/icons/asterisk_icon_yellow.png" id="3_4kpch"]
 [ext_resource type="Script" uid="uid://bb51tcti0v1ae" path="res://Scripts/message.gd" id="3_bmxlf"]
+[ext_resource type="Script" uid="uid://bag8u0bo1iuks" path="res://Scripts/curtain.gd" id="4_1p5hy"]
 [ext_resource type="Texture2D" uid="uid://da0t66iwxuyxq" path="res://Sprites/textbox_yellow.png" id="4_4kpch"]
 [ext_resource type="FontFile" uid="uid://bn56m5j1acs0j" path="res://Misc/Fonts/Georgia.ttf" id="5_grg3l"]
 [ext_resource type="Texture2D" uid="uid://c7mfwjyhhq810" path="res://Sprites/textbox.png" id="5_vy5pj"]
@@ -13,6 +14,8 @@
 [ext_resource type="Script" uid="uid://vp1q6c1vpebf" path="res://Scripts/mouse.gd" id="8_h1m7h"]
 [ext_resource type="Script" uid="uid://bqb4aevrhrx27" path="res://Scripts/inventory.gd" id="12_frkhe"]
 [ext_resource type="Texture2D" uid="uid://5hbjqblbd0ft" path="res://Sprites/sparks_in_the_dark.png" id="13_frkhe"]
+[ext_resource type="Texture2D" uid="uid://cmkst4o71b1e6" path="res://Sprites/terrain_sprites.png" id="15_h1m7h"]
+[ext_resource type="Texture2D" uid="uid://ck8qoiiu78eh6" path="res://Sprites/Glyphs.png" id="16_erwvk"]
 
 [sub_resource type="GDScript" id="GDScript_wxdwa"]
 script/source = "extends CanvasLayer
@@ -57,28 +60,6 @@ color_ramp = SubResource("Gradient_k6548")
 invert = true
 seamless_blend_skirt = 1.0
 
-[sub_resource type="GDScript" id="GDScript_ho7ea"]
-resource_name = "curtain"
-script/source = "extends CanvasLayer
-
-@onready var colRect:ColorRect = $Control/ColorRect;
-
-
-func _init() -> void:
-	self.show();
-
-
-func _ready() -> void:
-	var curtainTween:Tween = create_tween();
-	curtainTween.set_trans(Tween.TRANS_SINE);
-	curtainTween.set_ease(Tween.EASE_IN_OUT);
-	curtainTween.tween_property(colRect, \"modulate:a\", 0, 4);
-	
-	await curtainTween.finished;
-	
-	self.hide();
-"
-
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_svxh6"]
 content_margin_left = 2.0
 content_margin_right = 2.0
@@ -98,8 +79,8 @@ frequency = 0.04
 fractal_weighted_strength = 0.1
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ue23j"]
-width = 128
-height = 128
+width = 64
+height = 64
 generate_mipmaps = false
 noise = SubResource("FastNoiseLite_g2m6q")
 invert = true
@@ -298,6 +279,53 @@ func _On_Initial_MapGen_Complete() -> void:
 	
 "
 
+[sub_resource type="GDScript" id="GDScript_h1m7h"]
+resource_name = "cancel"
+script/source = "extends Sprite2D
+
+var _mouseover:bool;
+
+var _hover_tween:Tween;
+
+
+func _ready() -> void:
+	$Area2D.mouse_entered.connect(_Mouse_On);
+	$Area2D.mouse_exited.connect(_Mouse_Off);
+
+
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed(\"Left-Click\") && _mouseover:
+		$\"../../Curtain\".Obscure();
+		await $\"../../Curtain\".Fade_Complete;
+		get_tree().quit();
+
+
+func _Mouse_On() -> void:
+	_mouseover = true;
+	
+	if _hover_tween != null && _hover_tween.is_running():
+		_hover_tween.kill();
+		
+	_hover_tween = create_tween();
+	_hover_tween.set_trans(Tween.TRANS_CUBIC);
+	_hover_tween.set_ease(Tween.EASE_IN_OUT);
+	_hover_tween.tween_property(self, \"rotation_degrees\", 90, .5);
+
+func _Mouse_Off() -> void:
+	_mouseover = false;
+	
+	if _hover_tween != null && _hover_tween.is_running():
+		_hover_tween.kill();
+	
+	_hover_tween = create_tween();
+	_hover_tween.set_trans(Tween.TRANS_CUBIC);
+	_hover_tween.set_ease(Tween.EASE_IN_OUT);
+	_hover_tween.tween_property(self, \"rotation_degrees\", 0, .5);
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_erwvk"]
+size = Vector2(256, 256)
+
 [node name="Main" type="Node2D"]
 
 [node name="initialiser" type="Node" parent="." node_paths=PackedStringArray("_mapGen", "_cont_showOnZoom", "_cam", "_message")]
@@ -319,8 +347,6 @@ offset_left = -8.0
 offset_top = -8.0
 offset_right = 2040.0
 offset_bottom = 2040.0
-grow_horizontal = 2
-grow_vertical = 2
 mouse_filter = 2
 
 [node name="TextureRect" type="TextureRect" parent="Clouds/Control"]
@@ -347,7 +373,7 @@ texture = ExtResource("3_4kpch")
 
 [node name="Curtain" type="CanvasLayer" parent="."]
 visible = false
-script = SubResource("GDScript_ho7ea")
+script = ExtResource("4_1p5hy")
 
 [node name="Control" type="Control" parent="Curtain"]
 layout_mode = 3
@@ -356,6 +382,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
 [node name="ColorRect" type="ColorRect" parent="Curtain/Control"]
 layout_mode = 1
@@ -503,6 +530,7 @@ offset_left = -8.0
 offset_top = -8.0
 offset_right = 1016.0
 offset_bottom = 1016.0
+mouse_filter = 2
 
 [node name="ColorRect" type="ColorRect" parent="Background/Control"]
 layout_mode = 1
@@ -530,3 +558,25 @@ texture_repeat = 2
 texture = ExtResource("13_frkhe")
 region_enabled = true
 region_rect = Rect2(2560, 0, 256, 256)
+
+[node name="UI" type="CanvasLayer" parent="."]
+layer = 2
+visible = false
+
+[node name="Cancel_Button" type="Sprite2D" parent="UI"]
+position = Vector2(64, 64)
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("15_h1m7h")
+region_enabled = true
+region_rect = Rect2(1280, 0, 256, 256)
+script = SubResource("GDScript_h1m7h")
+
+[node name="Area2D" type="Area2D" parent="UI/Cancel_Button"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="UI/Cancel_Button/Area2D"]
+shape = SubResource("RectangleShape2D_erwvk")
+
+[node name="Sprite2D" type="Sprite2D" parent="UI/Cancel_Button"]
+texture = ExtResource("16_erwvk")
+region_enabled = true
+region_rect = Rect2(3328, 1024, 256, 256)

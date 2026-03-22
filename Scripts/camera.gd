@@ -44,6 +44,12 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	
+	if Input.is_action_just_pressed("Right-Click") && _zoomed:
+		_Zoom_Out();
+	elif Input.is_action_just_pressed("Right-Click") && !_zoomed:
+		_Position_Player(get_global_mouse_position());
+		_Zoom_In();
+	
 	if !_zoomed:
 		
 		var glob_mouse_pos:Vector2 = get_global_mouse_position();
@@ -100,15 +106,11 @@ func _process(delta: float) -> void:
 		_targPos.x += delta * _currSpeed;
 	
 	if !_zoomed || !_targObj:
-
 		_move_dest = self.position + (_targPos - self.position) * delta * (_currSpeed / 64);
 		self.position = _move_dest;
-	
 	else:
-		
 		_move_dest = self.position + (_targObj.position - self.position) * delta * (_currSpeed / 128);
 		self.position = _move_dest;
-
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	
@@ -152,6 +154,8 @@ func _Zoom_Out() -> void:
 	
 	_Show_Zoomed_OUT_Sprites();
 	
+	# Zoom Camera Out
+	
 	if _zoom_tween && _zoom_tween.is_running():
 		_zoom_tween.stop();
 	
@@ -179,6 +183,8 @@ func _Zoom_In() -> void:
 	Zoom.emit(_zoomed, _targPos);
 	
 	_Show_Zoomed_IN_Sprites();
+	
+	# Zoom Camera In
 	
 	if _zoom_tween && _zoom_tween.is_running():
 		_zoom_tween.stop();
