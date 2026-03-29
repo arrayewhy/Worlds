@@ -93,20 +93,22 @@ func Coord_OnGrid(v2:Vector2) -> Vector2:
 
 
 func Convert_Index_To_Coord(idx:int) -> Vector2:
-	return Vector2(idx % int(_mapWidth), idx / _mapWidth) * CellSize;
+	return Vector2(idx % _mapWidth, idx / _mapWidth) * CellSize;
 
 
 func Convert_Coord_To_Index(coord:Vector2) -> int:
+	#var float_idx:float = (_mapWidth * coord.y + coord.x) / CellSize;
+	#return int(float_idx);
 	return (_mapWidth * coord.y + coord.x) / CellSize;
 
 
-func V2_Array_Around(pos:Vector2, range:int, skipCenter:bool = false) -> Array[Vector2]:
+func V2_Array_Around(pos:Vector2, radius:int, skipCenter:bool = false) -> Array[Vector2]:
 	
 	var p:Array[Vector2] = [];
 	
-	var length:float = range * 2 + 1;
+	var length:float = radius * 2 + 1;
 	
-	var start:Vector2 = pos + (-Vector2.ONE * range * CellSize);
+	var start:Vector2 = pos + (-Vector2.ONE * radius * CellSize);
 	#REFACTOR
 	for y in length:
 		
@@ -121,7 +123,7 @@ func V2_Array_Around(pos:Vector2, range:int, skipCenter:bool = false) -> Array[V
 	
 	if skipCenter && p.has(pos):
 		p.erase(pos);
-		#p.remove_at(length * range + range);
+		#p.remove_at(length * radius + radius);
 	
 	return p;
 
@@ -157,7 +159,7 @@ func Create_Sprite(regPosX:float, regPosY:float, cells_y:int = 1, tex:Texture2D 
 	spr.region_rect.size = Vector2(World.Spr_Reg_Size, World.Spr_Reg_Size * cells_y);
 	
 	if cells_y > 1:
-		var displace_units:float = cells_y / 2;
+		var displace_units:float = float(cells_y) / 2;
 		spr.offset.y -= World.CellSize * 8 * displace_units;
 	
 	return spr;
