@@ -268,9 +268,9 @@ func Reset_CamSpeed(callerPath:String) -> void:
 	_speed_tween.tween_property(self, "_currSpeed", _normSpeed, 1);
 
 
-func _Player_Request_Zoom_Out() -> void:
-	if _zoom_tween != null && !_zoom_tween.is_running():
-		_Zoom_Out();
+#func _Player_Request_Zoom_Out() -> void:
+	#if _zoom_tween != null && !_zoom_tween.is_running():
+		#_Zoom_Out();
 
 
 # Functions: Signals ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -278,7 +278,7 @@ func _Player_Request_Zoom_Out() -> void:
 
 func _SIGNAL_Player_Created(player:AnimatedSprite2D) -> void:
 	
-	player.Player_Request_Zoom_Out.connect(_Player_Request_Zoom_Out);
+	#player.Player_Request_Zoom_Out.connect(_Player_Request_Zoom_Out);
 	
 	_targObj = player;
 	
