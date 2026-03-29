@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://86tq3blbo8rs"]
+[gd_scene load_steps=29 format=3 uid="uid://86tq3blbo8rs"]
 
 [ext_resource type="Script" uid="uid://bl2cub7bc84g5" path="res://Scripts/initialiser.gd" id="1_50glp"]
 [ext_resource type="Script" uid="uid://bu55c8rfhtrsl" path="res://Scripts/camera.gd" id="2_vy5pj"]
@@ -12,6 +12,7 @@
 [ext_resource type="Script" uid="uid://cal2wnxopwt2h" path="res://Scripts/terrain_grouper.gd" id="7_1p5hy"]
 [ext_resource type="Script" uid="uid://cfouw4aofu4hw" path="res://Scripts/message_button.gd" id="7_4kpch"]
 [ext_resource type="Script" uid="uid://vp1q6c1vpebf" path="res://Scripts/mouse.gd" id="8_h1m7h"]
+[ext_resource type="Script" uid="uid://bxhjku86cp5qu" path="res://Scripts/sprite_handler.gd" id="12_2w5on"]
 [ext_resource type="Script" uid="uid://bqb4aevrhrx27" path="res://Scripts/inventory.gd" id="12_frkhe"]
 [ext_resource type="Texture2D" uid="uid://5hbjqblbd0ft" path="res://Sprites/sparks_in_the_dark.png" id="13_frkhe"]
 [ext_resource type="Texture2D" uid="uid://cmkst4o71b1e6" path="res://Sprites/terrain_sprites.png" id="15_h1m7h"]
@@ -85,199 +86,6 @@ generate_mipmaps = false
 noise = SubResource("FastNoiseLite_g2m6q")
 invert = true
 seamless_blend_skirt = 1.0
-
-[sub_resource type="GDScript" id="GDScript_4kpch"]
-resource_name = "map_exporter"
-script/source = "extends Node
-
-@onready var _map_gen:Node2D = get_parent();
-
-@export var _save_image:bool;
-@export var _image_name:String;
-
-
-func _process(delta: float) -> void:
-	
-	if _save_image:
-		
-		if _image_name == \"\":
-			printerr(\"map_exporter: Export Image Name NOT set.\");
-			_save_image = false;
-			return;
-		
-		var terrain_data:Array[Map_Data.Terrain] = _map_gen.Get_Terrain_Data(self.get_path());
-		
-		var map_diameter:float = sqrt(terrain_data.size());
-		
-		var img:Image = Image.create(map_diameter, map_diameter, false, Image.FORMAT_RGB8);
-		
-		var currIdx:int = 0;
-		
-		for y in map_diameter:
-			for x in map_diameter:
-				
-				var col:Color;
-				
-				match terrain_data[currIdx]:
-					
-					Map_Data.Terrain.Null:
-						col = Color.MAGENTA;
-	
-					#DEBUG
-					Map_Data.Terrain.HOLE:
-						col = Color.BROWN;
-					
-					# Land
-					Map_Data.Terrain.MOUNTAIN:
-						col = Color.GRAY;
-					Map_Data.Terrain.MOUNTAIN_PATH:
-						col = Color.LIGHT_GRAY;
-					Map_Data.Terrain.FOREST:
-						col = Color.FOREST_GREEN;
-					Map_Data.Terrain.GROUND:
-						col = Color.GREEN;
-					Map_Data.Terrain.SHORE:
-						col = Color.SANDY_BROWN;
-					# Water
-					Map_Data.Terrain.SHALLOW:
-						col = Color.SKY_BLUE;
-					Map_Data.Terrain.SEA:
-						col = Color.DEEP_SKY_BLUE;
-					Map_Data.Terrain.OCEAN:
-						col = Color.DODGER_BLUE;
-					Map_Data.Terrain.DEPTHS:
-						col = Color.DARK_SLATE_BLUE;
-					Map_Data.Terrain.ABYSS:
-						col = Color.DARK_BLUE;
-					
-					# Special: Land
-					Map_Data.Terrain.TEMPLE_BROWN:
-						col = Color.INDIAN_RED;
-					Map_Data.Terrain.DOCK:
-						col = Color.SADDLE_BROWN;
-					# Special: Water
-					#SEA_GREEN,
-					Map_Data.Terrain.WATER_COAST:
-						col = Color.FUCHSIA;
-				
-				img.set_pixel(x, y, col);
-				
-				currIdx += 1;
-		
-		img.save_png(\"res://Exports/\" + _image_name + \".png\");
-		
-		print(\"map_exporter: Image Exported => \" + _image_name);
-		_image_name = \"\";
-		_save_image = false;
-"
-
-[sub_resource type="GDScript" id="GDScript_c1oqp"]
-resource_name = "lighting"
-script/source = "@icon(\"res://Misc/icons/asterisk_icon_yellow.png\")
-extends Node2D
-"
-
-[sub_resource type="Gradient" id="Gradient_lnlyj"]
-interpolation_mode = 2
-offsets = PackedFloat32Array(0.0502092, 1)
-colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_snou4"]
-gradient = SubResource("Gradient_lnlyj")
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(0.85, 0.15)
-
-[sub_resource type="GDScript" id="GDScript_cl1kf"]
-resource_name = "sun"
-script/source = "extends PointLight2D
-
-const _dayDur:float = 60;
-const _nightDur:float = 30;
-
-var _worldCenter:Vector2;
-
-var _rising:bool = true;
-
-var _posTween:Tween;
-var _energyTween:Tween;
-
-
-func _ready() -> void:
-	# Wait for Initial Map Generation
-	#World.Initial_MapGen_Complete.connect(_On_Initial_MapGen_Complete);
-	pass;
-
-
-func _unhandled_key_input(event: InputEvent) -> void:
-	if event.is_action_pressed(\"Zero\"):
-		if _posTween != null:
-			_posTween.stop();
-			_energyTween.stop();
-		if _rising:
-			#self.position.x = _worldCenter.x;
-			_Set(_nightDur);
-		else:
-			_Rise(_dayDur);
-
-
-func _Rise(duration:float) -> void:
-	
-	#self.position.x = _worldCenter.x + World.MapWidth() / 2;
-	
-	#_posTween = create_tween();
-	#_posTween.set_trans(Tween.TRANS_CUBIC);
-	#_posTween.set_ease(Tween.EASE_OUT);
-	#_posTween.tween_property(self, \"position:x\", _worldCenter.x, duration);
-	
-	_rising = !_rising;
-	var sun_energy:float = _rising;
-	
-	_energyTween = create_tween();
-	_energyTween.set_trans(Tween.TRANS_CUBIC);
-	_energyTween.set_ease(Tween.EASE_OUT);
-	_energyTween.tween_property(self, \"energy\", sun_energy, duration);
-	
-	await _energyTween.finished;
-	
-	_Set(_nightDur);
-
-
-func _Set(duration:float) -> void:
-	
-	#var endX:float = _worldCenter.x - World.MapWidth() / 2;
-	#
-	#_posTween = create_tween();
-	#_posTween.set_trans(Tween.TRANS_CUBIC);
-	#_posTween.set_ease(Tween.EASE_IN);
-	#_posTween.tween_property(self, \"position:x\", endX, duration);
-	
-	_rising = !_rising;
-	var sun_energy:float = _rising;
-	sun_energy += 0.05;
-	
-	_energyTween = create_tween();
-	_energyTween.set_trans(Tween.TRANS_CUBIC);
-	_energyTween.set_ease(Tween.EASE_OUT);
-	_energyTween.tween_property(self, \"energy\", sun_energy, duration);
-	
-	await _energyTween.finished;
-	
-	await get_tree().create_timer(_nightDur).timeout;
-	
-	_Rise(_dayDur);
-
-
-# Functions: Signals ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-
-
-func _On_Initial_MapGen_Complete() -> void:
-	_worldCenter = Vector2.ONE * (World.MapWidth() / 2) * World.CellSize;
-	self.position = _worldCenter;
-	await get_tree().create_timer(60).timeout;
-	_Set(_nightDur);
-	
-"
 
 [sub_resource type="GDScript" id="GDScript_h1m7h"]
 resource_name = "cancel"
@@ -495,32 +303,20 @@ stretch_mode = 5
 [node name="terrain_grouper" type="Node" parent="map_generator"]
 script = ExtResource("7_1p5hy")
 
-[node name="map_exporter" type="Node" parent="map_generator"]
-script = SubResource("GDScript_4kpch")
+[node name="secrets" type="Node2D" parent="map_generator"]
+z_index = 2
 
-[node name="lighting" type="Node2D" parent="."]
-visible = false
-script = SubResource("GDScript_c1oqp")
+[node name="sprite_handler" type="Node2D" parent="map_generator"]
+script = ExtResource("12_2w5on")
 
-[node name="Sun" type="PointLight2D" parent="lighting"]
-position = Vector2(1024, 1024)
-scale = Vector2(64, 64)
-color = Color(1, 0.983333, 0.9, 1)
-energy = 0.9
-texture = SubResource("GradientTexture2D_snou4")
-script = SubResource("GDScript_cl1kf")
-
-[node name="CanvasModulate" type="CanvasModulate" parent="lighting"]
-color = Color(0.03, 0.0918333, 0.1, 1)
-
-[node name="mouse" type="Node2D" parent="." node_paths=PackedStringArray("_mapGen")]
+[node name="mouse" type="Node2D" parent="."]
 z_index = 10
 script = ExtResource("8_h1m7h")
-_mapGen = NodePath("../map_generator")
 metadata/_edit_lock_ = true
 
 [node name="Background" type="CanvasLayer" parent="."]
 layer = -1
+visible = false
 follow_viewport_enabled = true
 
 [node name="Control" type="Control" parent="Background"]
@@ -541,10 +337,9 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.929412, 0.909804, 0.705882, 1)
 
-[node name="inventory" type="CanvasLayer" parent="." node_paths=PackedStringArray("_mouse")]
+[node name="inventory" type="CanvasLayer" parent="."]
 follow_viewport_enabled = true
 script = ExtResource("12_frkhe")
-_mouse = NodePath("../mouse")
 _debug = true
 
 [node name="slot_holder" type="Node2D" parent="inventory"]

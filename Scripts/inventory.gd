@@ -1,8 +1,6 @@
 extends CanvasLayer
 
-@export var _mouse:Node2D;
-
-var _size:int = 1;
+@onready var _mouse:Node2D = $"../mouse";
 
 var _open:bool;
 

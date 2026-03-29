@@ -1,27 +1,19 @@
-[gd_scene load_steps=11 format=3 uid="uid://bv8jsonjit21y"]
+[gd_scene load_steps=7 format=3 uid="uid://bv8jsonjit21y"]
 
 [ext_resource type="Texture2D" uid="uid://5hbjqblbd0ft" path="res://Sprites/sparks_in_the_dark.png" id="1_5wxv7"]
 [ext_resource type="Script" uid="uid://cvm1insy3g2kp" path="res://Scripts/player.gd" id="2_y5hcb"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_5wxv7"]
 atlas = ExtResource("1_5wxv7")
-region = Rect2(0, 1536, 256, 256)
+region = Rect2(0, 768, 256, 256)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_y5hcb"]
 atlas = ExtResource("1_5wxv7")
-region = Rect2(768, 1024, 256, 256)
+region = Rect2(256, 768, 256, 256)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_2nftw"]
 atlas = ExtResource("1_5wxv7")
-region = Rect2(512, 1024, 256, 256)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_knrd4"]
-atlas = ExtResource("1_5wxv7")
-region = Rect2(768, 1024, 256, 256)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_hck1p"]
-atlas = ExtResource("1_5wxv7")
-region = Rect2(1024, 1024, 256, 256)
+region = Rect2(512, 768, 256, 256)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_juxdh"]
 animations = [{
@@ -39,28 +31,11 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_2nftw")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_knrd4")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_hck1p")
 }],
 "loop": true,
 "name": &"Walk_Right",
-"speed": 3.0
+"speed": 2.0
 }]
-
-[sub_resource type="Gradient" id="Gradient_lnlyj"]
-interpolation_mode = 2
-offsets = PackedFloat32Array(0.0502092, 1)
-colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_c1oqp"]
-gradient = SubResource("Gradient_lnlyj")
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(0.85, 0.15)
 
 [node name="Player" type="AnimatedSprite2D"]
 scale = Vector2(0.047, 0.047)
@@ -68,11 +43,3 @@ sprite_frames = SubResource("SpriteFrames_juxdh")
 animation = &"Walk_Right"
 autoplay = "Idle"
 script = ExtResource("2_y5hcb")
-
-[node name="torch" type="PointLight2D" parent="."]
-visible = false
-position = Vector2(0, -64)
-scale = Vector2(32, 32)
-color = Color(0.929412, 0.909804, 0.705882, 1)
-energy = 0.9
-texture = SubResource("GradientTexture2D_c1oqp")

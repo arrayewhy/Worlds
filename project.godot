@@ -22,6 +22,7 @@ InGameDebugger="*res://Scripts/Debug/InGameDebugger.gd"
 TimeMaster="*res://Scripts/Autoloads/TimeMaster.gd"
 SoundMaster="*res://Scripts/Autoloads/Sound-Master.gd"
 MusicMaster="*res://Scripts/Autoloads/MusicMaster.gd"
+Fader="*res://Scripts/Autoloads/Global_Fader.gd"
 
 [display]
 
