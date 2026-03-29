@@ -7,8 +7,6 @@ const _terrain_sprites:Texture2D = preload("res://Sprites/terrain_sprites.png");
 const _fadeInOut:Shader = preload("res://Shaders/fadeInOut.gdshader");
 const _wiggle:Shader = preload("res://Shaders/wiggle.gdshader");
 
-#const _lighthouseLamp:PackedScene = preload("res://Prefabs/lighthouse_lamp.tscn");
-
 # Thresholds
 @export var _mountain:float = 245 - 20;
 @export var _forest:float = 220 - 20;
@@ -24,6 +22,7 @@ const _valueThresh:float = 1.0 / _waterDepth;
 
 var _terrain_data:Array[Map_Data.Terrain];
 var _marking_data:Array[Map_Data.Marking];
+var _secret_data:Array[Map_Data.Secrets];
 var _buried_data:Array[int];
 
 var _array_islands:Array[Array];
@@ -33,6 +32,7 @@ var _array_mountainRanges:Array[Array];
 var _sprite_array_Terrain:Array[Sprite2D];
 var _sprite_array_Marking:Array[Sprite2D]; # Markings / NULL
 var _sprite_array_Detail:Array[Sprite2D]; # Details / NULL
+var _sprite_array_Secrets:Array[Sprite2D]; # Secrets / NULL
 
 # Noise Data
 @export var _noiseTex:TextureRect;
@@ -43,6 +43,7 @@ var _sprite_array_Detail:Array[Sprite2D]; # Details / NULL
 @onready var _cont_hideOnZoom:Node2D = $hide_on_zoom;
 @onready var _cont_alwaysShow:Node2D = $always_show;
 @onready var _cont_treasures:CanvasLayer = $treasures;
+@onready var _cont_secrets:Node2D = $secrets;
 #@onready var _cont_showOnProximity:Node2D = $show_on_proximity;
 
 @onready var _terrain_grouper:Node = $terrain_grouper;
@@ -144,6 +145,7 @@ func _Generate_Map(newSeed:int) -> void:
 	# Amend Map Data
 	_terrain_data = Map_Data.Amend_TerrainData_Using_MarkingData(_terrain_data, _marking_data);
 	#_marking_data = Map_Data.Amend_MarkingData_Houses(_marking_data);
+	_secret_data = Map_Data.Derive_SecretData_From_MarkingData(_marking_data);
 	
 	# Add Docks
 	#_terrain_data = Map_Data.Amend_TerrainData_Docks(_terrain_data);
@@ -172,63 +174,25 @@ func _Generate_Map(newSeed:int) -> void:
 			if _terrain_data[idx] == Map_Data.Terrain.SHORE:
 				_marking_data[idx] = Map_Data.Marking.LIGHTHOUSE;
 				break;
-	# END
-	
-	#for island in _array_islands:
-		#if island.size() > 100:
-			#for idx in island:
-				#_terrain_data[idx] = Map_Data.Terrain.Null;
-	
-	#for island in _islands:
-		#for idx in island:
-			#_terrain_data[idx] = Map_Data.Terrain.HOLE;
-	
-	#var second_largest:Array[int];
-	#
-	#var top:int = 0;
-	#var sub:int = 0;
-	#
-	#for island in _islands:
-		#
-		#if top == 0:
-			#top = island.size();
-			#
-		#elif island.size() > top:
-			#
-			#sub = top;
-			#second_largest = island;
-			#top = island.size();
-			#
-		#elif island.size() > sub:
-			#
-			#sub = island.size();
-			#second_largest = island;
-#
-	#for idx in second_largest:
-		#match _terrain_data[idx]:
-			#Map_Data.Terrain.MOUNTAIN:
-				#_terrain_data[idx] = Map_Data.Terrain.COAST;
-			#Map_Data.Terrain.HIGHLAND:
-				#_terrain_data[idx] = Map_Data.Terrain.WATER_COAST;
-			#Map_Data.Terrain.GROUND:
-				#_terrain_data[idx] = Map_Data.Terrain.SEA;
-			#Map_Data.Terrain.COAST:
-				#_terrain_data[idx] = Map_Data.Terrain.SEA;
-			#Map_Data.Terrain.SHALLOWS:
-				#_terrain_data[idx] = Map_Data.Terrain.DEPTHS;
 	
 	# Create Sprite2Ds
 	_sprite_array_Terrain = _TerrainSprites_From_TerrainData(_terrain_data);
-	_sprite_array_Marking = _MarkingSprites_From_MarkingData(_marking_data);
+	
+	_sprite_array_Marking = $sprite_handler._MarkingSprites_From_MarkingData(
+		_marking_data, \
+		_cont_showOnZoom, \
+		_cont_hideOnZoom, \
+		_cont_alwaysShow, \
+		_cont_treasures, \
+		_debug
+		);
+		
 	_sprite_array_Detail = _DetailSprites_From_MarkingData(_marking_data);
+	_sprite_array_Secrets = _SecretSprites_From_SecretData(_secret_data);
+	
 	
 	# Buried Treasure
 	_Create_Buried_Treasure();
-	
-	#for m_range in _array_mountainRanges:
-		#var col:Color = Color(randf_range(.25, 1), randf_range(.25, 1), randf_range(.25, 1));
-		#for idx in m_range:
-			#_sprite_array_Terrain[idx].modulate = col;
 	
 	Map_Generated.emit();
 
@@ -313,186 +277,7 @@ func _TerrainSprites_From_TerrainData(terrainData:Array[Map_Data.Terrain]) -> Ar
 	return s_array;
 
 
-func _MarkingSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Array[Sprite2D]:
-	
-	var s_array:Array[Sprite2D];
-	
-	var currX:int = 0;
-	var currY:int = 0;
-	
-	for m_idx in markingData.size():
-		
-		var spr:Sprite2D = null;
-		
-		match markingData[m_idx]:
-		
-			Map_Data.Marking.HOUSE:
-				spr = World.Create_Sprite(2, 6, 1, _glyphs);
-				_cont_showOnZoom.add_child(spr);
-				spr.scale *= 0.75;
-				#s_array.append(null);
-				
-			#Map_Data.Marking.TENT:
-				#spr = World.Create_Sprite(4, 9, 1, _glyphs);
-				#_cont_showOnZoom.add_child(spr);
-				#spr.modulate = Color.BLACK;
-			
-			Map_Data.Marking.MOUNTAIN_ENTRANCE:
-				s_array.append(null);
-			
-			Map_Data.Marking.PEAK:
-				spr = World.Create_Sprite(9, 1, 1, _glyphs);
-				_cont_hideOnZoom.add_child(spr);
-				spr.scale *= randf_range(1, 1.5);
-				spr.modulate = Color.BLACK;
-			
-			Map_Data.Marking.MINI_MOUNT:
-				spr = World.Create_Sprite(9, 1, 1, _glyphs);
-				_cont_showOnZoom.add_child(spr);
-				spr.modulate = Color.BLACK;
-				spr.scale *= randf_range(1, 1.75);
-				spr.scale /= 2;
-				
-			Map_Data.Marking.HILL:
-				spr = World.Create_Sprite(5, 7);
-				_cont_showOnZoom.add_child(spr);
-				spr.modulate = Color.BLACK;
-				#spr.scale /= 1.5;
-				#s_array.append(null);
-				
-			Map_Data.Marking.TREE:
-				spr = World.Create_Sprite(7, 6);
-				_cont_showOnZoom.add_child(spr);
-				#spr.scale.x *= randf_range(.9, 1.125);
-				spr.scale.y *= randf_range(.9, 1.125);
-				spr.rotation += randf_range(-.125, .125);
-			
-			#Map_Data.Marking.TREE_HOUSE:
-				## Same as TREE
-				#spr = World.Create_Sprite(7, 6);
-				#_cont_showOnZoom.add_child(spr);
-				##spr.scale.x *= randf_range(.9, 1.125);
-				#spr.scale.y *= randf_range(.9, 1.125);
-				#spr.rotation += randf_range(-.125, .125);
-				
-			Map_Data.Marking.LIGHTHOUSE:
-				#s_array.append(null);
-				spr = World.Create_Sprite(0, 11, 1, _glyphs);
-				_cont_hideOnZoom.add_child(spr);
-				spr.modulate = Color.BLACK;
-				# Lamp
-				#var lamp:PointLight2D = _lighthouseLamp.instantiate();
-				#lamp.position = spr.position;
-				#spr.add_child(lamp);
-				#isLighthouse = true;
-				
-			Map_Data.Marking.SHELL:
-				spr = World.Create_Sprite(6, 9, 1, _glyphs);
-				_cont_showOnZoom.add_child(spr);
-				spr.modulate = Color.BLACK;
-				spr.scale = spr.scale / 4 * 3;
-			
-			Map_Data.Marking.MESSAGE_BOTTLE:
-				spr = World.Create_Sprite(14, 8, 1, _glyphs);
-				_cont_alwaysShow.add_child(spr)
-				#_cont_treasures.add_child(spr);
-				spr.add_child(Drift.new());
-				#spr.texture = _glyphs;
-				#spr.region_enabled = true;
-				#spr.region_rect.size = Vector2(World.Spr_Reg_Size, World.Spr_Reg_Size);
-				#spr.region_rect.position = Vector2(14, 8) * World.Spr_Reg_Size;
-				#spr.scale /= World.CellSize;
-				#spr.modulate = Color.BLACK;
-				spr.rotation_degrees = randf_range(15, 45);
-				#spr.scale = spr.scale / 4 * 3;
-				
-			Map_Data.Marking.SMALL_FISH:
-				spr = World.Create_Sprite(0, 7);
-				_cont_showOnZoom.add_child(spr);
-				spr.material = ShaderMaterial.new();
-				spr.material.shader = _wiggle;
-				spr.material.set_shader_parameter("amplitude", randf_range(1.0, 10.0));
-				spr.material.set_shader_parameter("prog", randf_range(0.0, 10.0));
-				
-			Map_Data.Marking.BIG_FISH:
-				spr = World.Create_Sprite(1, 7);
-				_cont_showOnZoom.add_child(spr);
-				spr.material = ShaderMaterial.new();
-				spr.material.shader = _wiggle;
-				spr.material.set_shader_parameter("amplitude", randf_range(1.0, 5.0));
-				spr.material.set_shader_parameter("prog", randf_range(0.0, 10.0));
-				
-			Map_Data.Marking.JETTY:
-				spr = World.Create_Sprite(13, 12, 1, _glyphs);
-				_cont_showOnZoom.add_child(spr);
-				
-			Map_Data.Marking.TREASURE:
-				spr = World.Create_Sprite(9, 8);
-				_cont_treasures.add_child(spr);
-				#spr.modulate = Color.BLACK;
-				spr.material = ShaderMaterial.new();
-				spr.material.shader = _fadeInOut;
-				
-			#Map_Data.Marking.WHALE:
-				#spr = World.Create_Sprite(2, 5, 1, _glyphs);
-				#_cont_showOnZoom.add_child(spr);
-			
-			#Map_Data.Marking.HOT_AIR_BALLOON:
-				#spr = World.Create_Sprite(10, 5);
-				#_cont_treasures.add_child(spr);
-			
-			#Map_Data.Marking.SEAGRASS:
-				#spr = World.Create_Sprite(0, 5);
-				#_cont_showOnZoom.add_child(spr);
-				#spr.rotation_degrees = 90;
-				#spr.modulate.a = randf_range(.125, .25);
-			
-			Map_Data.Marking.TEMPLE:
-				spr = World.Create_Sprite(13, 11, 1, _glyphs);
-				#spr = World.Create_Sprite(10, 0);
-				_cont_showOnZoom.add_child(spr);
-				#spr.modulate = Color.ORANGE;
-			
-			Map_Data.Marking.GOLD:
-				s_array.append(null);
-			
-			Map_Data.Marking.HOBBIT_HOUSE:
-				spr = World.Create_Sprite(5, 7);
-				_cont_hideOnZoom.add_child(spr);
-				spr.modulate = Color.BLACK;
-			
-			Map_Data.Marking.BOAT:
-				spr = World.Create_Sprite(randi_range(8, 10), 7);
-				_cont_alwaysShow.add_child(spr);
-				spr.modulate = Color(.25, .5, .5, 1);
-				#spr.modulate = Color.BLACK;
-				spr.modulate.a = .25;
-			
-			Map_Data.Marking.Null:
-				s_array.append(null);
-			
-			_:
-				print_debug("\nMarking Data contains Invalid Data: ", Map_Data.Marking.find_key(markingData[m_idx]));
-			
-		# Position Marking
-		
-		if spr:
-			
-			spr.position = Vector2(currX * World.CellSize, currY * World.CellSize);
-			# Make Mark Y-Sort Behind Player
-			spr.position.y -= .03125;
-			#marking.position += Vector2.ONE * randf_range(-.4, .4);
-			s_array.append(spr);
-			
-		# Set Next marking Position
-		
-		currX += 1;
-		if currX >= World.MapWidth_In_Units():
-			currX = 0;
-			currY += 1;
-			
-	if _debug: print_debug("_MarkingSprites_From_MarkingData, Markings: ", s_array.size());
-	return s_array;
+
 
 
 func _DetailSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Array[Sprite2D]:
@@ -540,62 +325,24 @@ func _DetailSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Arr
 				spr.position = Vector2(currX * World.CellSize, currY * World.CellSize);
 				spr.scale *= 1.5;
 				#spr.rotation += randf_range(-.125, .125);
+				spr.name = "Peak";
 				
 			Map_Data.Marking.MINI_MOUNT:
 				pass;
 				
 			Map_Data.Marking.HILL:
-				#spr = World.Create_Sprite(5, 7);
-				#_cont_showOnZoom.add_child(spr);
-				#spr.position = Vector2(currX * World.CellSize, currY * World.CellSize);
-				## Randomise Transform
-				##spr.position.y = currY * World.CellSize - randf_range(0, World.CellSize / 2);
-				#spr.scale *= randf_range(1, 1.125);
-				##spr.scale /= 1.5;
-				#spr.rotation += randf_range(-.125, .125);
 				pass;
 				
 			Map_Data.Marking.TREE:
 				pass;
 				
-				#spr = World.Create_Sprite(8, 6);
-				#_cont_showOnZoom.add_child(spr);
-				#
-				#spr.position = Vector2(currX * World.CellSize, currY * World.CellSize);
-				## Randomise Transform
-				#spr.position += Vector2.ONE * randf_range(-.4, .4);
-				#spr.scale += Vector2.ONE * randf_range(-.01, .02);
-				#spr.offset.y -= World.CellSize * 4;
-			
-			#Map_Data.Marking.TREE_HOUSE:
-				## Same as HOUSE
-				#spr = World.Create_Sprite(randi_range(2, 4), 14);
-				#_cont_showOnZoom.add_child(spr);
-				#
-				#spr.position = Vector2(currX * World.CellSize, currY * World.CellSize);
-				## Randomise Transform
-				#spr.position.y = currY * World.CellSize - randf_range(0, World.CellSize * .5);
-				##spr.scale *= randf_range(1, 1.125);
-				#spr.scale *= 0.75;
-				#spr.rotation += randf_range(-.125, .125);
-				#
-				#spr.modulate.a = 0;
-				
 			Map_Data.Marking.LIGHTHOUSE:
-				
-				#spr = World.Create_Sprite(14, 5);
-				#spr.region_rect.size = Vector2(World.Spr_Reg_Size, World.Spr_Reg_Size * 2);
-				#spr.offset.y -= World.Spr_Reg_Size;
 				
 				spr = World.Create_Sprite(7, 12, 2);
 				_cont_showOnZoom.add_child(spr);
 				
 				spr.position = Vector2(currX * World.CellSize, currY * World.CellSize);
 				spr.position.y -= World.CellSize / 2;
-				# Adjust Sprite2D
-				#spr.region_rect.size = Vector2(World.Spr_Reg_Size, World.Spr_Reg_Size * 2);
-				#spr.offset.y -= World.Spr_Reg_Size / 4 * 3;
-				#spr.scale /= 2;
 				
 			Map_Data.Marking.SHELL:
 				pass;
@@ -659,9 +406,40 @@ func _DetailSprites_From_MarkingData(markingData:Array[Map_Data.Marking]) -> Arr
 	return s_array;
 
 
-#func Create_Sprite(regPosX:float, regPosY:float, callerPath:String) -> Sprite2D:
-	#if _debug: print("\nmap_generator.gd - Create_Sprite, called by: ", callerPath);
-	#return World.Create_Sprite(regPosX, regPosY);
+func _SecretSprites_From_SecretData(secretData:Array[Map_Data.Secrets]) -> Array[Sprite2D]:
+	
+	var s_array:Array[Sprite2D];
+	
+	var currX:int = 0;
+	var currY:int = 0;
+	
+	for s_idx in secretData.size():
+		
+		var spr:Sprite2D = null;
+		
+		match secretData[s_idx]:
+			
+			Map_Data.Secrets.DRAGON:
+				spr = World.Create_Sprite(9, 1);
+				_cont_secrets.add_child(spr);
+				spr.position = Vector2(currX * World.CellSize, currY * World.CellSize);
+			
+			_:
+				pass;
+		
+		if spr:
+			spr.modulate.a = 0;
+		
+		s_array.append(spr);
+		
+		# Set Next Detail Position
+		currX += 1;
+		if currX >= World.MapWidth_In_Units():
+			currX = 0;
+			currY += 1;
+		
+	if _debug: print_debug("_SecretSprites_From_SecretData, Secrets: ", s_array.size());
+	return s_array;
 
 
 func _Configure_TerrainSprite_LandAndSea(spr:Sprite2D, terrainType:Map_Data.Terrain) -> void:
@@ -800,15 +578,27 @@ func _Get_All_Cells_Of_TerrainType_On_Island(type:Map_Data.Terrain, island_idxAr
 
 func Get_TerrainSprite(coord:Vector2, callerPath:String) -> Sprite2D:
 	if _debug: print("\nmap_generator.gd - Get_TerrainSprite, called by: ", callerPath);
+	if World.Convert_Coord_To_Index(coord) > _sprite_array_Terrain.size() - 1:
+		return null;
 	return _sprite_array_Terrain[World.Convert_Coord_To_Index(coord)];
 	
-func Get_MarkingSprite(coord:Vector2, callerPath:String) -> Sprite2D:
-	if _debug: print("\nmap_generator.gd - Get_MarkingSprite, called by: ", callerPath);
+func Get_Spr_Marking(coord:Vector2, callerPath:String) -> Sprite2D:
+	if _debug: print("\nmap_generator.gd - Get_Spr_Marking, called by: ", callerPath);
+	if World.Convert_Coord_To_Index(coord) > _sprite_array_Marking.size() - 1:
+		return null;
 	return _sprite_array_Marking[World.Convert_Coord_To_Index(coord)];
 	
-func Get_DetailSprite(coord:Vector2, callerPath:String) -> Sprite2D:
-	if _debug: print("\nmap_generator.gd - Get_DetailSprite, called by: ", callerPath);
+func Get_Spr_Detail(coord:Vector2, callerPath:String) -> Sprite2D:
+	if _debug: print("\nmap_generator.gd - Get_Spr_Detail, called by: ", callerPath);
+	if World.Convert_Coord_To_Index(coord) > _sprite_array_Detail.size() - 1:
+		return null;
 	return _sprite_array_Detail[World.Convert_Coord_To_Index(coord)];
+
+func Get_Spr_Secret(coord:Vector2, callerPath:String) -> Sprite2D:
+	if _debug: print("\nmap_generator.gd - Get_Spr_Secret, called by: ", callerPath);
+	if World.Convert_Coord_To_Index(coord) > _sprite_array_Secrets.size() - 1:
+		return null;
+	return _sprite_array_Secrets[World.Convert_Coord_To_Index(coord)];
 
 
 func Get_Terrain(idx:int, callerPath:String) -> Map_Data.Terrain:
@@ -819,6 +609,10 @@ func Get_Marking(idx:int, callerPath:String) -> Map_Data.Marking:
 	if _debug: print("\nmap_generator.gd - Get_Marking, called by: ", callerPath);
 	return _marking_data[idx];
 
+func Get_Secret(idx:int, callerPath:String) -> Map_Data.Secrets:
+	if _debug: print("\nmap_generator.gd - Get_Marking, called by: ", callerPath);
+	return _secret_data[idx];
+
 func Get_Buried(idx:int, callerPath:String) -> int:
 	if _debug: print("\nmap_generator.gd - Get_Marking, called by: ", callerPath);
 	return _buried_data[idx];
@@ -827,30 +621,6 @@ func Get_Buried(idx:int, callerPath:String) -> int:
 func Get_Terrain_Data(callerPath:String) -> Array[Map_Data.Terrain]:
 	if _debug: print("\nmap_generator.gd - Get_Terrain_Data, called by: ", callerPath);
 	return _terrain_data;
-
-
-#func Is_Land(coord:Vector2, callerPath:String, idx:int = -1) -> bool:
-	#if _debug: print("\nmap_generator.gd - Is_Land, called by: ", callerPath);
-	#return _Is_Land(coord, idx);
-#
-#func _Is_Land(coord:Vector2, idx:int = -1) -> bool:
-	#
-	#var t:Map_Data.Terrain;
-	#
-	#if idx == -1:
-		#t = _terrain_data[World.Convert_Coord_To_Index(coord)];
-	#else:
-		#t = _terrain_data[idx];
-	#
-	#if t == Map_Data.Terrain.MOUNTAIN \
-	#|| t == Map_Data.Terrain.MOUNTAIN_PATH \
-	#|| t == Map_Data.Terrain.FOREST \
-	#|| t == Map_Data.Terrain.GROUND \
-	#|| t == Map_Data.Terrain.SHORE \
-	#|| t == Map_Data.Terrain.TEMPLE_BROWN \
-	#|| t == Map_Data.Terrain.DOCK:
-		#return true;
-	#return false;
 
 
 func ChangeTerrain(v2_array:Array[Vector2], terrainType:Map_Data.Terrain, callerPath:String) -> void:
