@@ -1,4 +1,4 @@
-extends Node2D
+class_name Sprite_Handler
 
 const _terrain_sprites:Texture2D = preload("res://Sprites/terrain_sprites.png");
 const _glyphs:Texture2D = preload("res://Sprites/Glyphs.png");
@@ -11,11 +11,8 @@ const _waterDepth:float = 4.0;
 const _valueThresh:float = 1.0 / _waterDepth;
 
 
-func TerrainSprites_From_TerrainData(
-	terrainData:Array[Map_Data.Terrain],
-	cont_terrainSprites:Node2D,
-	debug:bool = false
-	) -> Array[Sprite2D]:
+static func TerrainSprites_From_TerrainData(terrainData:Array[Map_Data.Terrain],
+	cont_terrainSprites:Node2D, debug:bool = false) -> Array[Sprite2D]:
 	
 	var s_array:Array[Sprite2D];
 	
@@ -32,13 +29,16 @@ func TerrainSprites_From_TerrainData(
 		var spr:Sprite2D = World.Create_Sprite(0, 0, 1, _terrain_sprites);
 		cont_terrainSprites.add_child(spr);
 		
-		_Configure_TerrainSprite_LandAndSea(spr, t);
+		Configure_TerrainSprite_LandAndSea(spr, t);
 		
 		# Position Terrain Sprite
 		
 		spr.position = Vector2(currX * World.CellSize, currY * World.CellSize);
 		spr.position += Vector2.ONE * randf_range(-.4, .4);
 		spr.rotation += randf_range(-.0625, .0625);
+		
+		spr.modulate.a = 0;
+		spr.hide();
 		
 		s_array.append(spr);
 		
@@ -53,7 +53,7 @@ func TerrainSprites_From_TerrainData(
 	return s_array;
 
 
-func _Configure_TerrainSprite_LandAndSea(spr:Sprite2D, terrainType:Map_Data.Terrain) -> void:
+static func Configure_TerrainSprite_LandAndSea(spr:Sprite2D, terrainType:Map_Data.Terrain) -> void:
 	
 	match terrainType:
 		Map_Data.Terrain.MOUNTAIN:
@@ -133,14 +133,9 @@ func _Configure_TerrainSprite_LandAndSea(spr:Sprite2D, terrainType:Map_Data.Terr
 			print_debug("\nTerrain Data contains Invalid Data");
 
 
-func MarkingSprites_From_MarkingData(
-	markingData:Array[Map_Data.Marking],
-	cont_showOnZoom:Node2D,
-	cont_hideOnZoom:Node2D,
-	cont_alwaysShow:Node2D,
-	cont_treasures:CanvasLayer,
-	debug:bool = false
-	) -> Array[Sprite2D]:
+static func MarkingSprites_From_MarkingData(markingData:Array[Map_Data.Marking],
+	cont_showOnZoom:Node2D, cont_hideOnZoom:Node2D, cont_alwaysShow:Node2D, cont_treasures:CanvasLayer,
+	debug:bool = false) -> Array[Sprite2D]:
 	
 	var s_array:Array[Sprite2D];
 	
@@ -272,6 +267,10 @@ func MarkingSprites_From_MarkingData(
 			# Make Mark Y-Sort Behind Player
 			spr.position.y -= .03125;
 			#marking.position += Vector2.ONE * randf_range(-.4, .4);
+			
+			spr.modulate.a = 0;
+			spr.hide();
+			
 			s_array.append(spr);
 			
 		# Set Next marking Position
@@ -285,11 +284,8 @@ func MarkingSprites_From_MarkingData(
 	return s_array;
 
 
-func DetailSprites_From_MarkingData(
-	markingData:Array[Map_Data.Marking],
-	cont_showOnZoom:Node2D,
-	debug:bool = false
-	) -> Array[Sprite2D]:
+static func DetailSprites_From_MarkingData(markingData:Array[Map_Data.Marking],
+	cont_showOnZoom:Node2D, debug:bool = false) -> Array[Sprite2D]:
 	
 	var s_array:Array[Sprite2D];
 	
@@ -403,6 +399,10 @@ func DetailSprites_From_MarkingData(
 			_:
 				print_debug("\nMarking Data contains Invalid Data: ", Map_Data.Marking.find_key(markingData[m_idx]));
 		
+		if spr:
+			spr.modulate.a = 0;
+			spr.hide();
+		
 		s_array.append(spr);
 		
 		# Set Next Detail Position
@@ -415,11 +415,8 @@ func DetailSprites_From_MarkingData(
 	return s_array;
 
 
-func SecretSprites_From_SecretData(
-	secretData:Array[Map_Data.Secrets],
-	cont_secrets:Node2D,
-	debug:bool = false
-	) -> Array[Sprite2D]:
+static func SecretSprites_From_SecretData(secretData:Array[Map_Data.Secrets],
+	cont_secrets:Node2D, debug:bool = false) -> Array[Sprite2D]:
 	
 	var s_array:Array[Sprite2D];
 	
@@ -442,6 +439,7 @@ func SecretSprites_From_SecretData(
 		
 		if spr:
 			spr.modulate.a = 0;
+			spr.hide();
 		
 		s_array.append(spr);
 		

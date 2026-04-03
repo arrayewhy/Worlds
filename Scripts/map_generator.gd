@@ -173,9 +173,9 @@ func _Generate_Map(newSeed:int) -> void:
 				break;
 	
 	# Create Sprite2Ds
-	_sprite_array_Terrain = $sprite_handler.TerrainSprites_From_TerrainData(_terrain_data, _cont_terrainSprites, _debug);
+	_sprite_array_Terrain = Sprite_Handler.TerrainSprites_From_TerrainData(_terrain_data, _cont_terrainSprites, _debug);
 	
-	_sprite_array_Marking = $sprite_handler.MarkingSprites_From_MarkingData(
+	_sprite_array_Marking = Sprite_Handler.MarkingSprites_From_MarkingData(
 		_marking_data, \
 		_cont_showOnZoom, \
 		_cont_hideOnZoom, \
@@ -184,8 +184,8 @@ func _Generate_Map(newSeed:int) -> void:
 		_debug
 		);
 		
-	_sprite_array_Detail = $sprite_handler.DetailSprites_From_MarkingData(_marking_data, _cont_showOnZoom, _debug);
-	_sprite_array_Secrets = $sprite_handler.SecretSprites_From_SecretData(_secret_data, _cont_secrets, _debug);
+	_sprite_array_Detail = Sprite_Handler.DetailSprites_From_MarkingData(_marking_data, _cont_showOnZoom, _debug);
+	_sprite_array_Secrets = Sprite_Handler.SecretSprites_From_SecretData(_secret_data, _cont_secrets, _debug);
 	
 	
 	# Buried Treasure
@@ -341,7 +341,7 @@ func ChangeTerrain(v2_array:Array[Vector2], terrainType:Map_Data.Terrain, caller
 func _ChangeTerrain(v2_array:Array[Vector2], terrainType:Map_Data.Terrain) -> void:
 	for v2 in v2_array:
 		var spr:Sprite2D = _sprite_array_Terrain[World.Convert_Coord_To_Index(v2)];
-		$sprite_handler.Configure_TerrainSprite_LandAndSea(spr, terrainType);
+		Sprite_Handler.Configure_TerrainSprite_LandAndSea(spr, terrainType);
 
 
 # Functions: Signals ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||

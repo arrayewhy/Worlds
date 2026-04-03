@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://86tq3blbo8rs"]
+[gd_scene load_steps=28 format=3 uid="uid://86tq3blbo8rs"]
 
 [ext_resource type="Script" uid="uid://bl2cub7bc84g5" path="res://Scripts/initialiser.gd" id="1_50glp"]
 [ext_resource type="Script" uid="uid://bu55c8rfhtrsl" path="res://Scripts/camera.gd" id="2_vy5pj"]
@@ -12,7 +12,6 @@
 [ext_resource type="Script" uid="uid://cal2wnxopwt2h" path="res://Scripts/terrain_grouper.gd" id="7_1p5hy"]
 [ext_resource type="Script" uid="uid://cfouw4aofu4hw" path="res://Scripts/message_button.gd" id="7_4kpch"]
 [ext_resource type="Script" uid="uid://vp1q6c1vpebf" path="res://Scripts/mouse.gd" id="8_h1m7h"]
-[ext_resource type="Script" uid="uid://bxhjku86cp5qu" path="res://Scripts/sprite_handler.gd" id="12_2w5on"]
 [ext_resource type="Script" uid="uid://bqb4aevrhrx27" path="res://Scripts/inventory.gd" id="12_frkhe"]
 [ext_resource type="Texture2D" uid="uid://5hbjqblbd0ft" path="res://Sprites/sparks_in_the_dark.png" id="13_frkhe"]
 [ext_resource type="Texture2D" uid="uid://cmkst4o71b1e6" path="res://Sprites/terrain_sprites.png" id="15_h1m7h"]
@@ -255,7 +254,16 @@ vertical_alignment = 1
 
 [node name="map_generator" type="Node2D" parent="." node_paths=PackedStringArray("_noiseTex")]
 script = ExtResource("6_frkhe")
+_mountain = null
+_forest = null
+_ground = null
+_shore = null
+_shallow = null
+_sea = null
+_ocean = null
+_depths = null
 _noiseTex = NodePath("Noise/Control/Noise Rect")
+_debug = null
 metadata/_edit_lock_ = true
 
 [node name="terrain" type="Node2D" parent="map_generator"]
@@ -305,9 +313,6 @@ script = ExtResource("7_1p5hy")
 
 [node name="secrets" type="Node2D" parent="map_generator"]
 z_index = 2
-
-[node name="sprite_handler" type="Node2D" parent="map_generator"]
-script = ExtResource("12_2w5on")
 
 [node name="mouse" type="Node2D" parent="."]
 z_index = 10
