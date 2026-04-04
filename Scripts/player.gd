@@ -251,7 +251,8 @@ func _Fade_Markings_Arround(coord:Vector2) -> void:
 	# Get Terrain Sprites at those coordinates
 	# If they are close enough, Fade them in
 	for v2 in World.V2_Array_Around(coord, 6):
-		if v2.distance_to(coord) < 64:
+		var view_range:float = World.CellSize * 4;
+		if v2.distance_to(coord) < view_range:
 			
 			var spr:Sprite2D = _mapGen.Get_Spr_Marking(v2, self.get_path());
 			if spr == null || spr.visible:

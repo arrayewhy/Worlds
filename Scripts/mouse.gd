@@ -64,6 +64,7 @@ func _process(delta: float) -> void:
 func _Reveal(coord:Vector2) -> void:
 	
 	var secret_spr:Sprite2D = _mapGen.Get_Spr_Secret(coord, self.get_path());
+	
 	if secret_spr:
 		
 		# Secret
@@ -89,6 +90,7 @@ func _Reveal(coord:Vector2) -> void:
 			if detail_spr.modulate.a >= 1:
 				_skip_fade = true;
 			else:
+				detail_spr.show();
 				Fader.Fade(detail_spr, Fader.Phase.IN, .5);
 				# Marking
 				var marking_spr:Sprite2D = _mapGen.Get_Spr_Marking(coord, self.get_path());

@@ -7,6 +7,9 @@ var _active_fades:Dictionary[int, Array]; # Node ID : [ Node, Tween, Phase/Colou
 
 func Fade(obj:Node2D, phase:Phase, duration:float, end_alpha:float = INF) -> void:
 	
+	if !obj.visible:
+		obj.show();
+	
 	var id:int = obj.get_instance_id();
 	
 	# If the Node is already fading in the Same Phase, do Nothing.
@@ -43,6 +46,9 @@ func Fade(obj:Node2D, phase:Phase, duration:float, end_alpha:float = INF) -> voi
 	_active_fades.set(id, [obj, tween, phase]);
 	
 	await tween.finished;
+	
+	if obj.modulate.a <= 0:
+		obj.hide();
 	
 	_active_fades.erase(id);
 
