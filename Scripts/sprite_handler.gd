@@ -37,8 +37,8 @@ static func TerrainSprites_From_TerrainData(terrainData:Array[Map_Data.Terrain],
 		spr.position += Vector2.ONE * randf_range(-.4, .4);
 		spr.rotation += randf_range(-.0625, .0625);
 		
-		spr.modulate.a = 0;
-		spr.hide();
+		# Hide Sprite to Reveal on Proximity
+		#spr.hide();
 		
 		s_array.append(spr);
 		
@@ -268,7 +268,7 @@ static func MarkingSprites_From_MarkingData(markingData:Array[Map_Data.Marking],
 			spr.position.y -= .03125;
 			#marking.position += Vector2.ONE * randf_range(-.4, .4);
 			
-			spr.modulate.a = 0;
+			# Hide Sprite to Reveal on Proximity
 			spr.hide();
 			
 			s_array.append(spr);
@@ -400,7 +400,7 @@ static func DetailSprites_From_MarkingData(markingData:Array[Map_Data.Marking],
 				print_debug("\nMarking Data contains Invalid Data: ", Map_Data.Marking.find_key(markingData[m_idx]));
 		
 		if spr:
-			spr.modulate.a = 0;
+			# Hide Sprite to Reveal on Proximity
 			spr.hide();
 		
 		s_array.append(spr);
@@ -438,7 +438,7 @@ static func SecretSprites_From_SecretData(secretData:Array[Map_Data.Secrets],
 				pass;
 		
 		if spr:
-			spr.modulate.a = 0;
+			# Hide Sprite to Reveal on Proximity
 			spr.hide();
 		
 		s_array.append(spr);

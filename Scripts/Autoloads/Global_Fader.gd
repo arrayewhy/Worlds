@@ -5,7 +5,7 @@ enum Phase { Null, IN, OUT }
 var _active_fades:Dictionary[int, Array]; # Node ID : [ Node, Tween, Phase/Colour ]
 
 
-func Fade(obj:Node2D, phase:Phase, duration:float) -> void:
+func Fade(obj:Node2D, phase:Phase, duration:float, end_alpha:float = INF) -> void:
 	
 	var id:int = obj.get_instance_id();
 	
@@ -24,9 +24,15 @@ func Fade(obj:Node2D, phase:Phase, duration:float) -> void:
 	
 	match phase:
 		Phase.IN:
-			targ_alpha = 1;
+			if end_alpha == INF:
+				targ_alpha = 1;
+			else:
+				targ_alpha = end_alpha;
 		Phase.OUT:
-			targ_alpha = 0;
+			if end_alpha == INF:
+				targ_alpha = 0;
+			else:
+				targ_alpha = end_alpha;
 		_:
 			printerr("Fade Phase is Null for: ", obj.get_path());
 			targ_alpha = 0;

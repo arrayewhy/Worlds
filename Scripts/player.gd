@@ -9,7 +9,7 @@ const _moveSpeed:float = 72;
 
 var _moving:bool;
 var _moveDir:Vector2;
-var _destination:Vector2;
+var _destination_coord:Vector2;
 var _next_idx:int;
 
 var _anim_StaggerTimer:float;
@@ -47,7 +47,7 @@ func _ready() -> void:
 	
 	#_currCoord = World.Coord_OnGrid(self.position);
 	
-	_moving = false;
+	#_moving = false;
 	#set_process(false);
 	
 	World.Set_Player_Coord(World.Coord_OnGrid(self.position), self.get_path());
@@ -61,32 +61,32 @@ func _process(delta: float) -> void:
 	else:
 		_anim_StaggerTimer = 0;
 	#
-	#var next_step:Vector2 = self.position + (_destination - self.position) * _moveSpeed * delta;
+	#var next_step:Vector2 = self.position + (_destination_coord - self.position) * _moveSpeed * delta;
 	var next_step:Vector2 = self.position + _moveDir * _moveSpeed * delta;
 	
 	#TEMPORARY
 	
 	# Up
 	if _moveDir.y < 0:
-		if (_destination.y - next_step.y) < 0:
+		if (_destination_coord.y - next_step.y) < 0:
 			self.position = next_step;
 		else:
 			_Reach_Destination(next_step);
 	# Down
 	elif _moveDir.y > 0:
-		if (_destination.y - next_step.y) > 0:
+		if (_destination_coord.y - next_step.y) > 0:
 			self.position = next_step;
 		else:
 			_Reach_Destination(next_step);
 	# Left
 	elif _moveDir.x < 0:
-		if (_destination.x - next_step.x) < 0:
+		if (_destination_coord.x - next_step.x) < 0:
 			self.position = next_step;
 		else:
 			_Reach_Destination(next_step);
 	# Right
 	elif _moveDir.x > 0:
-		if (_destination.x - next_step.x) > 0:
+		if (_destination_coord.x - next_step.x) > 0:
 			self.position = next_step;
 		else:
 			_Reach_Destination(next_step);
@@ -118,7 +118,7 @@ func _Move(dir:Vector2) -> void:
 	# If we receive Movement input while Moving, do Nothing
 	if _moveDir != Vector2.ZERO:
 		return;
-		#self.position = _destination;
+		#self.position = _destination_coord;
 	
 	# Flip player Sprite
 	
@@ -158,8 +158,8 @@ func _Move(dir:Vector2) -> void:
 	
 	# Movement
 	
-	_destination = next_coord;
-	_next_idx = World.Convert_Coord_To_Index(_destination);
+	_destination_coord = next_coord;
+	_next_idx = World.Convert_Coord_To_Index(_destination_coord);
 	
 	var next_marking:Map_Data.Marking = _mapGen.Get_Marking(_next_idx, self.get_path());
 	
@@ -190,7 +190,8 @@ func _Move(dir:Vector2) -> void:
 	if dir == Vector2.LEFT || dir == Vector2.RIGHT:
 		self.play("Walk_Right");
 	
-	_Fade_CloseUps_And_Markings(_destination);
+	#_Fade_CloseUps_And_Markings(_destination_coord);
+	_Fade_Markings_Arround(_destination_coord);
 	
 	# Forest
 	
@@ -224,7 +225,7 @@ func _Reach_Destination(next_step:Vector2) -> void:
 		return;
 	else:
 		_moveDir = Vector2.ZERO;
-		self.position = _destination;
+		self.position = _destination_coord;
 		_moving = false;
 		#set_process(false);
 		self.play("Idle");
@@ -232,7 +233,7 @@ func _Reach_Destination(next_step:Vector2) -> void:
 
 #func _Step_On_BuriedTreasure(idx:int) -> void:
 	#if _mapGen.Get_Buried(idx, self.get_path()) > -1:
-		#var terrainSpr:Sprite2D = _mapGen.Get_TerrainSprite(_destination, self.get_path());
+		#var terrainSpr:Sprite2D = _mapGen.Get_TerrainSprite(_destination_coord, self.get_path());
 		#terrainSpr.rotation_degrees = randf_range(-4, 4);
 
 
@@ -243,6 +244,23 @@ func Initialise(mapGen:Node2D, cam:Camera2D, msg:Node2D) -> void:
 
 
 # Functions: Forest Fade ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+func _Fade_Markings_Arround(coord:Vector2) -> void:
+	# Get Surrounding Grid Coordinates
+	# Get Terrain Sprites at those coordinates
+	# If they are close enough, Fade them in
+	for v2 in World.V2_Array_Around(coord, 6):
+		if v2.distance_to(coord) < 64:
+			
+			var spr:Sprite2D = _mapGen.Get_Spr_Marking(v2, self.get_path());
+			if spr == null || spr.visible:
+				continue;
+			# Some Markings have unique Alpha values
+			var end_alpha:float = spr.modulate.a;
+			spr.modulate.a = 0;
+			spr.show();
+			Fader.Fade(spr, Fader.Phase.IN, 1, end_alpha);
 
 
 func _Fade_CloseUps_And_Markings(pos:Vector2) -> void:
@@ -271,29 +289,6 @@ func _Fade_CloseUps_And_Markings(pos:Vector2) -> void:
 			marking_spr.add_child(_Create_And_Record_Fade(Fade.Phase.OUT, idx, marking_spr, fade_records_Markings));
 		
 		new_records.push_back(idx);
-		
-		#else:
-			#
-			## If the Current Close-up sprite is Fading Out,
-			## we Interrupt it and Fade it back In.
-			## We do the same for the Marking Sprite.
-			#
-			## Close-ups
-			#if fade_records_CloseUps.get(idx).Current_Phase() == Fade.Phase.OUT:
-				#
-				## Fade Close-up sprite In
-				#fade_records_CloseUps.get(idx).Interrupt(Fade.Phase.IN);
-				## Cancel Fade Removal
-				#if fade_records_CloseUps.get(idx).Complete.is_connected(_RemoveFade_CloseUp):
-					#fade_records_CloseUps.get(idx).Complete.disconnect(_RemoveFade_CloseUp);
-			#
-			## Markings
-			#if fade_records_Markings.get(idx).Current_Phase() == Fade.Phase.IN:
-				## Fade Marking sprite Out
-				#fade_records_Markings.get(idx).Interrupt(Fade.Phase.OUT);
-				## Cancel Fade Removal
-				#if fade_records_Markings.get(idx).Complete.is_connected(_RemoveFade_Marking):
-					#fade_records_Markings.get(idx).Complete.disconnect(_RemoveFade_Marking);
 	
 	# Fade sprites when Out of Range
 	
@@ -303,12 +298,7 @@ func _Fade_CloseUps_And_Markings(pos:Vector2) -> void:
 		if new_records.has(f_idx):
 			continue;
 		
-		if World.Convert_Index_To_Coord(f_idx).distance_to(_destination) > World.CellSize * 1.5:
-			
-			# Fade Message Out
-			#if _message_curr_idx == f_idx:
-				#_message_curr_idx = -1;
-				#_message.Disappear(self.get_path());
+		if World.Convert_Index_To_Coord(f_idx).distance_to(_destination_coord) > World.CellSize * 1.5:
 				
 			# Fade Close-up sprite Out
 			fade_records_CloseUps.get(f_idx).Interrupt(Fade.Phase.OUT);
@@ -320,7 +310,7 @@ func _Fade_CloseUps_And_Markings(pos:Vector2) -> void:
 	for f_idx in fade_records_Markings.keys():
 		if new_records.has(f_idx):
 			continue;
-		if World.Convert_Index_To_Coord(f_idx).distance_to(_destination) > World.CellSize * 1.5:
+		if World.Convert_Index_To_Coord(f_idx).distance_to(_destination_coord) > World.CellSize * 1.5:
 			# Fade Marking sprite In
 			fade_records_Markings.get(f_idx).Interrupt(Fade.Phase.IN);
 			# Connect to Signal to Remove this Fade from the Records
@@ -337,7 +327,7 @@ func _Create_And_Record_Fade(phase:Fade.Phase, idx:int, spr:Sprite2D, records:Di
 func _Enter_Forest() -> void:
 	
 	# TEMPORARY: Rotate TREE sprite
-	_mapGen.Get_Spr_Marking(_destination, self.get_path()).rotation_degrees = randf_range(-4, 4);
+	_mapGen.Get_Spr_Marking(_destination_coord, self.get_path()).rotation_degrees = randf_range(-4, 4);
 	
 	if _hideTween && _hideTween.is_running():
 		_hideTween.stop();
