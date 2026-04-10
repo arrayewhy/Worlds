@@ -12,7 +12,7 @@ var _zoomed:bool;
 #const _mouse_reset_pos:Vector2 = Vector2(9999, 9999);
 var _last_mouse_pos:Vector2;
 var _click_holding:bool;
-var _zoom_timer:float;
+#var _zoom_timer:float;
 var _dbl_click_timer:float;
 
 var _targObj:AnimatedSprite2D;
@@ -35,7 +35,6 @@ signal Zoom(on:bool, camTargPos:Vector2);
 
 
 func _ready() -> void:
-	
 	# Wait for Initial Map Generation
 	_initialiser.Player_Created.connect(_SIGNAL_Player_Created);
 	# It is Good Practice to Connect to Signals instead of Awaiting Directly,
@@ -136,11 +135,11 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 
 func _Position_Player(pos:Vector2) -> void:
-	_targObj.position = World.Coord_OnGrid(pos);
-	World.Set_Player_Coord(World.Coord_OnGrid(_targObj.position), self.get_path());
+	_targObj.position = Tools.Coord_OnGrid(pos);
+	World.Set_Player_Coord(Tools.Coord_OnGrid(_targObj.position), self.get_path());
 
 
-func _Zoom_Out() -> void:
+func _Zoom_Out(dur:float = 1.5) -> void:
 	
 	if !_zoomed:
 		return;
@@ -163,17 +162,16 @@ func _Zoom_Out() -> void:
 	_zoom_tween.set_parallel(true);
 	_zoom_tween.set_trans(Tween.TRANS_QUINT);
 	_zoom_tween.set_ease(Tween.EASE_OUT);
-	_zoom_tween.tween_property(self, "zoom", Vector2(1, 1), 1.5);
+	_zoom_tween.tween_property(self, "zoom", Vector2(1, 1), dur);
 	
 	# Show Screen Center Cursor
 	
-	if self.get_child(0):
-		self.get_child(0).show();
-		_zoom_tween.tween_property(self.get_child(0), "modulate:a", 1.0, 1.5);
-		# Rotate Cursor
-		_zoom_tween.tween_property(self.get_child(0), "rotation_degrees", -180, 1.5);
+	$center_cursor.show();
+	_zoom_tween.tween_property($center_cursor, "modulate:a", 1.0, dur);
+	# Rotate Cursor
+	_zoom_tween.tween_property($center_cursor, "rotation_degrees", -180, dur);
 
-func _Zoom_In() -> void:
+func _Zoom_In(dur:float = 1.5) -> void:
 	
 	if _zoomed:
 		return;
@@ -193,15 +191,14 @@ func _Zoom_In() -> void:
 	_zoom_tween.set_parallel(true);
 	_zoom_tween.set_trans(Tween.TRANS_CUBIC);
 	_zoom_tween.set_ease(Tween.EASE_IN_OUT);
-	_zoom_tween.tween_property(self, "zoom", Vector2(3, 3), 1.5);
+	_zoom_tween.tween_property(self, "zoom", Vector2(2.5, 2.5), dur);
 	
 	# Hide Screen Center Cursor
-	if self.get_child(0):
-		_zoom_tween.tween_property(self.get_child(0), "rotation_degrees", 180, 1.5);
-		_zoom_tween.tween_property(self.get_child(0), "modulate:a", 0, 1.5);
-		await _zoom_tween.finished;
-		self.get_child(0).hide();
-		self.get_child(0).rotation_degrees = 0;
+	_zoom_tween.tween_property($center_cursor, "rotation_degrees", 180, dur);
+	_zoom_tween.tween_property($center_cursor, "modulate:a", 0, dur);
+	await _zoom_tween.finished;
+	$center_cursor.hide();
+	$center_cursor.rotation_degrees = 0;
 
 
 func _Show_Zoomed_IN_Sprites() -> void:
@@ -278,15 +275,19 @@ func Reset_CamSpeed(callerPath:String) -> void:
 
 func _SIGNAL_Player_Created(player:AnimatedSprite2D) -> void:
 	
+	await  get_tree().process_frame;
+	
 	#player.Player_Request_Zoom_Out.connect(_Player_Request_Zoom_Out);
 	
 	_targObj = player;
 	
-	self.position = Vector2.ONE * World.CellSize * (World.MapWidth_In_Units() / 2);
+	self.position = Vector2.ONE * World.CellSize * (World.MAP_UNIT_WIDTH / 2);
 	
 	_targPos = self.position;
 	
 	self.zoom = Vector2(.5, .5);
+	
+	_Zoom_In(5);
 	
 	#Cam_Pos_On_MapGenComplete.emit(self.position);
 	
