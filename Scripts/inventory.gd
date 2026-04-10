@@ -31,14 +31,12 @@ func _unhandled_key_input(event: InputEvent) -> void:
 func _On_Click(mouse_coord:Vector2) -> void:
 	
 	# On Left Click near the player, Show inventory
-	
-	if World.Distance_From_Player(mouse_coord) <= World.CellSize / 2:
+	if World.PLAYER_COORD.distance_to(mouse_coord) <= World.CellSize / 2:
 		if !_open:
 			_Open();
 	
 	# If Far from the player, Hide inventory
-	
-	elif World.Distance_From_Player(mouse_coord) > World.CellSize:
+	elif World.PLAYER_COORD.distance_to(mouse_coord) > World.CellSize:
 		if _open:
 			_Close();
 
@@ -54,7 +52,7 @@ func _Open() -> void:
 	
 	_open = true;
 	
-	$slot_holder.position = World.Player_Coord() + Vector2.UP * World.CellSize;
+	$slot_holder.position = World.PLAYER_COORD + Vector2.UP * World.CellSize;
 	
 	$slot_holder.modulate.a = 0;
 	

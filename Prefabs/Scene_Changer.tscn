@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://debp4hu23ie6f"]
+
+[ext_resource type="Script" uid="uid://uibm0yw3uxaa" path="res://Scripts/Autoloads/Scene_Changer.gd" id="1_rsey8"]
+
+[node name="Scene_Changer" type="CanvasLayer"]
+layer = 100
+script = ExtResource("1_rsey8")
+
+[node name="Curtain" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)

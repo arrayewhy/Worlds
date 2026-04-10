@@ -17,12 +17,13 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+DBG="*res://Scenes/Debug/Debug_Overlay.tscn"
 World="*res://Scripts/Autoloads/World.gd"
-InGameDebugger="*res://Scripts/Debug/InGameDebugger.gd"
 TimeMaster="*res://Scripts/Autoloads/TimeMaster.gd"
 SoundMaster="*res://Scripts/Autoloads/Sound-Master.gd"
 MusicMaster="*res://Scripts/Autoloads/MusicMaster.gd"
 Fader="*res://Scripts/Autoloads/Global_Fader.gd"
+SceneChanger="*res://Prefabs/Scene_Changer.tscn"
 
 [display]
 

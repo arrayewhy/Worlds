@@ -29,7 +29,7 @@ func _init(terrainSpr:Sprite2D, start_pos:Vector2, treasure:int, mousePosY:float
 	
 	# Treasure Sprite
 	
-	_treasure_sprite = World.Create_Sprite(10, 0);
+	_treasure_sprite = Sprite_Handler.Create_Sprite(10, 0);
 	
 	_treasure_sprite.modulate = Color.BLACK;
 	_treasure_sprite.position = _spr.position;
@@ -54,8 +54,8 @@ func _process(delta: float) -> void:
 				_spr.position.y = _ori_pos.y - World.CellSize;
 				_treasure_sprite.offset.y = (_spr.position.y - _ori_pos.y) * World.CellSize + _treasure_offset;
 				
-				World.Signal_Replace_Terrain_Sprite(
-					World.Convert_Coord_To_Index(_ori_pos), Map_Data.Terrain.HOLE, _treasure_sprite, self.get_path());
+				World.Replace_Terrain_Sprite(
+					Tools.Convert_Coord_To_Index(_ori_pos), Map_Data.Terrain.HOLE, _treasure_sprite, self.get_path());
 				
 				var fadeTween:Tween = create_tween();
 				fadeTween.tween_property(_spr, "modulate:a", 0, .5);

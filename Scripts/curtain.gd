@@ -7,12 +7,12 @@ extends CanvasLayer
 signal Fade_Complete;
 
 
-func _init() -> void:
-	self.show();
+#func _init() -> void:
+	#self.show();
 
 
-func _ready() -> void:
-	Reveal(4);
+#func _ready() -> void:
+	#Reveal(4);
 
 
 func Reveal(dur:float = 1) -> void:

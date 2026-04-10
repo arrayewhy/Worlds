@@ -1,7 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://bv8jsonjit21y"]
+[gd_scene load_steps=8 format=3 uid="uid://bv8jsonjit21y"]
 
 [ext_resource type="Texture2D" uid="uid://5hbjqblbd0ft" path="res://Sprites/sparks_in_the_dark.png" id="1_5wxv7"]
 [ext_resource type="Script" uid="uid://cvm1insy3g2kp" path="res://Scripts/player.gd" id="2_y5hcb"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_knrd4"]
+atlas = ExtResource("1_5wxv7")
+region = Rect2(256, 1536, 256, 256)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_5wxv7"]
 atlas = ExtResource("1_5wxv7")
@@ -17,6 +21,14 @@ region = Rect2(512, 768, 256, 256)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_juxdh"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_knrd4")
+}],
+"loop": true,
+"name": &"Boating",
+"speed": 5.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_5wxv7")
@@ -40,6 +52,6 @@ animations = [{
 [node name="Player" type="AnimatedSprite2D"]
 scale = Vector2(0.047, 0.047)
 sprite_frames = SubResource("SpriteFrames_juxdh")
-animation = &"Walk_Right"
+animation = &"Boating"
 autoplay = "Idle"
 script = ExtResource("2_y5hcb")

@@ -55,7 +55,7 @@ func _Set_Position_And_Size(pos:Vector2, displaceY:float) -> void:
 	
 	_panelContainer.reset_size();
 	if _debug: print_debug(_panelContainer.size);
-	self.position = World.Coord_OnGrid(pos) - _panelContainer.size;
+	self.position = Tools.Coord_OnGrid(pos) - _panelContainer.size;
 
 	_panelContainer.position = _panelContainer.size / 2;
 	
