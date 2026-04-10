@@ -1,11 +1,11 @@
 extends Node2D
 
 # Resources
-const _glyphs:Texture2D = preload("res://Sprites/Glyphs.png");
-const _terrain_sprites:Texture2D = preload("res://Sprites/terrain_sprites.png");
-
 const _fadeInOut:Shader = preload("res://Shaders/fadeInOut.gdshader");
 const _wiggle:Shader = preload("res://Shaders/wiggle.gdshader");
+
+@export var _terrain_map:Texture2D;
+@export var _marking_map:Texture2D;
 
 # Thresholds
 @export var _mountain:float = 245 - 20;
@@ -19,17 +19,18 @@ const _wiggle:Shader = preload("res://Shaders/wiggle.gdshader");
 
 var _terrain_data:Array[Map_Data.Terrain];
 var _marking_data:Array[Map_Data.Marking];
-var _secret_data:Array[Map_Data.Secrets];
-var _buried_data:Array[int];
+#var _secret_data:Array[Map_Data.Secrets];
+#var _buried_data:Array[int];
 
 var _array_islands:Array[Array];
-var _array_mountainRanges:Array[Array];
+var _array_mount_ranges:Array[Array];
+var _largest_island:int;
 
 # Sprite2D Arrays to quickly grab a Sprite2D by its Index
 var _sprite_array_Terrain:Array[Sprite2D];
 var _sprite_array_Marking:Array[Sprite2D]; # Markings / NULL
 var _sprite_array_Detail:Array[Sprite2D]; # Details / NULL
-var _sprite_array_Secrets:Array[Sprite2D]; # Secrets / NULL
+#var _sprite_array_Secrets:Array[Sprite2D]; # Secrets / NULL
 
 # Noise Data
 @export var _noiseTex:TextureRect;
@@ -40,10 +41,7 @@ var _sprite_array_Secrets:Array[Sprite2D]; # Secrets / NULL
 @onready var _cont_hideOnZoom:Node2D = $hide_on_zoom;
 @onready var _cont_alwaysShow:Node2D = $always_show;
 @onready var _cont_treasures:CanvasLayer = $treasures;
-@onready var _cont_secrets:Node2D = $secrets;
-#@onready var _cont_showOnProximity:Node2D = $show_on_proximity;
-
-@onready var _terrain_grouper:Node = $terrain_grouper;
+#@onready var _cont_secrets:Node2D = $secrets;
 
 @export_group("#DEBUG")
 @export var _debug:bool;
@@ -56,163 +54,197 @@ signal Map_Generated;
 
 func _ready() -> void:
 	
-	World.Replace_Terrain.connect(_On_Replace_Terrain_Sprite);
+	World.Replace_Terrain.connect(_SIGNAL_On_Replace_Terrain_Sprite);
 	
 	# Make sure Zoom Objects start off Invisible
 	_cont_showOnZoom.modulate.a = 0;
-	
-	#_Generate_Map(2989861102);
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	
-	if !Input.is_action_pressed("Cancel") || !Input.is_action_just_pressed("Enter"):
-		return;
-			
-	_Clear();
+	if Input.is_action_pressed("Cancel") && Input.is_action_just_pressed("Enter"):
+		
+		_Clear_Sprites();
 	
-	var newSeed:int = randi();
-	print("map_generator, Latest Seed: ", newSeed);
-	_Generate_Map(newSeed);
+		var newSeed:int = randi();
+		_Generate_Map(newSeed);
+		print("map_generator, Latest Seed: ", newSeed);
 
 
 # Functions ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
 func Generate_Map(newSeed:int, callerPath:String) -> void:
-	if _debug: print("\nmap_generator => Generate_map() called by: ", callerPath);
+	if DBG.DEBUG: DBG.LOG(str("map_generator => Generate_map() called by: ", callerPath), Color.BLUE);
+	#if DBG.DEBUG: print("\nmap_generator => Generate_map() called by: ", callerPath);
 	_Generate_Map(newSeed);
 
 func _Generate_Map(newSeed:int) -> void:
 	
-	_noiseTex.texture.noise.seed = newSeed;
-	await _noiseTex.texture.changed;
-	var noiseData:PackedByteArray = _noiseTex.get_texture().get_image().get_data();
+	# Create: Terrain Data
 	
-	World.Set_MapWidth_In_Units(_noiseTex.get_texture().get_size().x, self.get_path());
+	# We use Await here because we have to wait for the Noise Texture to Update
+	# before we can use it to generate the Terrain Data.
 	
-	# Generate Map Data
-	_terrain_data = Map_Data.Derive_TerrainData_From_NoiseData(_mountain, _forest, _ground, _shore, _shallow, _sea, _ocean, _depths, noiseData);
+	#await _Create_TerrainData_From_NoiseData_And_Set_WorldWidth(newSeed);
+	_Create_TerrainData_From_ImageData_And_Set_WorldWidth();
 	
 	# Derive Islands
-	var islands_coordArrays:Array[Array] = _terrain_grouper.Island_CoordArrays_From_TerrainData(_terrain_data, self.get_path());
+	var islands_coordArrays:Array[Array] = Terrain_Grouper.Island_CoordArrays_From_TerrainData(_terrain_data, self.get_path());
 	# Convert Island Array[Array[Coord]] => Array[Array[Index]]
 	for coordArray in islands_coordArrays:
-		_array_islands.push_back(World.Convert_CoordArray_To_IdxArray(coordArray));
+		_array_islands.push_back(Tools.Convert_CoordArray_To_IdxArray(coordArray));
 	
-	# Largest Island - START * * * * *
+	# Islands: Basically Land Terrain Clusters separated by Water.
+	_Determine_Largest_Island();
+	#_Submerge_Smaller_Islands();
 	
-	var largest_island:int;
+	# Mountain Paths: The only way to Enter the Mountains
+	#_Determine_Mountain_Paths();
 	
-	for i in _array_islands.size():
-		if _array_islands[i].size() > _array_islands[largest_island].size():
-			largest_island = i;
+	# Create: Marking Data
+	_Create_MarkingData_From_TerrainData();
+	#_Create_MarkingData_From_ImgData();
+	_Override_MarkingData_with_ImageData();
 	
-	# Make Other islands water
-	
-	for i in _array_islands.size():
-		if i == largest_island:
-			continue;
-		else:
-			for idx in _array_islands[i]:
-				_terrain_data[idx] = Map_Data.Terrain.SHALLOW;
-	
-	# END
-	
-	# Derive Mountain Ranges
-	for island in _array_islands:
-		var m_cluster_array:Array[Array] = _terrain_grouper.TerrainClusters_From_Island(Map_Data.Terrain.MOUNTAIN, island, _terrain_data);
-		for cluster in m_cluster_array:
-			if cluster.size() > 9:
-				_array_mountainRanges.push_back(cluster);
-	
-	var edgeRing_array:Array[Array];
-	
-	for m_range in _array_mountainRanges:
-		
-		var edge_ring:Array[int] = _TerrainCluster_Edges_FourDir(Map_Data.Terrain.MOUNTAIN, m_range);
-		
-		if edge_ring.size() > 0:
-			edgeRing_array.push_back(edge_ring);
-	
-	for edgeIndices in edgeRing_array:
-		_terrain_data[edgeIndices.pick_random()] = Map_Data.Terrain.MOUNTAIN_PATH;
-	
-	_marking_data = Map_Data.Derive_MarkingData_From_TerrainData(_terrain_data);
 	# Amend Map Data
 	_terrain_data = Map_Data.Amend_TerrainData_Using_MarkingData(_terrain_data, _marking_data);
 	#_marking_data = Map_Data.Amend_MarkingData_Houses(_marking_data);
-	_secret_data = Map_Data.Derive_SecretData_From_MarkingData(_marking_data);
+	#_secret_data = Map_Data.Derive_SecretData_From_MarkingData(_marking_data);
 	
-	# Add Docks
-	#_terrain_data = Map_Data.Amend_TerrainData_Docks(_terrain_data);
-	
-	# Mark Lighthouse - START * * * * *
-	
-	var lighthouse_spawned:bool;
-	
-	for i in _array_islands[largest_island].size():
-		
-		var idx:int = _array_islands[largest_island][i];
-		
-		if _terrain_data[idx] == Map_Data.Terrain.SHORE && randf_range(0, 1000) > 995:
-			_marking_data[idx] = Map_Data.Marking.LIGHTHOUSE;
-			lighthouse_spawned = true;
-			break;
-		else:
-			continue;
-	
-	if !lighthouse_spawned:
-		
-		for i in _array_islands[largest_island].size():
-			
-			var idx:int = _array_islands[largest_island][i];
-			
-			if _terrain_data[idx] == Map_Data.Terrain.SHORE:
-				_marking_data[idx] = Map_Data.Marking.LIGHTHOUSE;
-				break;
-	
-	# Create Sprite2Ds
-	_sprite_array_Terrain = Sprite_Handler.TerrainSprites_From_TerrainData(_terrain_data, _cont_terrainSprites, _debug);
-	
-	_sprite_array_Marking = Sprite_Handler.MarkingSprites_From_MarkingData(
-		_marking_data, \
-		_cont_showOnZoom, \
-		_cont_hideOnZoom, \
-		_cont_alwaysShow, \
-		_cont_treasures, \
-		_debug
-		);
-		
-	_sprite_array_Detail = Sprite_Handler.DetailSprites_From_MarkingData(_marking_data, _cont_showOnZoom, _debug);
-	_sprite_array_Secrets = Sprite_Handler.SecretSprites_From_SecretData(_secret_data, _cont_secrets, _debug);
-	
-	
-	# Buried Treasure
-	_Create_Buried_Treasure();
+	# Create Sprites for Terrain, Markings, Details, and Secrets
+	_Create_Sprites();
 	
 	Map_Generated.emit();
 
 
-func _Create_Buried_Treasure() -> void:
-	for t in _terrain_data:
+# Data Creation ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+func _Create_TerrainData_From_NoiseData_And_Set_WorldWidth(newSeed:int) -> void:
+	_noiseTex.texture.noise.seed = newSeed;
+	await _noiseTex.texture.changed;
+	var noiseData:PackedByteArray = _noiseTex.get_texture().get_image().get_data();
+	_terrain_data = Map_Data.Derive_TerrainData_From_NoiseData(_mountain, _forest, _ground, _shore, _shallow, _sea, _ocean, _depths, noiseData);
+	
+	World.Set_Map_Width_In_Units(_noiseTex.get_texture().get_size().x, self.get_path());
+
+func _Create_TerrainData_From_ImageData_And_Set_WorldWidth() -> void:
+	_terrain_data = Map_Data.Derive_TerrainData_From_ImgData(_terrain_map, false);
+	
+	World.Set_Map_Width_In_Units(_terrain_map.get_width(), self.get_path());
+
+
+func _Create_MarkingData_From_TerrainData() -> void:
+	_marking_data = Map_Data.Derive_MarkingData_From_TerrainData(_terrain_data);
+
+func _Create_MarkingData_From_ImgData() -> void:
+	_marking_data = Map_Data.Derive_MarkingData_From_ImgData(_marking_map, true);
+
+func _Override_MarkingData_with_ImageData() -> void:
+	_marking_data = Map_Data.Override_MarkingData_with_ImageData(_marking_data, _marking_map, true);
+
+# Functions ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+func _TerrainCluster_Edges_FourDir(type:Map_Data.Terrain, cluster:Array[int]) -> Array[int]:
+	
+	var edges:Array[int];
+	
+	for i in cluster.size():
 		
-		if t == Map_Data.Terrain.SHORE:
+		var surr_terr_of_same_type:int = 0;
+		var curr_coord:Vector2 = Tools.Convert_Index_To_Coord(cluster[i]);
+		
+		var up_coord:Vector2 = curr_coord + Vector2.UP * World.CellSize;
+		if up_coord.y <= World.CellSize:
+			continue;
+		if _terrain_data[Tools.Convert_Coord_To_Index(up_coord)] == type:
+			surr_terr_of_same_type += 1;
 			
-			if randf_range(0, 1000) > 800:
-				# Append with the ID of the Treasure Type
-				_buried_data.push_back(1);
-			else:
-				_buried_data.push_back(-1);
-				
+		var down_coord:Vector2 = curr_coord + Vector2.DOWN * World.CellSize;
+		if down_coord.y >= World.MAP_UNIT_WIDTH * World.CellSize - World.CellSize:
+			continue;
+		if _terrain_data[Tools.Convert_Coord_To_Index(down_coord)] == type:
+			surr_terr_of_same_type += 1;
+		
+		var left_coord:Vector2 = curr_coord + Vector2.LEFT * World.CellSize;
+		if left_coord.x <= World.CellSize:
+			continue;
+		if _terrain_data[Tools.Convert_Coord_To_Index(left_coord)] == type:
+			surr_terr_of_same_type += 1;
+			
+		var right_coord:Vector2 = curr_coord + Vector2.RIGHT * World.CellSize;
+		if right_coord.x >= World.MAP_UNIT_WIDTH * World.CellSize - World.CellSize:
+			continue;
+		if _terrain_data[Tools.Convert_Coord_To_Index(right_coord)] == type:
+			surr_terr_of_same_type += 1;
+		
+		if surr_terr_of_same_type > 0 && surr_terr_of_same_type < 4:
+			edges.push_back(cluster[i]);
+	
+	return edges;
+
+
+func _Determine_Largest_Island() -> void:
+	for i in _array_islands.size():
+		if _array_islands[i].size() > _array_islands[_largest_island].size():
+			_largest_island = i;
+
+func _Submerge_Smaller_Islands() -> void:
+	for i in _array_islands.size():
+		if i == _largest_island:
+			continue;
 		else:
-			_buried_data.push_back(-1);
+			for idx in _array_islands[i]:
+				_terrain_data[idx] = Map_Data.Terrain.SHALLOW;
 
 
-func _Clear() -> void:
+#func _Determine_Mountain_Paths() -> void:
+	#
+	## Derive Mountain Ranges
+	#
+	#for island in _array_islands:
+		#
+		## Get Mountain Clusters
+		#var m_cluster_array:Array[Array] = \
+		#Terrain_Grouper.TerrainClusters_From_Island(Map_Data.Terrain.MOUNTAIN, island, _terrain_data);
+		#
+		## If the Mountain Cluster is Big enough,
+		## add it as a Mountain Range.
+		#for cluster in m_cluster_array:
+			#if cluster.size() > 9:
+				#_array_mount_ranges.push_back(cluster);
+	#
+	#var edge_ring_array:Array[Array];
+	#
+	#for m_range in _array_mount_ranges:
+		#
+		#var edge_ring:Array[int] = _TerrainCluster_Edges_FourDir(Map_Data.Terrain.MOUNTAIN, m_range);
+		#
+		#if edge_ring.size() > 0:
+			#edge_ring_array.push_back(edge_ring);
+	#
+	## For every Edge Ring, turn a Random cell into a Mountain Path
+	#for edgeIndices in edge_ring_array:
+		#_terrain_data[edgeIndices.pick_random()] = Map_Data.Terrain.MOUNTAIN_PATH;
+
+
+func _Create_Sprites() -> void:
+	# Terrain
+	_sprite_array_Terrain = Sprite_Handler.Terr_Sprites_From_Terr_Data(
+		_terrain_data, _cont_terrainSprites, _debug);
+	# Marking
+	_sprite_array_Marking = Sprite_Handler.MarkingSprites_From_MarkingData(_marking_data, _terrain_data, 
+	_cont_showOnZoom, _cont_hideOnZoom, _cont_alwaysShow, _cont_treasures, _debug);
+	# Detail
+	_sprite_array_Detail = Sprite_Handler.DetailSprites_From_MarkingData(_marking_data, _cont_showOnZoom, _debug);
+	# Secrets
+	#_sprite_array_Secrets = Sprite_Handler.SecretSprites_From_SecretData(_secret_data, _cont_secrets, _debug);
+
+func _Clear_Sprites() -> void:
 	# Delete Sprite2Ds
 	for c in _cont_terrainSprites.get_children(): c.queue_free();
-	
 	# Clear all Sprite2D except the Player.
 	# We put the Player in this Container for Y-Sorting.
 	for c in _cont_showOnZoom.get_children():
@@ -229,87 +261,37 @@ func _Clear() -> void:
 	_sprite_array_Detail = [];
 	# Clear Data
 	_array_islands = [];
-	_array_mountainRanges = [];
-	_buried_data = [];
-
-
-# Functions ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-
-
-func _TerrainCluster_Edges_FourDir(type:Map_Data.Terrain, cluster:Array[int]) -> Array[int]:
-	var edges:Array[int];
-	#
-	for i in cluster.size():
-		
-		var rocks:int;
-		var curr_coord:Vector2 = World.Convert_Index_To_Coord(cluster[i]);
-		
-		var up_coord:Vector2 = curr_coord + Vector2.UP * World.CellSize;
-		if up_coord.y <= World.CellSize:
-			continue;
-		if _terrain_data[World.Convert_Coord_To_Index(up_coord)] == Map_Data.Terrain.MOUNTAIN:
-			rocks += 1;
-			
-		var down_coord:Vector2 = curr_coord + Vector2.DOWN * World.CellSize;
-		if down_coord.y >= World.MapWidth_In_Units() * World.CellSize - World.CellSize:
-			continue;
-		if _terrain_data[World.Convert_Coord_To_Index(down_coord)] == Map_Data.Terrain.MOUNTAIN:
-			rocks += 1;
-		
-		var left_coord:Vector2 = curr_coord + Vector2.LEFT * World.CellSize;
-		if left_coord.x <= World.CellSize:
-			continue;
-		if _terrain_data[World.Convert_Coord_To_Index(left_coord)] == Map_Data.Terrain.MOUNTAIN:
-			rocks += 1;
-			
-		var right_coord:Vector2 = curr_coord + Vector2.RIGHT * World.CellSize;
-		if right_coord.x >= World.MapWidth_In_Units() * World.CellSize - World.CellSize:
-			continue;
-		if _terrain_data[World.Convert_Coord_To_Index(right_coord)] == Map_Data.Terrain.MOUNTAIN:
-			rocks += 1;
-		
-		if rocks > 0 && rocks < 4:
-			edges.push_back(cluster[i]);
-	
-	return edges;
-
-
-func _Get_All_Cells_Of_TerrainType_On_Island(type:Map_Data.Terrain, island_idxArray:Array[int], terrainData:Array[Map_Data.Terrain]) -> Array[int]:
-	var t_group:Array[int];
-	
-	for idx in island_idxArray:
-		if terrainData[idx] == type:
-			t_group.push_back(idx);
-	
-	return t_group;
+	_array_mount_ranges = [];
 
 
 # Functions: Get Set ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
-func Get_TerrainSprite(coord:Vector2, callerPath:String) -> Sprite2D:
-	if _debug: print("\nmap_generator.gd - Get_TerrainSprite, called by: ", callerPath);
-	if World.Convert_Coord_To_Index(coord) > _sprite_array_Terrain.size() - 1:
+func Get_Spr_Terrain(coord:Vector2, callerPath:String) -> Sprite2D:
+	if _debug: print("\nmap_generator.gd - Get_Spr_Terrain, called by: ", callerPath);
+	if Tools.Convert_Coord_To_Index(coord) > _sprite_array_Terrain.size() - 1:
 		return null;
-	return _sprite_array_Terrain[World.Convert_Coord_To_Index(coord)];
+	return _sprite_array_Terrain[Tools.Convert_Coord_To_Index(coord)];
 	
 func Get_Spr_Marking(coord:Vector2, callerPath:String) -> Sprite2D:
 	if _debug: print("\nmap_generator.gd - Get_Spr_Marking, called by: ", callerPath);
-	if World.Convert_Coord_To_Index(coord) > _sprite_array_Marking.size() - 1:
+	if Tools.Convert_Coord_To_Index(coord) > _sprite_array_Marking.size() - 1:
 		return null;
-	return _sprite_array_Marking[World.Convert_Coord_To_Index(coord)];
+	return _sprite_array_Marking[Tools.Convert_Coord_To_Index(coord)];
 	
 func Get_Spr_Detail(coord:Vector2, callerPath:String) -> Sprite2D:
+	
 	if _debug: print("\nmap_generator.gd - Get_Spr_Detail, called by: ", callerPath);
-	if World.Convert_Coord_To_Index(coord) > _sprite_array_Detail.size() - 1:
+	
+	if Tools.Convert_Coord_To_Index(coord) > _sprite_array_Detail.size() - 1:
 		return null;
-	return _sprite_array_Detail[World.Convert_Coord_To_Index(coord)];
+	return _sprite_array_Detail[Tools.Convert_Coord_To_Index(coord)];
 
-func Get_Spr_Secret(coord:Vector2, callerPath:String) -> Sprite2D:
-	if _debug: print("\nmap_generator.gd - Get_Spr_Secret, called by: ", callerPath);
-	if World.Convert_Coord_To_Index(coord) > _sprite_array_Secrets.size() - 1:
-		return null;
-	return _sprite_array_Secrets[World.Convert_Coord_To_Index(coord)];
+#func Get_Spr_Secret(coord:Vector2, callerPath:String) -> Sprite2D:
+	#if _debug: print("\nmap_generator.gd - Get_Spr_Secret, called by: ", callerPath);
+	#if Tools.Convert_Coord_To_Index(coord) > _sprite_array_Secrets.size() - 1:
+		#return null;
+	#return _sprite_array_Secrets[Tools.Convert_Coord_To_Index(coord)];
 
 
 func Get_Terrain(idx:int, callerPath:String) -> Map_Data.Terrain:
@@ -320,34 +302,38 @@ func Get_Marking(idx:int, callerPath:String) -> Map_Data.Marking:
 	if _debug: print("\nmap_generator.gd - Get_Marking, called by: ", callerPath);
 	return _marking_data[idx];
 
-func Get_Secret(idx:int, callerPath:String) -> Map_Data.Secrets:
-	if _debug: print("\nmap_generator.gd - Get_Marking, called by: ", callerPath);
-	return _secret_data[idx];
-
-func Get_Buried(idx:int, callerPath:String) -> int:
-	if _debug: print("\nmap_generator.gd - Get_Marking, called by: ", callerPath);
-	return _buried_data[idx];
+#func Get_Secret(idx:int, callerPath:String) -> Map_Data.Secrets:
+	#if _debug: print("\nmap_generator.gd - Get_Marking, called by: ", callerPath);
+	#return _secret_data[idx];
+#
+##func Get_Buried(idx:int, callerPath:String) -> int:
+	##if _debug: print("\nmap_generator.gd - Get_Marking, called by: ", callerPath);
+	##return _buried_data[idx];
 
 
 func Get_Terrain_Data(callerPath:String) -> Array[Map_Data.Terrain]:
 	if _debug: print("\nmap_generator.gd - Get_Terrain_Data, called by: ", callerPath);
 	return _terrain_data;
 
-# Is this for Terrain Data or Terrain Sprite?
-func ChangeTerrain(v2_array:Array[Vector2], terrainType:Map_Data.Terrain, callerPath:String) -> void:
-	if _debug: print_debug("\nmap_generator.gd - ChangeTerrain, called by: ", callerPath);
-	_ChangeTerrain(v2_array, terrainType);
+func Get_Marking_Data(callerPath:String) -> Array[Map_Data.Marking]:
+	if _debug: print("\nmap_generator.gd - Get_Marking_Data, called by: ", callerPath);
+	return _marking_data;
 
-func _ChangeTerrain(v2_array:Array[Vector2], terrainType:Map_Data.Terrain) -> void:
+
+func Change_Spr_Terrain(v2_array:Array[Vector2], terrainType:Map_Data.Terrain, callerPath:String) -> void:
+	if _debug: print_debug("\nmap_generator.gd - Change_Spr_Terrain, called by: ", callerPath);
+	_Change_Spr_Terrain(v2_array, terrainType);
+
+func _Change_Spr_Terrain(v2_array:Array[Vector2], terrainType:Map_Data.Terrain) -> void:
 	for v2 in v2_array:
-		var spr:Sprite2D = _sprite_array_Terrain[World.Convert_Coord_To_Index(v2)];
+		var spr:Sprite2D = _sprite_array_Terrain[Tools.Convert_Coord_To_Index(v2)];
 		Sprite_Handler.Configure_TerrainSprite_LandAndSea(spr, terrainType);
 
 
 # Functions: Signals ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
-func _On_Replace_Terrain_Sprite(idx:int, type:Map_Data.Terrain, spr:Sprite2D) -> void:
+func _SIGNAL_On_Replace_Terrain_Sprite(idx:int, type:Map_Data.Terrain, spr:Sprite2D) -> void:
 	_terrain_data[idx] = type;
 	if spr:
 		_sprite_array_Terrain[idx] = spr;
