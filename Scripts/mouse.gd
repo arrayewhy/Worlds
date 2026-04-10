@@ -11,7 +11,7 @@ var _curr_hover_coord:Vector2 = Vector2.INF;
 
 var _skip_fade:bool;
 
-#TEMPORARY
+# TEMPORARY
 # Why do we need this signal?
 # Why not just have scripts check Input as usual?
 signal Left_Click(mouse_coord:Vector2);
@@ -29,11 +29,12 @@ func _process(delta: float) -> void:
 		Left_Click.emit(get_global_mouse_position());
 		
 		# Play Ship Horn Sound on Click
-		var mouse_grid_pos:Vector2 = World.Coord_OnGrid(get_global_mouse_position());
-		var idx:int = World.Convert_Coord_To_Index(mouse_grid_pos);
-		if _mapGen.Get_Marking(idx, self.get_path()) == Map_Data.Marking.BOAT:
+		var mouse_grid_pos:Vector2 = Tools.Coord_OnGrid(get_global_mouse_position());
+		var idx:int = Tools.Convert_Coord_To_Index(mouse_grid_pos);
+		if _mapGen.Get_Marking(idx, self.get_path()) == Map_Data.Marking.SHIP:
 			SoundMaster.Ship_Horn();
 			
+	# If NO Hover Coordinate is recorded
 	if _curr_hover_coord == Vector2.INF:
 		if mouse_pos.distance_to(_last_mouse_pos) < 2:
 			_hover_timer += delta;
@@ -54,7 +55,7 @@ func _process(delta: float) -> void:
 		
 		_hover_timer = 0;
 		
-		_curr_hover_coord = World.Coord_OnGrid(mouse_pos);
+		_curr_hover_coord = Tools.Coord_OnGrid(mouse_pos);
 		
 		_Reveal(_curr_hover_coord);
 	
@@ -63,27 +64,30 @@ func _process(delta: float) -> void:
 
 func _Reveal(coord:Vector2) -> void:
 	
-	var secret_spr:Sprite2D = _mapGen.Get_Spr_Secret(coord, self.get_path());
-	
-	if secret_spr:
+	#var secret_spr:Sprite2D = _mapGen.Get_Spr_Secret(coord, self.get_path());
+	#
+	#if secret_spr:
+		#
+		## Secret
+		#Fader.Fade(secret_spr, Fader.Phase.IN, .5);
+		#
+		## TEMPORARY: Mountain Dragon Growl
+		#var secret_type:Map_Data.Secrets = _mapGen.Get_Secret(Tools.Convert_Coord_To_Index(coord), self.get_path());
+		#if secret_type == Map_Data.Secrets.DRAGON:
+			#SoundMaster.Dragon_Growl();
+		#
+		## Detail
+		#var detail_spr:Sprite2D = _mapGen.Get_Spr_Detail(coord, self.get_path());
+		#if detail_spr:
+			#Fader.Fade(detail_spr, Fader.Phase.OUT, .5);
+		## Terrain
+			##var terrain_spr = _mapGen.Get_Spr_Terrain(coord, self.get_path());
+			##Fader.Colour_Fade(terrain_spr, Color.BLACK, .5);
+			#
+	#else:
 		
-		# Secret
-		Fader.Fade(secret_spr, Fader.Phase.IN, .5);
-		
-		# TEMPORARY: Mountain Dragon Growl
-		var secret_type:Map_Data.Secrets = _mapGen.Get_Secret(World.Convert_Coord_To_Index(coord), self.get_path());
-		if secret_type == Map_Data.Secrets.DRAGON:
-			SoundMaster.Dragon_Growl();
-		
-		# Detail
 		var detail_spr:Sprite2D = _mapGen.Get_Spr_Detail(coord, self.get_path());
-		if detail_spr:
-			Fader.Fade(detail_spr, Fader.Phase.OUT, .5);
-		# Terrain
-			var terrain_spr = _mapGen.Get_TerrainSprite(coord, self.get_path());
-			Fader.Colour_Fade(terrain_spr, Color.BLACK, .5);
-	else:
-		var detail_spr:Sprite2D = _mapGen.Get_Spr_Detail(coord, self.get_path());
+		
 		if detail_spr:
 			# Some Details like Peaks always start Visible,
 			# so we Skip them.
@@ -99,18 +103,18 @@ func _Reveal(coord:Vector2) -> void:
 
 func _Reset_Reveal(coord:Vector2) -> void:
 	
-	var secret_spr:Sprite2D = _mapGen.Get_Spr_Secret(coord, self.get_path());
-	if secret_spr:
-		# Secret
-		Fader.Fade(secret_spr, Fader.Phase.OUT, .5);
-		# Detail
-		var detail_spr:Sprite2D = _mapGen.Get_Spr_Detail(coord, self.get_path());
-		if detail_spr:
-			Fader.Fade(detail_spr, Fader.Phase.IN, .5);
-		# Terrain
-		var terrain_spr = _mapGen.Get_TerrainSprite(coord, self.get_path());
-		Fader.Colour_Fade(terrain_spr, Color.WHITE, .5);
-	else:
+	#var secret_spr:Sprite2D = _mapGen.Get_Spr_Secret(coord, self.get_path());
+	#if secret_spr:
+		## Secret
+		#Fader.Fade(secret_spr, Fader.Phase.OUT, .5);
+		## Detail
+		#var detail_spr:Sprite2D = _mapGen.Get_Spr_Detail(coord, self.get_path());
+		#if detail_spr:
+			#Fader.Fade(detail_spr, Fader.Phase.IN, .5);
+		## Terrain
+		##var terrain_spr = _mapGen.Get_Spr_Terrain(coord, self.get_path());
+		##Fader.Colour_Fade(terrain_spr, Color.WHITE, .5);
+	#else:
 		var detail_spr:Sprite2D = _mapGen.Get_Spr_Detail(coord, self.get_path());
 		if detail_spr:
 			if _skip_fade:
